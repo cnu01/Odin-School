@@ -1,18 +1,18 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, Dict, Any
 
-class LeadBase(BaseModel):
-    """Base model for HotLead - define your lead models here"""
-    email: str
-    name: str
-    
-    class Config:
-        # Add any configuration here
-        pass
+class LeadInput(BaseModel):
+    """Request model for a new lead to be analyzed"""
+    source: str
+    pageviews: int
+    device: str
+    geography: str
+    form_fields: Dict[str, Any]
 
-# TODO: Add your models here
-# Example:
-# class Lead(LeadBase):
-#     id: Optional[str] = None
-#     source: str
-#     score: Optional[int] = None
+class ScoredLead(BaseModel):
+    """Response model for a scored lead with AI analysis"""
+    lead_input: LeadInput
+    score: int
+    reason: str
+    priority: str
+    routing_action: str
