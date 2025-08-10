@@ -31,7 +31,7 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 - [ ] **MongoDB** (Optional - for persistence)
   - Local: `brew install mongodb-community` (macOS)
   - Or use MongoDB Atlas (cloud)
-  - App will run without MongoDB (will show connection errors but work)
+  - App can start without MongoDB; database-dependent endpoints will fail until MongoDB is reachable. The app logs a warning instead of crashing.
 
 ## 🌐 API Access
 
@@ -84,15 +84,17 @@ DATABASE_NAME=odin_school_db           # Database name
 DEBUG=true                             # Development mode
 API_HOST=0.0.0.0                       # Server host
 API_PORT=8000                          # Server port
+CORS_ORIGINS=http://localhost:8000,http://localhost:8001  # Comma-separated list; use '*' only if allow-credentials=false
 ```
 
 ## 🔧 Troubleshooting
 
 ### Common Issues
 1. **Module not found errors**: Run `pip install -r requirements.txt`
-2. **MongoDB connection error**: Install MongoDB or update MONGODB_URL
+2. **MongoDB unreachable**: App starts and logs a warning; DB-using routes will fail until it’s reachable. Install MongoDB or update MONGODB_URL.
 3. **Port already in use**: Change API_PORT in .env
-4. **FastAPI command not found**: Use `uvicorn main:app --reload` instead
+4. **CORS with credentials**: If you need cookies/Authorization headers, set explicit origins in CORS_ORIGINS (don’t use '*').
+5. **FastAPI command not found**: Use `uvicorn main:app --reload` instead
 
 ### Testing Installation
 ```bash

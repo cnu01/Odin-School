@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import connect_to_mongo, close_mongo_connection
 from contextlib import asynccontextmanager
+import os
+from dotenv import load_dotenv
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -11,18 +13,30 @@ async def lifespan(app: FastAPI):
     # Shutdown
     await close_mongo_connection()
 
+load_dotenv()
+
 app = FastAPI(
     title="Odin School - EdTech Solutions",
-    description="9 AI-driven solutions for EdTech problems",
+    description="AI-driven solutions for EdTech problems",
     version="1.0.0",
     lifespan=lifespan
 )
 
 # CORS middleware
+# Read CORS origins from env: comma-separated list, e.g. "http://localhost:8000,http://localhost:8001"
+cors_origins_env = os.getenv("CORS_ORIGINS", "http://localhost:8000,http://localhost:8001")
+origins = [o.strip() for o in cors_origins_env.split(",") if o.strip()]
+
+# Browsers disallow credentials with wildcard origin. If '*' is present, disable credentials.
+allow_credentials = True
+if any(o == "*" for o in origins):
+    origins = ["*"]
+    allow_credentials = False
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure as needed
-    allow_credentials=True,
+    allow_origins=origins,
+    allow_credentials=allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )

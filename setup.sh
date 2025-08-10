@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 echo "🚀 Odin School EdTech Solutions Backend"
 echo "======================================"
@@ -10,38 +11,39 @@ if [ ! -d "venv" ]; then
     python3 -m venv venv
 fi
 
-# Activate virtual environment
-echo "🔧 Activating virtual environment..."
-source venv/bin/activate
+# Activate virtual environment for this script's duration
+if [ -f "venv/bin/activate" ]; then
+    echo "🛠️  Using virtual environment (script-local)..."
+    # shellcheck disable=SC1091
+    source venv/bin/activate
+else
+    echo "❌ venv activation script missing at venv/bin/activate" >&2
+    exit 1
+fi
 
 # Install dependencies
 echo "📚 Installing dependencies..."
 pip install -r requirements.txt
 
-# Check if .env exists
+# Ensure a .env file exists
 if [ ! -f ".env" ]; then
-    echo "⚙️  Creating .env file from template..."
-    cp .env.example .env
-    echo "Please edit .env file with your settings before running the app"
+    if [ -f ".env.example" ]; then
+        echo "⚙️  Creating .env file from template..."
+        cp .env.example .env
+        echo "Please edit .env file with your settings before running the app"
+    else
+        echo "⚠️  No .env or .env.example found. Create a .env before running the app." >&2
+    fi
 fi
 
 echo ""
 echo "✅ Setup complete!"
 echo ""
-echo "🌟 Available commands:"
-echo "   fastapi dev main.py          # Start development server"
-echo "   fastapi run main.py          # Start production server"
+echo "Next: activate the venv in your current shell before running the app:"
+echo "  source venv/bin/activate"
 echo ""
-echo "📖 API Documentation will be available at:"
-echo "   http://localhost:8000/docs"
+echo "� Commands:"
+echo "  fastapi dev main.py          # Start development server"
+echo "  uvicorn main:app --reload    # Alternative"
 echo ""
-echo "🎯 9 Problems ready for development:"
-echo "   1. HotLead - Sales Lead Scoring"
-echo "   2. CreatorFit - Influencer Marketing"
-echo "   3. TrustDesk - Comment/Review Management"
-echo "   4. AdLift - Marketing Optimization"
-echo "   5. ReferMore - Referral System"
-echo "   6. PriceSense - Pricing Optimization"
-echo "   7. FirstTouch - Sales Automation"
-echo "   8. OneTruth - Analytics Dashboard"
-echo "   9. CloseMore - Sales Conversation Analysis"
+echo "📖 API Docs: http://localhost:8000/docs"
