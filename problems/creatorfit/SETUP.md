@@ -7,9 +7,10 @@ CreatorFit is an AI-powered influencer marketing optimization tool for Odin Scho
 1. **Activate virtual environment**: `.venv\Scripts\activate`
 2. **Train the model**: `python -m problems.creatorfit.train`
 3. **Test predictions**: `python problems/creatorfit/frontend/process_csv.py sample_creators.csv data_science`
-4. **Open frontend**: Open `problems/creatorfit/frontend/index.html` in browser
-5. **Upload CSV**: Select program and upload your creator dataset
-6. **View results**: See Phase 3 ML pipeline results in beautiful table format
+4. **Start frontend server**: `cd problems/creatorfit/frontend && python -m http.server 8000`
+5. **Open frontend**: Navigate to `http://localhost:8000` in browser
+6. **Upload CSV**: Select program and upload your creator dataset
+7. **View results**: See Phase 3 ML pipeline results in beautiful table format
 
 **Note**: Replace `data_science` with any program type: `web_development`, `python_programming`, or `career_guidance`
 
@@ -120,9 +121,20 @@ python problems/creatorfit/frontend/process_csv.py your_creators.csv PROGRAM_TYP
 # Navigate to frontend directory
 cd problems/creatorfit/frontend
 
-# Open in browser (double-click or drag to browser)
-index.html
+# Start HTTP server (REQUIRED for full functionality)
+python -m http.server 8000
+
+# Open in browser
+# Navigate to: http://localhost:8000
 ```
+
+**⚠️ Important**: The frontend requires an HTTP server to work properly due to JavaScript security restrictions. Opening `index.html` directly in the browser will result in limited functionality.
+
+**Why HTTP Server is Required:**
+- **CORS Restrictions**: Modern browsers block local file access for security
+- **JavaScript Fetch API**: The frontend uses `fetch()` to load JSON results, which requires HTTP protocol
+- **File Protocol Limitations**: `file://` protocol restricts AJAX calls and external resource loading
+- **Production Simulation**: HTTP server mimics real-world deployment environment
 
 ### 2. Frontend Features
 - **Program Selection**: Choose from 4 Odin School programs
@@ -203,7 +215,16 @@ python problems/creatorfit/frontend/process_csv.py your_file.csv data_science
 # Then refresh frontend
 ```
 
-#### 4. Low accuracy predictions
+#### 4. Frontend JavaScript errors or limited functionality
+```bash
+# Ensure you're using HTTP server, not opening file directly
+cd problems/creatorfit/frontend
+python -m http.server 8000
+
+# Open http://localhost:8000 in browser (not file:// protocol)
+```
+
+#### 5. Low accuracy predictions
 ```bash
 # Check data quality
 python problems/creatorfit/data_preprocessing.py
@@ -245,7 +266,7 @@ python -m problems.creatorfit.train
 1. **Setup**: Install dependencies, activate virtual environment
 2. **Training**: Run `train.py` to build ML model
 3. **Testing**: Use `process_csv.py` for predictions
-4. **Frontend**: Open `index.html` for user interface
+4. **Frontend**: Start HTTP server and open `http://localhost:8000`
 
 ### For End Users
 1. **Upload**: CSV file with creator data
@@ -279,8 +300,10 @@ python -m problems.creatorfit.train
 # Predictions
 python problems/creatorfit/frontend/process_csv.py file.csv program
 
-# Frontend
-open problems/creatorfit/frontend/index.html
+# Frontend (REQUIRES HTTP SERVER)
+cd problems/creatorfit/frontend
+python -m http.server 8000
+# Then open: http://localhost:8000
 ```
 
 ---
