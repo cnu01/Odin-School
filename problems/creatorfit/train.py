@@ -155,6 +155,40 @@ def main():
     print("\n[TOP FEATURES]")
     for i in order[:top_k]:
         print(f"{all_names[i]:35s}  {importances[i]}")
+    
+    # -----------------------------
+    # 9) Save the trained model and preprocessor for production use
+    # -----------------------------
+    import joblib
+    
+    model_dir = repo_root() / "models"
+    model_dir.mkdir(exist_ok=True)
+    
+    # Save the trained model
+    model_path = model_dir / "creatorfit_lgb_model.pkl"
+    joblib.dump(lgb, model_path)
+    
+    # Save the preprocessor (needed for new predictions)
+    preprocessor_path = model_dir / "creatorfit_preprocessor.pkl"
+    joblib.dump(preprocessor, preprocessor_path)
+    
+    # Save metadata for easy loading
+    metadata = {
+        "model_type": "LGBMRegressor",
+        "features": meta,
+        "target_geo": TARGET_GEO,
+        "target_lang": TARGET_LANG,
+        "program_text": PROGRAM_TEXT,
+        "best_iteration": best_iter,
+        "performance": {"mae": mae, "rmse": rmse, "r2": r2, "mape": mape}
+    }
+    metadata_path = model_dir / "creatorfit_metadata.pkl"
+    joblib.dump(metadata, metadata_path)
+    
+    print(f"\n[SAVED] Model saved to: {model_path}")
+    print(f"[SAVED] Preprocessor saved to: {preprocessor_path}")
+    print(f"[SAVED] Metadata saved to: {metadata_path}")
+    print(f"[READY] Model ready for production deployment!")
 
 if __name__ == "__main__":
     main()
