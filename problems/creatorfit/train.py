@@ -13,16 +13,10 @@ from .features import build_features
 from .modeling import build_preprocessor, group_train_val_split
 
 # -----------------------------
-# Project config (edit as needed)
+# EdTech CreatorFit Training Config
 # -----------------------------
-PROGRAM_TEXT = """
-Odin School Data Science program: Python, SQL, statistics, machine learning,
-feature engineering, model deployment, and career coaching for analytics roles.
-"""
-TARGET_GEO = "INDIA"  # Match the realistic dataset geography format
-TARGET_LANG = "English"
-
-RAW_FILENAME = "creator_campaign_audience_EDTECH.csv"  # Use the EdTech-focused dataset
+PROGRAM_TYPE = "data_science"  # Options: data_science, web_development, python_programming, career_guidance
+RAW_FILENAME = "creator_campaign_audience_EDTECH.csv"  # EdTech-focused dataset
 CLEANED_FILENAME = "creator_campaign_audience_EDTECH.cleaned.csv"
 
 def repo_root() -> Path:
@@ -43,12 +37,10 @@ def main():
     # Optional: reload from disk to simulate downstream usage
     df_clean = pd.read_csv(cleaned_path)
 
-    # 2) Build features for modeling (pre-booking features only)
+    # 2) Build EdTech-specific features for modeling (pre-booking features only)
     X, y, meta = build_features(
         df_clean=df_clean,
-        program_text=PROGRAM_TEXT,
-        target_geo=TARGET_GEO,
-        target_lang=TARGET_LANG,
+        program_type=PROGRAM_TYPE,
     )
 
     # 3) Quick summary (sanity before training)
@@ -176,9 +168,7 @@ def main():
     metadata = {
         "model_type": "LGBMRegressor",
         "features": meta,
-        "target_geo": TARGET_GEO,
-        "target_lang": TARGET_LANG,
-        "program_text": PROGRAM_TEXT,
+        "program_type": PROGRAM_TYPE,
         "best_iteration": best_iter,
         "performance": {"mae": mae, "rmse": rmse, "r2": r2, "mape": mape}
     }
