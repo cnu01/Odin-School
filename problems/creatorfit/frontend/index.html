@@ -221,6 +221,30 @@
             color: #721c24;
         }
 
+        /* Creator Tier Styling */
+        .creator-tier {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .tier-established {
+            background: #27ae60;
+            color: white;
+        }
+
+        .tier-growing {
+            background: #f39c12;
+            color: white;
+        }
+
+        .tier-emerging {
+            background: #95a5a6;
+            color: white;
+        }
+
         .sort-indicator {
             margin-left: 5px;
             opacity: 0.5;
@@ -363,10 +387,11 @@
                         <th onclick="sortTable('rank')">Rank <span class="sort-indicator">↕</span></th>
                         <th onclick="sortTable('creator_id')">Creator ID <span class="sort-indicator">↕</span></th>
                         <th onclick="sortTable('fit_score')">Fit Score <span class="sort-indicator active">↓</span></th>
+                        <th onclick="sortTable('predicted_qualified_leads')">Predicted Leads <span class="sort-indicator">↕</span></th>
                         <th onclick="sortTable('topic')">Topic <span class="sort-indicator">↕</span></th>
                         <th onclick="sortTable('language')">Language <span class="sort-indicator">↕</span></th>
                         <th onclick="sortTable('views_90d')">90-Day Views <span class="sort-indicator">↕</span></th>
-                        <th onclick="sortTable('qualified_leads')">Qualified Leads <span class="sort-indicator">↕</span></th>
+                        <th onclick="sortTable('creator_tier')">Creator Tier <span class="sort-indicator">↕</span></th>
                     </tr>
                 </thead>
                 <tbody id="resultsBody">
@@ -547,14 +572,19 @@
                 const row = tbody.insertRow();
                 const fitScoreClass = getFitScoreClass(item.fit_score);
                 
+                // Get creator tier class for styling
+                const tierClass = item.creator_tier === 'Established' ? 'tier-established' : 
+                                 item.creator_tier === 'Growing' ? 'tier-growing' : 'tier-emerging';
+                
                 row.innerHTML = `
                     <td><strong>#${item.rank}</strong></td>
                     <td><strong>${item.creator_id}</strong></td>
                     <td><span class="fit-score ${fitScoreClass}">${item.fit_score.toFixed(3)}</span></td>
+                    <td><strong>${Math.round(item.predicted_qualified_leads || 0)}</strong></td>
                     <td>${item.topic}</td>
                     <td>${item.language}</td>
                     <td>${formatNumber(item.views_90d)}</td>
-                    <td>${formatNumber(item.qualified_leads)}</td>
+                    <td><span class="creator-tier ${tierClass}">${item.creator_tier || 'Unknown'}</span></td>
                 `;
             });
             
@@ -577,7 +607,7 @@
                 let bVal = b[column];
                 
                 // Handle numeric columns
-                if (['fit_score', 'views_90d', 'qualified_leads', 'rank'].includes(column)) {
+                if (['fit_score', 'views_90d', 'qualified_leads', 'predicted_qualified_leads', 'rank'].includes(column)) {
                     aVal = parseFloat(aVal) || 0;
                     bVal = parseFloat(bVal) || 0;
                 }
