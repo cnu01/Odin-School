@@ -310,12 +310,13 @@ class CreatorFitPredictionPipeline:
                 }
             }
             
-            # 10. Save prediction results
+            # 10. Save prediction results (JSON only)
             output_file = csv_path.replace('.csv', '_prediction_results.json')
+            
             with open(output_file, 'w') as f:
                 json.dump(output, f, indent=2)
             
-            logging.info(f"Prediction analysis complete. Results saved to {output_file}")
+            logging.info(f"Prediction analysis complete. Results saved to: {output_file}")
             return output
             
         except Exception as e:
