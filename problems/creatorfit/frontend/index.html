@@ -312,6 +312,220 @@
                 padding: 10px 8px;
             }
         }
+
+        /* Enhanced Prediction Section Styles */
+        .enhanced-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin: 40px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .enhanced-section h2 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .section-description {
+            text-align: center;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .enhanced-upload {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .enhanced-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(238, 90, 36, 0.4);
+        }
+
+        .enhanced-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(238, 90, 36, 0.6);
+        }
+
+        .enhanced-loading {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+
+        .loading-steps {
+            margin-top: 20px;
+        }
+
+        .loading-steps .step {
+            margin: 10px 0;
+            font-size: 1.1em;
+            opacity: 0.8;
+        }
+
+        .enhanced-results {
+            background: white;
+            color: #333;
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .bi-dashboard {
+            margin-bottom: 30px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(116, 185, 255, 0.3);
+        }
+
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .performance-distribution {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .distribution-chart {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .distribution-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #27ae60;
+        }
+
+        .enhanced-table-container {
+            margin: 30px 0;
+        }
+
+        .table-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .book-filter { background: #27ae60; color: white; }
+        .review-filter { background: #f39c12; color: white; }
+        .skip-filter { background: #e74c3c; color: white; }
+        .all-filter { background: #3498db; color: white; }
+
+        .filter-btn:hover {
+            transform: translateY(-1px);
+            opacity: 0.9;
+        }
+
+        .enhanced-results-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .enhanced-results-table th,
+        .enhanced-results-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .enhanced-results-table th {
+            background: #2c3e50;
+            color: white;
+            font-weight: bold;
+        }
+
+        .enhanced-results-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .recommendation-book { 
+            background: #d5ead5; 
+            color: #27ae60; 
+            padding: 5px 10px; 
+            border-radius: 20px; 
+            font-weight: bold;
+        }
+
+        .recommendation-review { 
+            background: #fdf2e1; 
+            color: #f39c12; 
+            padding: 5px 10px; 
+            border-radius: 20px; 
+            font-weight: bold;
+        }
+
+        .recommendation-skip { 
+            background: #fadbd8; 
+            color: #e74c3c; 
+            padding: 5px 10px; 
+            border-radius: 20px; 
+            font-weight: bold;
+        }
+
+        .recommendations-panel {
+            background: #e8f5e8;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #27ae60;
+            margin-top: 30px;
+        }
     </style>
 </head>
 <body>
@@ -716,6 +930,300 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('CreatorFit Analysis Tool Loaded');
         });
+
+        // Enhanced prediction functionality
+        let enhancedData = [];
+        
+        document.getElementById('enhancedAnalyzeButton').addEventListener('click', async function() {
+            const fileInput = document.getElementById('enhancedCsvFile');
+            console.log('fileInput:', fileInput)
+            const programSelect = document.getElementById('enhancedProgramSelect');
+            const budgetInput = document.getElementById('campaignBudget');
+            
+            if (!fileInput.files[0]) {
+                alert('Please select a CSV file to upload');
+                return;
+            }
+            
+            showEnhancedLoading();
+            
+            try {
+                // Look for prediction results JSON
+                const fileName = fileInput.files[0].name.replace('.csv', '_prediction_results.json');
+                console.log('fileName:', fileName)
+                const result = await loadEnhancedResults(fileName);
+                console.log('result:', result)
+                
+                hideEnhancedLoading();
+                
+                if (result && result.success) {
+                    displayEnhancedResults(result);
+                } else {
+                    showEnhancedError(`Please run: python prediction_pipeline.py ${fileInput.files[0].name} ${programSelect.value}`);
+                }
+                
+            } catch (error) {
+                hideEnhancedLoading();
+                showEnhancedError(`Prediction results not found. Please run:\n\npython prediction_pipeline.py ${fileInput.files[0].name} ${programSelect.value}`);
+            }
+        });
+
+        async function loadEnhancedResults(fileName) {
+            try {
+                console.log('Attempting to fetch:', fileName);
+                const response = await fetch(fileName);
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Data loaded successfully:', data);
+                    return data;
+                } else {
+                    console.error('Response not ok:', response.status, response.statusText);
+                    return null;
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                return null;
+            }
+        }
+
+        function showEnhancedLoading() {
+            document.getElementById('enhancedLoading').style.display = 'block';
+            document.getElementById('enhancedResults').style.display = 'none';
+        }
+
+        function hideEnhancedLoading() {
+            document.getElementById('enhancedLoading').style.display = 'none';
+        }
+
+        function showEnhancedError(message) {
+            alert(message);
+        }
+
+        function displayEnhancedResults(result) {
+            enhancedData = result.results;
+            
+            // Update BI Dashboard
+            document.getElementById('totalPredictedLeads').textContent = result.summary.total_predicted_leads.toLocaleString();
+            document.getElementById('estimatedCPL').textContent = `₹${result.summary.estimated_cpl.toLocaleString()}`;
+            document.getElementById('estimatedROI').textContent = `${result.summary.estimated_roi_percent}%`;
+            document.getElementById('avgConfidence').textContent = `${(result.summary.avg_confidence * 100).toFixed(1)}%`;
+            
+            // Update Performance Distribution
+            displayPerformanceDistribution(result.summary.creator_distribution);
+            
+            // Update Enhanced Results Table
+            displayEnhancedTable(result.results);
+            
+            // Update Recommendations
+            displayRecommendations(result.recommendations);
+            
+            // Show results
+            document.getElementById('enhancedResults').style.display = 'block';
+        }
+
+        function displayPerformanceDistribution(distribution) {
+            const chartContainer = document.getElementById('distributionChart');
+            chartContainer.innerHTML = `
+                <div class="distribution-item">
+                    <h4 style="color: #27ae60; margin: 0 0 10px 0;">High Performers</h4>
+                    <div style="font-size: 2em; font-weight: bold;">${distribution.high_performers}</div>
+                    <div style="opacity: 0.7;">Ready to Book</div>
+                </div>
+                <div class="distribution-item" style="border-left-color: #f39c12;">
+                    <h4 style="color: #f39c12; margin: 0 0 10px 0;">Medium Performers</h4>
+                    <div style="font-size: 2em; font-weight: bold;">${distribution.medium_performers}</div>
+                    <div style="opacity: 0.7;">Review Required</div>
+                </div>
+                <div class="distribution-item" style="border-left-color: #e74c3c;">
+                    <h4 style="color: #e74c3c; margin: 0 0 10px 0;">Low Performers</h4>
+                    <div style="font-size: 2em; font-weight: bold;">${distribution.low_performers}</div>
+                    <div style="opacity: 0.7;">Consider Skipping</div>
+                </div>
+            `;
+        }
+
+        function displayEnhancedTable(data) {
+            const tbody = document.getElementById('enhancedResultsBody');
+            tbody.innerHTML = '';
+            
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                
+                const confidenceClass = item.confidence_score >= 0.8 ? 'confidence-high' : 
+                                       item.confidence_score >= 0.6 ? 'confidence-medium' : 'confidence-low';
+                
+                const recommendationClass = `recommendation-${item.recommendation.toLowerCase()}`;
+                
+                row.innerHTML = `
+                    <td>${item.rank}</td>
+                    <td><strong>${item.creator_id}</strong></td>
+                    <td><strong>${item.predicted_qualified_leads}</strong></td>
+                    <td>${item.fit_score}</td>
+                    <td class="${confidenceClass}">${(item.confidence_score * 100).toFixed(1)}%</td>
+                    <td>${item.topic}</td>
+                    <td>${item.language}</td>
+                    <td>${item.views_90d.toLocaleString()}</td>
+                    <td>${item.creator_tier}</td>
+                    <td><span class="${recommendationClass}">${item.recommendation}</span></td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        function displayRecommendations(recommendations) {
+            const container = document.getElementById('recommendationsContent');
+            container.innerHTML = `
+                <div style="display: grid; gap: 15px;">
+                    <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #27ae60;">
+                        <h4 style="margin: 0 0 10px 0; color: #27ae60;">📋 Top Performers</h4>
+                        <p style="margin: 0;">${recommendations.top_performers.length} creators ready for immediate booking</p>
+                        <p style="margin: 5px 0 0 0; font-size: 0.9em; opacity: 0.8;">Creators: ${recommendations.top_performers.map(c => c.creator_id).join(', ')}</p>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #3498db;">
+                        <h4 style="margin: 0 0 10px 0; color: #3498db;">💰 Budget Allocation</h4>
+                        <p style="margin: 0;">${recommendations.budget_allocation}</p>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #f39c12;">
+                        <h4 style="margin: 0 0 10px 0; color: #f39c12;">⚠️ Risk Mitigation</h4>
+                        <p style="margin: 0;">${recommendations.risk_mitigation}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function filterByRecommendation(recommendation) {
+            const filtered = enhancedData.filter(item => item.recommendation === recommendation);
+            displayEnhancedTable(filtered);
+        }
+
+        function showAllCreators() {
+            displayEnhancedTable(enhancedData);
+        }
     </script>
+
+    <!-- Enhanced Prediction Section -->
+    <div class="enhanced-section">
+        <h2>🚀 Production Lead Forecasting Pipeline</h2>
+        <p class="section-description">Production-ready prediction system with ensemble models, confidence scoring, and business intelligence for maximum accuracy.</p>
+        
+        <div class="enhanced-upload">
+            <h3>📈 Production Batch Prediction</h3>
+            <div class="upload-controls">
+                <div class="input-group">
+                    <label for="enhancedProgramSelect">Select Program Type:</label>
+                    <select id="enhancedProgramSelect">
+                        <option value="data_science">Data Science Program</option>
+                        <option value="web_development">Web Development Program</option>
+                        <option value="python_programming">Python Programming Course</option>
+                        <option value="career_guidance">Career Guidance & Interview Prep</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="campaignBudget">Campaign Budget (₹):</label>
+                    <input type="number" id="campaignBudget" value="100000" min="10000" step="10000" placeholder="Enter campaign budget">
+                </div>
+                
+                <div class="input-group">
+                    <label for="enhancedCsvFile">Upload Creator Data (CSV):</label>
+                    <input type="file" id="enhancedCsvFile" accept=".csv">
+                </div>
+                
+                <button id="enhancedAnalyzeButton" class="analyze-btn enhanced-btn">
+                    🚀 Run Production Analysis
+                </button>
+            </div>
+        </div>
+
+        <div class="enhanced-loading" id="enhancedLoading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Running production prediction pipeline...</p>
+            <div class="loading-steps">
+                <div class="step">✅ Data quality validation</div>
+                <div class="step">⚙️ Advanced feature engineering</div>
+                <div class="step">🤖 Ensemble model prediction</div>
+                <div class="step">📊 Business intelligence analysis</div>
+            </div>
+        </div>
+
+        <!-- Enhanced Results -->
+        <div class="enhanced-results" id="enhancedResults" style="display: none;">
+            
+            <!-- Business Intelligence Dashboard -->
+            <div class="bi-dashboard">
+                <h3>💼 Business Intelligence Dashboard</h3>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value" id="totalPredictedLeads">0</div>
+                        <div class="metric-label">Total Predicted Leads</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="estimatedCPL">₹0</div>
+                        <div class="metric-label">Estimated CPL</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="estimatedROI">0%</div>
+                        <div class="metric-label">Estimated ROI</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="avgConfidence">0%</div>
+                        <div class="metric-label">Avg Confidence</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Creator Performance Distribution -->
+            <div class="performance-distribution">
+                <h3>📊 Creator Performance Distribution</h3>
+                <div class="distribution-chart" id="distributionChart">
+                    <!-- Performance chart will be populated here -->
+                </div>
+            </div>
+
+            <!-- Enhanced Results Table -->
+            <div class="enhanced-table-container">
+                <h3>🎯 Detailed Creator Rankings</h3>
+                <div class="table-controls">
+                    <button onclick="filterByRecommendation('BOOK')" class="filter-btn book-filter">📋 Book (High Performers)</button>
+                    <button onclick="filterByRecommendation('REVIEW')" class="filter-btn review-filter">🔍 Review (Medium Performers)</button>
+                    <button onclick="filterByRecommendation('SKIP')" class="filter-btn skip-filter">❌ Skip (Low Performers)</button>
+                    <button onclick="showAllCreators()" class="filter-btn all-filter">📋 Show All</button>
+                </div>
+                
+                <table class="enhanced-results-table" id="enhancedResultsTable">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Creator ID</th>
+                            <th>Predicted Leads</th>
+                            <th>Fit Score</th>
+                            <th>Confidence</th>
+                            <th>Topic</th>
+                            <th>Language</th>
+                            <th>Views</th>
+                            <th>Creator Tier</th>
+                            <th>Recommendation</th>
+                        </tr>
+                    </thead>
+                    <tbody id="enhancedResultsBody">
+                        <!-- Enhanced results will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Recommendations Panel -->
+            <div class="recommendations-panel">
+                <h3>💡 Strategic Recommendations</h3>
+                <div id="recommendationsContent">
+                    <!-- Recommendations will be populated here -->
+                </div>
+            </div>
+
+        </div>
+    </div>
 </body>
 </html>
