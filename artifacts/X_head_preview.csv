@@ -1,0 +1,21 @@
+fit_score,posting_cadence_days,views_90d,log_views_90d,geo_match,lang_match,topic,category_tag,qualified_leads
+0.63319564,3.6,5000,8.517393171418904,0,0,Finance;Data Science;Design,vlog,15.0
+0.57164013,3.9,5000,8.517393171418904,0,0,Productivity;SaaS;Travel,how-to,9.0
+0.5626439,0.9,5000,8.517393171418904,0,0,Data Science;Crypto;Web Dev,comparison;quick-win;myth-busting,4.0
+0.5544558,2.7,5000,8.517393171418904,0,0,Data Science;Marketing,live-demo;tips;case-study,4.0
+0.63488936,2.3,5000,8.517393171418904,0,0,Cooking,tips,10.0
+0.5751784,1.5,5000,8.517393171418904,0,0,Gaming,tutorial;live-demo;storytime,2.0
+0.655884,2.9,5000,8.517393171418904,0,0,Productivity,comparison,2.0
+0.52525264,0.9,5000,8.517393171418904,0,0,Finance,case-study;interview,7.0
+0.6032216,2.0,5000,8.517393171418904,0,0,Web Dev;Design,comparison;storytime;tutorial,13.0
+0.5671687,1.6,5000,8.517393171418904,0,0,Cooking;Design,quick-win;myth-busting;vlog,14.0
+0.62939703,3.4,5000,8.517393171418904,0,0,Health,case-study;tutorial,9.0
+0.6423133,2.6,5000,8.517393171418904,0,0,Cooking;Gaming,case-study,3.0
+0.61643326,2.0,5000,8.517393171418904,0,0,Travel;SaaS;Cooking,vlog;review,11.0
+0.54840326,4.2,5000,8.517393171418904,0,0,Finance,comparison,4.0
+0.62938786,3.0,5000,8.517393171418904,0,0,EdTech;Gaming,case-study;myth-busting;how-to,4.0
+0.6370628,3.5,5000,8.517393171418904,0,0,Health;Finance;Startups,review;interview,9.0
+0.67580134,3.1,5000,8.517393171418904,0,0,Study Hacks,storytime,8.0
+0.50647604,3.9,5000,8.517393171418904,0,1,Marketing;Crypto,how-to;behind-the-scenes;tips,7.0
+0.64114654,1.8,5000,8.517393171418904,0,0,Mobile Dev;AI Tools,behind-the-scenes,5.0
+0.503286,3.6,5000,8.517393171418904,0,0,Crypto,review,9.0
