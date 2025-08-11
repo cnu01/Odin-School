@@ -141,59 +141,81 @@ def build_features(
     model: Optional[SentenceTransformer] = None,
 ) -> Tuple[pd.DataFrame, pd.Series, Dict[str, List[str]]]:
     """
-    Build the pre-booking feature matrix X and the label y.
+    Build CreatorFit-specific features for predicting qualified leads.
+    
+    Problem-specific features:
+      - Content-program fit score (semantic similarity)
+      - Audience targeting quality (geo/lang match)
+      - Creator performance indicators (views, cadence)
+      - Brand safety & topic relevance scores
+      - Engagement quality metrics
 
-    Uses ONLY signals available before a campaign runs:
-      - Fit score (semantic match between transcripts and program text)
-      - Audience match flags (geo/lang)
-      - Exposure & cadence
-      - Topic/category (categorical, to be encoded by a downstream ColumnTransformer)
-
-    Returns
-    -------
-    X : pd.DataFrame
-        numeric + raw categorical columns (categoricals will be encoded later)
-    y : pd.Series
-        qualified_leads as float
-    meta : dict
-        {'numeric': [...], 'categorical': [...], 'target': 'qualified_leads'}
+    Returns pre-booking features only (no data leakage).
     """
     # 1) Add audience & exposure features
     df = add_audience_and_exposure(df_clean, target_geo, target_lang)
 
-    # 2) Compute Fit Score with sentence-transformers (cached model to save time)
+    # 2) CreatorFit-specific: Semantic content fit score
     df["fit_score"] = compute_fit_scores(
         df=df,
         program_text=program_text,
         emb_model_name=emb_model_name,
         model=model,
-        to_unit_interval=True,  # 0..1 scale is intuitive for feature importance & dashboards
+        to_unit_interval=True,
     )
+    
+    # 3) Problem-specific features for CPL optimization
+    # Brand safety: Educational content indicators
+    df["is_educational"] = df["topic"].str.contains(
+        "Data Science|Machine Learning|Programming|EdTech|Career|Statistics|Analytics", 
+        case=False, na=False
+    ).astype(int)
+    
+    # Content quality indicators
+    df["transcript_length"] = df["recent_video_transcript"].str.len()
+    df["topic_count"] = df["topic"].str.count(";") + 1  # Multi-topic creators
+    df["category_count"] = df["category_tag"].str.count(";") + 1
+    
+    # Audience engagement potential (log-scaled for stability)
+    df["log_views_90d"] = np.log1p(df["views_90d"].clip(lower=0))
+    df["posting_frequency_score"] = 1.0 / (df["posting_cadence_days"] + 0.1)  # Higher freq = higher score
 
-    # 3) Define the feature contract (pre-booking only)
+    # 4) Define feature contract (pre-booking signals only)
     numeric = [
-        "fit_score",
-        "posting_cadence_days",
-        "views_90d",
-        "log_views_90d",
-        "geo_match",
-        "lang_match",
+        "fit_score",               # Content-program alignment
+        "posting_cadence_days",    # Creator consistency  
+        "views_90d",              # Audience reach
+        "log_views_90d",          # Stabilized reach
+        "geo_match",              # Geographic targeting
+        "lang_match",             # Language targeting
+        "is_educational",         # Brand safety
+        "transcript_length",      # Content depth
+        "topic_count",            # Content diversity
+        "category_count",         # Category breadth
+        "posting_frequency_score" # Activity level
     ]
     categorical = ["topic", "category_tag"]
     target = "qualified_leads"
 
-    # 4) Safety checks: make sure we don't accidentally include outcome columns
-    leakage_cols = {"clicks", "leads", "qualified_leads", "enrollments", "refunds"}
-    assert not (set(numeric + categorical) & leakage_cols), "Leakage risk: outcomes in features!"
+    # 5) Prevent data leakage - exclude post-campaign outcomes
+    leakage_cols = {"clicks", "leads", "qualified_leads", "enrollments", "refunds", 
+                   "click_rate", "lead_rate", "qualification_rate", "enrollment_rate"}
+    feature_cols = set(numeric + categorical)
+    if feature_cols & leakage_cols:
+        raise ValueError(f"Data leakage detected! Features overlap with outcomes: {feature_cols & leakage_cols}")
 
-    # 5) Build X and y
+    # 6) Build final feature matrix
     X = df[numeric + categorical].copy()
     y = df[target].astype(float).copy()
 
-    # 6) Defensive guard against missing values (should be handled in preprocessing)
+    # 7) Quality checks
     if X.isna().any().any():
         nan_cols = X.columns[X.isna().any()].tolist()
-        raise ValueError(f"NaNs found in features: {nan_cols}. Check preprocessing step.")
+        raise ValueError(f"Missing values in features: {nan_cols}")
+
+    print(f"[CREATORFIT] Built {len(numeric)} numeric + {len(categorical)} categorical features")
+    print(f"[CREATORFIT] Educational content creators: {df['is_educational'].sum()}/{len(df)}")
+    print(f"[CREATORFIT] Geo+Lang match rate: {((df['geo_match'] + df['lang_match'])/2).mean():.2%}")
 
     meta = {"numeric": numeric, "categorical": categorical, "target": target}
     return X, y, meta
