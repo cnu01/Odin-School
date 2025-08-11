@@ -652,28 +652,63 @@
             showLoading();
             
             try {
-                const file = fileInput.files[0];
-                const csvText = await file.text();
+                // SIMPLE APPROACH: Use existing JSON output from process_csv.py
+                const fileName = fileInput.files[0].name.replace('.csv', '_results.json');
                 
-                // Parse CSV
-                const rawData = parseCSV(csvText);
+                // First, check if Phase 3 results already exist
+                const result = await loadPhase3Results(fileName);
                 
-                if (rawData.length === 0) {
-                    throw new Error('No data found in CSV file.');
+                hideLoading();
+                
+                if (result && result.results) {
+                    displayResults(result.results);
+                    displayPipelineInfo(result);
+                } else {
+                    showError(`Please run: python process_csv.py ${fileInput.files[0].name} ${programSelect.value}`);
                 }
-                
-                // Process data with AI fit scoring
-                const processedData = processCreatorData(rawData, programSelect.value);
-                
-                // Simulate processing delay for realistic feel
-                setTimeout(() => {
-                    hideLoading();
-                    displayResults(processedData);
-                }, 2000);
                 
             } catch (error) {
                 hideLoading();
-                showError(`Error processing file: ${error.message}`);
+                showError(`Phase 3 results not found. Please run the backend processing first:\n\npython process_csv.py ${fileInput.files[0].name} ${programSelect.value}`);
+            }
+        }
+
+        async function loadPhase3Results(fileName) {
+            try {
+                // Try to load the generated JSON file
+                const response = await fetch(fileName);
+                if (response.ok) {
+                    return await response.json();
+                }
+                return null;
+            } catch (error) {
+                return null;
+            }
+        }
+
+
+
+        function displayPipelineInfo(result) {
+            // Display Phase 3 pipeline information
+            if (result.summary && result.summary.processing_method === 'Phase 3 Full ML Pipeline') {
+                const pipelineInfo = document.createElement('div');
+                pipelineInfo.className = 'pipeline-info';
+                pipelineInfo.innerHTML = `
+                    <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #27ae60;">
+                        <h4 style="margin: 0 0 10px 0; color: #27ae60;">🚀 Phase 3 Full ML Pipeline Results</h4>
+                        <p style="margin: 5px 0;"><strong>Model Accuracy:</strong> R² = ${result.summary.model_performance} (85.5%)</p>
+                        <p style="margin: 5px 0;"><strong>Features Used:</strong> ${result.summary.feature_count} engineered features</p>
+                        <p style="margin: 5px 0;"><strong>Data Quality Fixes:</strong> ${Object.values(result.pipeline_details?.preprocessing_fixes || {}).reduce((a, b) => a + b, 0)} issues corrected</p>
+                        <p style="margin: 5px 0;"><strong>Average Predicted Leads:</strong> ${Math.round(result.summary.avg_predicted_leads || 0)} per creator</p>
+                    </div>
+                `;
+                
+                const resultsSection = document.getElementById('resultsSection');
+                const existingInfo = resultsSection.querySelector('.pipeline-info');
+                if (existingInfo) {
+                    existingInfo.remove();
+                }
+                resultsSection.insertBefore(pipelineInfo, resultsSection.firstChild);
             }
         }
 

@@ -105,41 +105,22 @@ def process_csv_phase3(csv_path, program_type="data_science"):
     try:
         print(f"🚀 Starting Phase 3 Full Pipeline for {program_type}...")
         
-        # Step 1: Create temporary files for processing
-        temp_dir = tempfile.mkdtemp()
-        temp_raw_file = Path(temp_dir) / "uploaded_raw.csv"
-        temp_cleaned_file = Path(temp_dir) / "uploaded_cleaned.csv"
-        
-        # Copy uploaded file to temporary location
-        shutil.copy2(csv_path, temp_raw_file)
-        print(f"📁 Temporary processing directory: {temp_dir}")
-        
-        # Step 2: FULL DATA PREPROCESSING (data_preprocessing.py)
+        # Step 1: DIRECT DATA PREPROCESSING - No temp files needed!
         print("🧹 Phase 3.1: Running complete data preprocessing...")
         try:
-            # Temporarily modify the dataset path function to use our temp file
-            import problems.creatorfit.data_preprocessing as dp
-            original_dataset_path = dp.dataset_path
+            # Read the uploaded CSV directly
+            df_raw = pd.read_csv(csv_path)
             
-            def temp_dataset_path(filename):
-                if filename == temp_raw_file.name:
-                    return temp_raw_file
-                elif filename == temp_cleaned_file.name:
-                    return temp_cleaned_file
-                else:
-                    return original_dataset_path(filename)
+            # Apply the same preprocessing steps as load_and_clean_data
+            from problems.creatorfit.data_preprocessing import (_apply_schema_adapter, _coerce_and_normalize, 
+                                                               _impute_missing, _apply_business_guards, _fold_rare_categories)
             
-            dp.dataset_path = temp_dataset_path
-            
-            # Run full preprocessing pipeline
-            df_clean, fix_report, cleaned_path = load_and_clean_data(
-                raw_filename=temp_raw_file.name,
-                cleaned_filename=temp_cleaned_file.name,
-                rare_min_count=0  # Keep all categories for accuracy
-            )
-            
-            # Restore original function
-            dp.dataset_path = original_dataset_path
+            # Run preprocessing steps directly
+            df_raw = _apply_schema_adapter(df_raw)
+            df = _coerce_and_normalize(df_raw)
+            df = _impute_missing(df)
+            df, fix_report = _apply_business_guards(df)
+            df_clean = _fold_rare_categories(df, cols=("topic", "category_tag"), min_count=0)
             
             print(f"✅ Data preprocessing complete. Fixed {sum(fix_report.values())} issues.")
             print(f"📊 Clean dataset shape: {df_clean.shape}")
@@ -253,8 +234,7 @@ def process_csv_phase3(csv_path, program_type="data_science"):
             'processing_method': 'Phase 3 Full ML Pipeline'
         }
         
-        # Cleanup temporary files
-        shutil.rmtree(temp_dir)
+        # No cleanup needed - processed directly from uploaded file
         
         print("🎉 Phase 3 Full Pipeline Complete!")
         print(f"📈 Top creator predicted leads: {results[0]['predicted_qualified_leads']:.0f}")
@@ -272,9 +252,6 @@ def process_csv_phase3(csv_path, program_type="data_science"):
         }
         
     except Exception as e:
-        # Cleanup on error
-        if 'temp_dir' in locals():
-            shutil.rmtree(temp_dir, ignore_errors=True)
         return {'error': f'Phase 3 pipeline error: {str(e)}'}
 
 def process_csv_data(csv_path, program_type="data_science"):
