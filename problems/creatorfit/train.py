@@ -22,8 +22,8 @@ feature engineering, model deployment, and career coaching for analytics roles.
 TARGET_GEO = "INDIA"  # Match the realistic dataset geography format
 TARGET_LANG = "English"
 
-RAW_FILENAME = "creator_campaign_audience_realistic.csv"  # Use the realistic dataset
-CLEANED_FILENAME = "creator_campaign_audience_realistic.cleaned.csv"
+RAW_FILENAME = "creator_campaign_audience_EDTECH.csv"  # Use the EdTech-focused dataset
+CLEANED_FILENAME = "creator_campaign_audience_EDTECH.cleaned.csv"
 
 def repo_root() -> Path:
     # problems/creatorfit/train.py -> up 2 -> repo root
