@@ -28,29 +28,129 @@ def generate_edtech_creator_data(n_creators=1500):
         "System Design", "Algorithms", "Data Structures"
     ]
     
-    # Realistic EdTech content transcripts (more specific and detailed)
-    edtech_transcripts = [
-        "Complete Python programming masterclass: from basics to advanced projects including web scraping and automation",
-        "Data Science career roadmap 2024: statistics, pandas, machine learning, and real industry projects",
-        "Frontend development with React and Redux: building scalable web applications with modern practices",
-        "SQL for data analysis: advanced queries, window functions, and database optimization techniques",
-        "Machine learning algorithms deep dive: linear regression to neural networks with Python implementation",
-        "JavaScript complete guide: ES6+, async programming, DOM manipulation, and modern frameworks",
-        "Backend development masterclass: Node.js, Express, MongoDB, and RESTful API design patterns",
-        "Deep learning with PyTorch and TensorFlow: computer vision and NLP projects from scratch",
-        "Full-stack development bootcamp: MERN stack with authentication and deployment strategies",
-        "Data analysis with Python: exploratory data analysis, visualization with matplotlib and seaborn",
-        "React Native mobile development: cross-platform apps with navigation and state management",
-        "DevOps engineering essentials: Docker containers, Kubernetes orchestration, and CI/CD automation",
-        "System design interview masterclass: scalability patterns and distributed systems architecture",
-        "Data structures and algorithms: coding interview preparation with 200+ practice problems",
-        "AWS cloud computing: EC2, S3, Lambda, and serverless architecture implementation guide",
-        "Database design fundamentals: normalization, indexing, and performance optimization strategies",
-        "Software engineering best practices: clean code, testing, and agile development methodologies",
-        "Career transition to tech: portfolio building, networking, and landing your first developer job",
-        "Coding interview bootcamp: problem-solving techniques and whiteboard coding strategies",
-        "Web development portfolio: 10 projects to showcase your skills and impress employers"
-    ]
+    # Topic-to-transcript mapping for consistent data
+    topic_transcript_mapping = {
+        "Python": [
+            "Complete Python programming masterclass: from basics to advanced projects including web scraping and automation",
+            "Data analysis with Python: exploratory data analysis, visualization with matplotlib and seaborn",
+            "Machine learning algorithms deep dive: linear regression to neural networks with Python implementation"
+        ],
+        "Data Science": [
+            "Data Science career roadmap 2024: statistics, pandas, machine learning, and real industry projects",
+            "Machine learning algorithms deep dive: linear regression to neural networks with Python implementation",
+            "Data analysis with Python: exploratory data analysis, visualization with matplotlib and seaborn"
+        ],
+        "Machine Learning": [
+            "Machine learning algorithms deep dive: linear regression to neural networks with Python implementation",
+            "Deep learning with PyTorch and TensorFlow: computer vision and NLP projects from scratch",
+            "Data Science career roadmap 2024: statistics, pandas, machine learning, and real industry projects"
+        ],
+        "JavaScript": [
+            "JavaScript complete guide: ES6+, async programming, DOM manipulation, and modern frameworks",
+            "Frontend development with React and Redux: building scalable web applications with modern practices",
+            "Full-stack development bootcamp: MERN stack with authentication and deployment strategies"
+        ],
+        "React": [
+            "Frontend development with React and Redux: building scalable web applications with modern practices",
+            "React Native mobile development: cross-platform apps with navigation and state management",
+            "Full-stack development bootcamp: MERN stack with authentication and deployment strategies"
+        ],
+        "Node.js": [
+            "Backend development masterclass: Node.js, Express, MongoDB, and RESTful API design patterns",
+            "Full-stack development bootcamp: MERN stack with authentication and deployment strategies",
+            "JavaScript complete guide: ES6+, async programming, DOM manipulation, and modern frameworks"
+        ],
+        "SQL": [
+            "SQL for data analysis: advanced queries, window functions, and database optimization techniques",
+            "Database design fundamentals: normalization, indexing, and performance optimization strategies",
+            "Data Science career roadmap 2024: statistics, pandas, machine learning, and real industry projects"
+        ],
+        "Frontend Development": [
+            "Frontend development with React and Redux: building scalable web applications with modern practices",
+            "JavaScript complete guide: ES6+, async programming, DOM manipulation, and modern frameworks",
+            "Web development portfolio: 10 projects to showcase your skills and impress employers"
+        ],
+        "Backend Development": [
+            "Backend development masterclass: Node.js, Express, MongoDB, and RESTful API design patterns",
+            "Database design fundamentals: normalization, indexing, and performance optimization strategies",
+            "System design interview masterclass: scalability patterns and distributed systems architecture"
+        ],
+        "Web Development": [
+            "Full-stack development bootcamp: MERN stack with authentication and deployment strategies",
+            "Frontend development with React and Redux: building scalable web applications with modern practices",
+            "Web development portfolio: 10 projects to showcase your skills and impress employers"
+        ],
+        "Mobile Development": [
+            "React Native mobile development: cross-platform apps with navigation and state management",
+            "Frontend development with React and Redux: building scalable web applications with modern practices",
+            "Full-stack development bootcamp: MERN stack with authentication and deployment strategies"
+        ],
+        "DevOps": [
+            "DevOps engineering essentials: Docker containers, Kubernetes orchestration, and CI/CD automation",
+            "AWS cloud computing: EC2, S3, Lambda, and serverless architecture implementation guide",
+            "System design interview masterclass: scalability patterns and distributed systems architecture"
+        ],
+        "Cloud Computing": [
+            "AWS cloud computing: EC2, S3, Lambda, and serverless architecture implementation guide",
+            "DevOps engineering essentials: Docker containers, Kubernetes orchestration, and CI/CD automation",
+            "System design interview masterclass: scalability patterns and distributed systems architecture"
+        ],
+        "Artificial Intelligence": [
+            "Deep learning with PyTorch and TensorFlow: computer vision and NLP projects from scratch",
+            "Machine learning algorithms deep dive: linear regression to neural networks with Python implementation",
+            "Data Science career roadmap 2024: statistics, pandas, machine learning, and real industry projects"
+        ],
+        "Deep Learning": [
+            "Deep learning with PyTorch and TensorFlow: computer vision and NLP projects from scratch",
+            "Machine learning algorithms deep dive: linear regression to neural networks with Python implementation",
+            "Data Science career roadmap 2024: statistics, pandas, machine learning, and real industry projects"
+        ],
+        "Analytics": [
+            "Data analysis with Python: exploratory data analysis, visualization with matplotlib and seaborn",
+            "SQL for data analysis: advanced queries, window functions, and database optimization techniques",
+            "Data Science career roadmap 2024: statistics, pandas, machine learning, and real industry projects"
+        ],
+        "Database": [
+            "Database design fundamentals: normalization, indexing, and performance optimization strategies",
+            "SQL for data analysis: advanced queries, window functions, and database optimization techniques",
+            "Backend development masterclass: Node.js, Express, MongoDB, and RESTful API design patterns"
+        ],
+        "Career Guidance": [
+            "Career transition to tech: portfolio building, networking, and landing your first developer job",
+            "Coding interview bootcamp: problem-solving techniques and whiteboard coding strategies",
+            "Web development portfolio: 10 projects to showcase your skills and impress employers"
+        ],
+        "Interview Preparation": [
+            "Coding interview bootcamp: problem-solving techniques and whiteboard coding strategies",
+            "Data structures and algorithms: coding interview preparation with 200+ practice problems",
+            "System design interview masterclass: scalability patterns and distributed systems architecture"
+        ],
+        "System Design": [
+            "System design interview masterclass: scalability patterns and distributed systems architecture",
+            "Database design fundamentals: normalization, indexing, and performance optimization strategies",
+            "DevOps engineering essentials: Docker containers, Kubernetes orchestration, and CI/CD automation"
+        ],
+        "Algorithms": [
+            "Data structures and algorithms: coding interview preparation with 200+ practice problems",
+            "Coding interview bootcamp: problem-solving techniques and whiteboard coding strategies",
+            "Machine learning algorithms deep dive: linear regression to neural networks with Python implementation"
+        ],
+        "Software Engineering": [
+            "Software engineering best practices: clean code, testing, and agile development methodologies",
+            "System design interview masterclass: scalability patterns and distributed systems architecture",
+            "Full-stack development bootcamp: MERN stack with authentication and deployment strategies"
+        ],
+        "Java": [
+            "Software engineering best practices: clean code, testing, and agile development methodologies",
+            "Data structures and algorithms: coding interview preparation with 200+ practice problems",
+            "System design interview masterclass: scalability patterns and distributed systems architecture"
+        ],
+        "Flask": [
+            "Backend development masterclass: Node.js, Express, MongoDB, and RESTful API design patterns",
+            "Complete Python programming masterclass: from basics to advanced projects including web scraping and automation",
+            "Full-stack development bootcamp: MERN stack with authentication and deployment strategies"
+        ]
+    }
     
     # Indian languages for EdTech platform
     languages = ["English", "Hindi", "Telugu"]
@@ -78,8 +178,24 @@ def generate_edtech_creator_data(n_creators=1500):
         else:
             topic = primary_topic
         
-        # Select appropriate transcript
-        transcript = np.random.choice(edtech_transcripts)
+        # Select appropriate transcript based on primary topic
+        def get_relevant_transcript(topic_string):
+            # Extract primary topic (before semicolon if multi-topic)
+            primary = topic_string.split(';')[0]
+            
+            # Get relevant transcripts for this topic
+            if primary in topic_transcript_mapping:
+                return np.random.choice(topic_transcript_mapping[primary])
+            else:
+                # Fallback: use a general tech transcript
+                fallback_transcripts = [
+                    "Software engineering best practices: clean code, testing, and agile development methodologies",
+                    "Career transition to tech: portfolio building, networking, and landing your first developer job",
+                    "Web development portfolio: 10 projects to showcase your skills and impress employers"
+                ]
+                return np.random.choice(fallback_transcripts)
+        
+        transcript = get_relevant_transcript(topic)
         
         # Posting cadence - PURE INTEGERS (days between posts)
         posting_cadence = np.random.choice([1, 2, 3, 4, 5, 6, 7, 10, 14], 
