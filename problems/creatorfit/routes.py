@@ -12,18 +12,7 @@ def get_service():
     """Get CreatorFit service instance"""
     return CreatorFitService()
 
-@router.get("/")
-async def creatorfit_home():
-    """CreatorFit - Influencer Marketing Optimization"""
-    return {
-        "problem": "CreatorFit - Influencer Marketing",
-        "description": "AI-driven creator scoring and audience analysis",
-        "status": "Active",
-        "endpoints": {
-            "analyze_csv": "POST /analyze - Upload CSV for creator analysis",
-            "forecast_leads": "POST /forecast - Forecast leads for specific creator"
-        }
-    }
+
 
 @router.post("/analyze", response_model=PredictionResponse)
 async def analyze_creators_csv(
