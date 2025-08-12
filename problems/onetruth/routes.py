@@ -1,12 +1,13 @@
 from fastapi import APIRouter, HTTPException
 from typing import Optional
+from datetime import datetime
 
 from .models import (
     TrainingRequest, DashboardRequest, ExecutiveBriefRequest, 
     DataVerificationRequest, BusinessAnalyticsRecord, 
     StatusResponse, AnomalyDetectionResponse, BusinessHealthResponse,
     ExecutiveDecisionResponse, ModelEvaluationResponse, SeedResponse,
-    AnalyticsOutcome, AnalyticsDiagnosticsResponse
+    AnalyticsOutcome, AnalyticsDiagnosticsResponse, ProblemAnalysisResponse
 )
 from .service import OnetruthService
 
@@ -207,3 +208,46 @@ async def health_check():
             "error": str(e),
             "timestamp": "2025-08-12T00:00:00Z"
         }
+
+
+@router.get("/problem-analysis", response_model=ProblemAnalysisResponse)
+async def get_problem_analysis():
+    """
+    Get complete problem diagnosis and analysis for OneTruth frontend display
+    Shows identified issues, segment challenges, and implementation status
+    """
+    try:
+        analysis = await onetruth_service.get_problem_analysis()
+        return analysis
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"OneTruth problem analysis failed: {e}")
+
+
+@router.get("/dashboard-data")
+async def get_dashboard_data():
+    """
+    Get combined data for OneTruth dashboard including problems and metrics
+    """
+    try:
+        # Get problem analysis
+        problem_analysis = await onetruth_service.get_problem_analysis()
+        
+        # Get current system status
+        status = await onetruth_service.get_system_status()
+        
+        # Create dashboard summary
+        dashboard_data = {
+            "problems_identified": len(problem_analysis.diagnosed_problems),
+            "segments_analyzed": len(problem_analysis.segment_challenges),
+            "implementation_progress": len([status for status in problem_analysis.implementation_status.values() if "✅" in status]),
+            "total_implementation_items": len(problem_analysis.implementation_status),
+            "intelligence_opportunity": problem_analysis.overall_impact.get("intelligence_unification", "₹48L+ annually"),
+            "decision_acceleration": problem_analysis.overall_impact.get("decision_acceleration", "5-10x faster"),
+            "problem_analysis": problem_analysis,
+            "system_status": status,
+            "last_updated": datetime.now().isoformat()
+        }
+        
+        return dashboard_data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"OneTruth dashboard data failed: {e}")

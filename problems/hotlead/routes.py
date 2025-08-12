@@ -1,9 +1,10 @@
 from fastapi import APIRouter, HTTPException, Query
 from typing import Optional, Dict, Any
+from datetime import datetime
 from .models import (
     LeadInput, ScoredLead, LeadIngestRequest, LeadResponse,
     PriorityQueueRequest, PriorityQueueResponse, LeadAnalyticsResponse,
-    ContactUpdate, OutreachRequest, WhyLeadRequest
+    ContactUpdate, OutreachRequest, WhyLeadRequest, ProblemAnalysisResponse
 )
 from .service import HotLeadService
 
@@ -265,3 +266,47 @@ async def test_lead_prediction(
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/problem-analysis", response_model=ProblemAnalysisResponse)
+async def get_problem_analysis():
+    """
+    Get complete problem diagnosis and analysis for HotLead frontend display
+    Shows identified issues, segment challenges, and implementation status
+    """
+    try:
+        analysis = await hotlead_service.get_problem_analysis()
+        return analysis
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"HotLead problem analysis failed: {e}")
+
+
+@router.get("/dashboard-data")
+async def get_dashboard_data():
+    """
+    Get combined data for HotLead dashboard including problems and metrics
+    """
+    try:
+        # Get problem analysis
+        problem_analysis = await hotlead_service.get_problem_analysis()
+        
+        # Get current analytics
+        analytics = await hotlead_service.get_analytics(limit=100)
+        
+        # Create dashboard summary
+        dashboard_data = {
+            "problems_identified": len(problem_analysis.diagnosed_problems),
+            "segments_analyzed": len(problem_analysis.segment_challenges),
+            "implementation_progress": len([status for status in problem_analysis.implementation_status.values() if "✅" in status]),
+            "total_implementation_items": len(problem_analysis.implementation_status),
+            "conversion_opportunity": problem_analysis.overall_impact.get("conversion_optimization", "₹21L+ annually"),
+            "efficiency_improvement": problem_analysis.overall_impact.get("efficiency_improvement", "3x improvement"),
+            "problem_analysis": problem_analysis,
+            "current_analytics": analytics,
+            "last_updated": datetime.now().isoformat()
+        }
+        
+        return dashboard_data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"HotLead dashboard data failed: {e}")
+

@@ -1,9 +1,10 @@
 from fastapi import APIRouter, HTTPException
 from typing import Optional, List, Dict, Any
+from datetime import datetime
 from .models import (
     ScoreRequest, ScoreResponse, MessageRequest, MessageResponse,
     TrainRequest, AnalyticsResponse, ReferralProfile, TrackEvent,
-    ProgressMessageRequest, AnalyticsInsightsRequest
+    ProgressMessageRequest, AnalyticsInsightsRequest, ProblemAnalysisResponse
 )
 from .service import RefermoreService
 
@@ -171,4 +172,48 @@ async def progress_message(req: ProgressMessageRequest):
         raise HTTPException(status_code=500, detail=f"Progress message failed: {e}")
 
 
+@router.get("/problem-analysis", response_model=ProblemAnalysisResponse)
+async def get_problem_analysis():
+    """
+    Get complete problem diagnosis and analysis for ReferMore frontend display
+    Shows identified issues, segment challenges, and implementation status
+    """
+    try:
+        service = get_service()
+        analysis = await service.get_problem_analysis()
+        return analysis
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"ReferMore problem analysis failed: {e}")
+
+
+@router.get("/dashboard-data")
+async def get_dashboard_data():
+    """
+    Get combined data for ReferMore dashboard including problems and metrics
+    """
+    try:
+        service = get_service()
+        
+        # Get problem analysis
+        problem_analysis = await service.get_problem_analysis()
+        
+        # Get current analytics
+        status = await service.get_status()
+        
+        # Create dashboard summary
+        dashboard_data = {
+            "problems_identified": len(problem_analysis.diagnosed_problems),
+            "segments_analyzed": len(problem_analysis.segment_challenges),
+            "implementation_progress": len([status for status in problem_analysis.implementation_status.values() if "✅" in status]),
+            "total_implementation_items": len(problem_analysis.implementation_status),
+            "growth_opportunity": problem_analysis.overall_impact.get("growth_opportunity", "₹10L+ annually"),
+            "participation_improvement": problem_analysis.overall_impact.get("participation_improvement", "40-60%"),
+            "problem_analysis": problem_analysis,
+            "system_status": status,
+            "last_updated": datetime.now().isoformat()
+        }
+        
+        return dashboard_data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"ReferMore dashboard data failed: {e}")
 

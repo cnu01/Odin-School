@@ -2,6 +2,36 @@ from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 
+# Problem diagnosis models for frontend display
+class ProblemDiagnosis(BaseModel):
+    """Model for displaying diagnosed problems to frontend"""
+    problem_id: str
+    title: str
+    symptom: str
+    root_cause: str
+    impact: str
+    evidence: str
+    supporting_data: Dict[str, Any]
+
+
+class SegmentChallenge(BaseModel):
+    """Model for segment-specific challenges"""
+    segment_type: str
+    segment_name: str
+    description: str
+    characteristics: List[str]
+    conversion_impact: str
+    supporting_metrics: Dict[str, float]
+
+
+class ProblemAnalysisResponse(BaseModel):
+    """Complete problem analysis for frontend display"""
+    diagnosed_problems: List[ProblemDiagnosis]
+    segment_challenges: List[SegmentChallenge]
+    overall_impact: Dict[str, str]
+    implementation_status: Dict[str, str]
+
+
 class BusinessAnalyticsRecord(BaseModel):
     """Model for business analytics data"""
     # CRM Metrics
