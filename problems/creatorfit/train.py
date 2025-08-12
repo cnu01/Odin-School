@@ -50,7 +50,7 @@ def main():
     print("[INFO] Target:", meta["target"])
 
     # 4) (Optional) Save interim feature set for inspection/debug
-    artifacts_dir = repo_root() / "artifacts"
+    artifacts_dir = repo_root() / "problems" / "creatorfit" / "artifacts"
     artifacts_dir.mkdir(parents=True, exist_ok=True)
     (artifacts_dir / "X_head_preview.csv").write_text(
         pd.concat([X.head(20), y.head(20).rename("qualified_leads")], axis=1).to_csv(index=False)
