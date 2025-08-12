@@ -121,7 +121,8 @@ async def health_check():
         # Check if ML pipeline is available
         try:
             from pathlib import Path
-            models_dir = Path("models")
+            # Use absolute path to models directory
+            models_dir = Path(__file__).parent.parent.parent / "models"
             model_files = [
                 "creatorfit_lgb_model.pkl",
                 "creatorfit_preprocessor.pkl", 

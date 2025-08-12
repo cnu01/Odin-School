@@ -40,7 +40,14 @@ class CreatorFitService:
                 from problems.creatorfit.frontend.prediction_pipeline import CreatorFitPredictionPipeline
                 
                 # Initialize predictor with correct model path (uses our trained models)
-                predictor = CreatorFitPredictionPipeline(model_dir="../../../models")
+                # Use absolute path to models directory
+                models_path = Path(__file__).parent.parent.parent / "models"
+                print(f"DEBUG: Loading models from: {models_path}")
+                print(f"DEBUG: Models directory exists: {models_path.exists()}")
+                if models_path.exists():
+                    print(f"DEBUG: Model files: {list(models_path.glob('*.pkl'))}")
+                
+                predictor = CreatorFitPredictionPipeline(model_dir=str(models_path))
                 
                 # Run prediction pipeline
                 result = predictor.process_csv_file(temp_csv_path, program_type)
@@ -51,10 +58,19 @@ class CreatorFitService:
                 
             except ImportError as e:
                 # Fallback to basic processing if ML pipeline not available
+                print(f"DEBUG: Import error: {e}")
                 return {
                     'success': False,
                     'error': f'ML pipeline not available: {str(e)}',
                     'details': 'Please ensure the prediction pipeline is properly set up'
+                }
+            except Exception as e:
+                # Catch any other errors during pipeline execution
+                print(f"DEBUG: Pipeline execution error: {e}")
+                return {
+                    'success': False,
+                    'error': f'Pipeline execution failed: {str(e)}',
+                    'details': 'Check the debug output for more information'
                 }
             
             finally:
@@ -97,15 +113,30 @@ class CreatorFitService:
                     sys.path.append(creatorfit_path)
                 
                 from problems.creatorfit.frontend.prediction_pipeline import CreatorFitPredictionPipeline
-                predictor = CreatorFitPredictionPipeline(model_dir="../../../models")
+                # Use absolute path to models directory
+                models_path = Path(__file__).parent.parent.parent / "models"
+                print(f"DEBUG: Loading models from: {models_path}")
+                print(f"DEBUG: Models directory exists: {models_path.exists()}")
+                if models_path.exists():
+                    print(f"DEBUG: Model files: {list(models_path.glob('*.pkl'))}")
+                
+                predictor = CreatorFitPredictionPipeline(model_dir=str(models_path))
                 result = predictor.process_csv_file(temp_csv_path, program_type)
                 
                 return result
                 
             except ImportError as e:
+                print(f"DEBUG: Import error in forecast: {e}")
                 return {
                     'success': False,
                     'error': f'Prediction pipeline not available: {str(e)}'
+                }
+            except Exception as e:
+                print(f"DEBUG: Pipeline execution error in forecast: {e}")
+                return {
+                    'success': False,
+                    'error': f'Pipeline execution failed: {str(e)}',
+                    'details': 'Check the debug output for more information'
                 }
             
             finally:
