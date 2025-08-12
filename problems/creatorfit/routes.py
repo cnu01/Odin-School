@@ -21,12 +21,15 @@ async def analyze_creators_csv(
     campaign_budget: float = Form(default=100000, ge=0, description="Campaign budget for CPL calculation")
 ):
     """
-    Upload CSV file and get creator analysis with fit scores and lead predictions
+    COMPREHENSIVE CREATOR ANALYSIS - Upload CSV and get full business intelligence
     
-    This is the main endpoint that:
-    1. Takes uploaded CSV file
-    2. Analyzes creators using our ML pipeline
-    3. Returns JSON with rankings, fit scores, and recommendations
+    This endpoint provides:
+    1. Creator fit scores and rankings
+    2. Lead predictions with confidence levels  
+    3. Business metrics (CPL, ROI, budget allocation)
+    4. Strategic recommendations for campaign optimization
+    
+    Perfect for: Campaign planning, budget allocation, strategic decision making
     """
     try:
         # Validate file
@@ -59,30 +62,32 @@ async def analyze_creators_csv(
 
 @router.post("/forecast")
 async def forecast_creator_leads(
-    creator_data: Dict[str, Any],
-    program_type: ProgramType = ProgramType.DATA_SCIENCE
+    file: UploadFile = File(..., description="CSV file with creator data for lead forecasting"),
+    program_type: ProgramType = Form(default=ProgramType.DATA_SCIENCE, description="Program type for forecasting")
 ):
     """
-    Forecast qualified leads for a specific creator
+    LEAD FORECASTING - Upload CSV and get qualified leads predictions
     
-    Send creator data and get lead predictions before booking
+    This endpoint focuses on lead prediction and booking recommendations:
+    - Predicted qualified leads for each creator
+    - Confidence scores for prediction reliability
+    - Immediate booking recommendations (BOOK/REVIEW/SKIP)
+    - Forecasting insights for lead planning
+    
+    Perfect for: Lead planning, creator booking decisions, performance forecasting
     """
     try:
-        # Validate required fields
-        required_fields = ['creator_id', 'topic', 'recent_video_transcript', 
-                          'posting_cadence_days', 'views_90d', 'language', 'category_tag']
+        # Validate file
+        if not file.filename.endswith('.csv'):
+            raise HTTPException(status_code=400, detail="File must be a CSV")
         
-        missing_fields = [field for field in required_fields if field not in creator_data]
-        if missing_fields:
-            raise HTTPException(
-                status_code=400, 
-                detail=f"Missing required fields: {missing_fields}"
-            )
+        # Read CSV content
+        csv_content = await file.read()
         
         # Get service and forecast
         service = get_service()
-        result = await service.forecast_leads(
-            creator_data=creator_data,
+        result = await service.forecast_leads_csv(
+            csv_content=csv_content,
             program_type=program_type.value
         )
         
