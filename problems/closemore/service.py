@@ -1,257 +1,579 @@
-import httpx
+"""
+CloseMore Service - Comprehensive sales conversation analysis and action planning
+Integrates Amazon Bedrock AI, conversation management, and intelligent action planning
+"""
+
+import asyncio
 import os
-import json
-from dotenv import load_dotenv
-from typing import List
-from .models import ConversationInput, ConversationAnalysis, NextBestAction
-
-# Load environment variables
-load_dotenv()
-
-async def analyze_conversation_with_ai(conversation_input: ConversationInput) -> ConversationAnalysis:
-    """
-    Analyze a sales conversation using AI to extract insights and next steps
-    
-    Args:
-        conversation_input: ConversationInput containing lead_id, channel, and conversation text
-        
-    Returns:
-        ConversationAnalysis with summary, intent, objections, and next steps
-    """
-    api_key = os.getenv("AI_API_KEY")
-    
-    if not api_key:
-        raise ValueError("AI_API_KEY not found in environment variables")
-    
-    # Construct detailed prompt for sales conversation analysis
-    prompt = f"""
-You are an expert sales coach analyzing a conversation from Odin School, an EdTech company.
-
-**Context from Playbooks:**
-- Common objections include: price, course timing, job support uncertainty, and content quality.
-- The goal is to book a meeting, get a clear commitment, or advance the lead through the funnel.
-- Odin School offers professional courses for career advancement in tech.
-
-**Conversation to Analyze:**
-- Channel: {conversation_input.channel}
-- Lead ID: {conversation_input.lead_id}
-- Transcript: "{conversation_input.conversation_text}"
-
-**Your Task:**
-Based on the conversation, return ONLY a valid JSON object with four keys:
-1. "summary": A very short, one-sentence summary of the conversation.
-2. "detected_intent": The lead's primary intent (e.g., "Ready to book", "Price sensitive", "Needs more info", "Comparing options", "Not interested").
-3. "objections": A list of strings of any objections raised by the lead.
-4. "suggested_next_steps": A list of strings for the sales rep's next immediate actions.
-
-Example format:
-{{
-  "summary": "Lead is interested but concerned about course price and time commitment",
-  "detected_intent": "Price sensitive",
-  "objections": ["Too expensive", "Not enough time"],
-  "suggested_next_steps": ["Send pricing breakdown", "Offer flexible payment plan", "Schedule follow-up call"]
-}}
-"""
-    
-    # API request payload for OpenAI
-    payload = {
-        "model": "gpt-3.5-turbo",
-        "messages": [
-            {"role": "user", "content": prompt}
-        ],
-        "max_tokens": 500,
-        "temperature": 0.1
-    }
-    
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
-    }
-    
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            "https://api.openai.com/v1/chat/completions",
-            headers=headers,
-            json=payload,
-            timeout=30.0
-        )
-        
-        if response.status_code != 200:
-            raise Exception(f"AI API error: {response.status_code} - {response.text}")
-        
-        result = response.json()
-        ai_response = result["choices"][0]["message"]["content"].strip()
-        
-        # Parse JSON response
-        try:
-            analysis_data = json.loads(ai_response)
-            return ConversationAnalysis(**analysis_data)
-        except json.JSONDecodeError:
-            # Fallback if JSON parsing fails
-            raise Exception(f"Invalid JSON response from AI: {ai_response}")
-
-async def get_daily_actions_for_rep(rep_id: str) -> List[NextBestAction]:
-    """
-    Generate a prioritized daily action list for a sales rep based on recent conversations
-    
-    Args:
-        rep_id: Sales representative ID
-        
-    Returns:
-        List of NextBestAction objects with prioritized tasks
-    """
-    api_key = os.getenv("AI_API_KEY")
-    
-    if not api_key:
-        raise ValueError("AI_API_KEY not found in environment variables")
-    
-    # Mock recent conversation analyses for the rep (in real app, this would come from database)
-    mock_conversations = [
-        {
-            "lead_id": f"lead_{rep_id}_001",
-            "summary": "Lead expressed strong interest but wants to compare with competitors",
-            "detected_intent": "Comparing options",
-            "objections": ["Wants to see competitor comparison"],
-            "channel": "call_transcript"
-        },
-        {
-            "lead_id": f"lead_{rep_id}_002", 
-            "summary": "Lead is price-sensitive but very interested in the course content",
-            "detected_intent": "Price sensitive",
-            "objections": ["Course is expensive", "Needs payment plan"],
-            "channel": "whatsapp"
-        },
-        {
-            "lead_id": f"lead_{rep_id}_003",
-            "summary": "Lead ready to enroll but has questions about job support",
-            "detected_intent": "Ready to book",
-            "objections": ["Uncertain about job placement support"],
-            "channel": "email"
-        },
-        {
-            "lead_id": f"lead_{rep_id}_004",
-            "summary": "Lead missed scheduled demo call, sent apology message",
-            "detected_intent": "Needs more info",
-            "objections": ["Scheduling conflicts"],
-            "channel": "email"
-        }
-    ]
-    
-    # Convert mock data to string for prompt
-    conversations_str = json.dumps(mock_conversations, indent=2)
-    
-    # Construct prompt for daily action planning
-    prompt = f"""
-You are a sales manager creating a prioritized to-do list for sales rep ID: {rep_id}. 
-Here are the summaries of their recent conversations. Your goal is to increase win rates and reduce no-shows.
-
-**Conversation Summaries:**
-{conversations_str}
-
-**Your Task:**
-Based on the summaries, provide a JSON list of next-best-action objects for the rep. Each object should have:
-- "lead_id": The lead identifier
-- "action_type": One of ["SEND_FOLLOW_UP", "SCHEDULE_NUDGE", "UPDATE_CRM", "SEND_DEMO", "PRICE_DISCUSSION", "COMPETITOR_COMPARISON"]
-- "suggested_message": Specific message or action to take
-- "reason": Brief explanation why this action is recommended
-
-Prioritize leads that are closest to conversion. Include 'SCHEDULE_NUDGE' actions for leads who missed meetings.
-
-Example format:
-[
-  {{
-    "lead_id": "lead_001",
-    "action_type": "SEND_FOLLOW_UP",
-    "suggested_message": "Hi [Name], I wanted to follow up on our conversation about the pricing options...",
-    "reason": "Lead showed high interest but had price concerns"
-  }}
-]
-"""
-    
-    # API request payload
-    payload = {
-        "model": "gpt-3.5-turbo",
-        "messages": [
-            {"role": "user", "content": prompt}
-        ],
-        "max_tokens": 800,
-        "temperature": 0.2
-    }
-    
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
-    }
-    
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            "https://api.openai.com/v1/chat/completions",
-            headers=headers,
-            json=payload,
-            timeout=30.0
-        )
-        
-        if response.status_code != 200:
-            raise Exception(f"AI API error: {response.status_code} - {response.text}")
-        
-        result = response.json()
-        ai_response = result["choices"][0]["message"]["content"].strip()
-        
-        # Parse JSON response
-        try:
-            actions_data = json.loads(ai_response)
-            return [NextBestAction(**action) for action in actions_data]
-        except json.JSONDecodeError:
-            # Fallback if JSON parsing fails
-            raise Exception(f"Invalid JSON response from AI: {ai_response}")
+from typing import List, Dict, Any, Optional
+from datetime import datetime, timedelta
+from .models import (
+    ConversationInput, ConversationAnalysis, NextBestAction, 
+    DailyActionsRequest, DailyActionsSummary, PipelineMetrics,
+    ConversationInsights, LegacyConversationInput, LegacyConversationAnalysis,
+    RAGConversationInput, RAGConversationAnalysis, SalesKnowledgeInput,
+    KnowledgeQuery, KnowledgeSearchResult, KnowledgeStats, KnowledgeReference
+)
+from .bedrock_service import ClosemoreBedrockService
+from .conversation_manager import ConversationManager, MockDataGenerator
+from .rag_service import ClosemoreRAGService
+from .sales_knowledge import SalesKnowledgeManager
 
 class ClosemoreService:
-    """Service class for Closemore operations"""
+    """
+    Main service class for CloseMore sales conversation analysis and action planning
+    
+    Provides comprehensive AI-powered features:
+    - Conversation analysis with Amazon Bedrock
+    - Intelligent action planning
+    - Pipeline analytics and insights
+    - Rep performance tracking
+    """
     
     def __init__(self):
-        # Initialize any database connections, etc.
-        pass
+        """Initialize CloseMore service with all components"""
+        self.bedrock_service = ClosemoreBedrockService()
+        self.conversation_manager = ConversationManager()
+        self.mock_generator = MockDataGenerator()
+        self.rag_service = ClosemoreRAGService()
+        self.knowledge_manager = SalesKnowledgeManager()
+        
+        print("ClosemoreService initialized successfully with RAG capabilities")
+    
+    # CORE CONVERSATION ANALYSIS
     
     async def analyze_conversation(self, conversation_input: ConversationInput) -> ConversationAnalysis:
         """
-        Analyze a sales conversation and return structured insights
+        Analyze a sales conversation with comprehensive AI insights
         
         Args:
             conversation_input: The conversation data to analyze
             
         Returns:
-            ConversationAnalysis with AI-generated insights
+            ConversationAnalysis with detailed insights and recommendations
         """
         try:
-            return await analyze_conversation_with_ai(conversation_input)
+            # Analyze with Bedrock AI
+            analysis = await self.bedrock_service.analyze_conversation_with_bedrock(conversation_input)
+            
+            # Store conversation and analysis
+            conversation_id = self.conversation_manager.store_conversation_analysis(
+                conversation_input, analysis
+            )
+            
+            print(f"Conversation {conversation_id} analyzed and stored successfully")
+            return analysis
+            
         except Exception as e:
-            # Fallback response if AI service fails
+            print(f"Error in conversation analysis: {e}")
+            
+            # Fallback analysis
             return ConversationAnalysis(
-                summary="Conversation analysis unavailable due to service issue",
-                detected_intent="Needs manual review",
-                objections=["Service unavailable"],
-                suggested_next_steps=[f"Manual review required: {str(e)}"]
+                lead_id=conversation_input.lead_id,
+                summary="Analysis service temporarily unavailable",
+                detailed_summary="Manual review recommended for this conversation",
+                detected_intent="needs_more_info",
+                intent_confidence=0.5,
+                objections=[],
+                sentiment_analysis={
+                    "overall_sentiment": 0.0,
+                    "confidence": 0.0,
+                    "emotional_indicators": []
+                },
+                key_topics=[],
+                next_steps=["Manual review required", "Follow up within 24 hours"],
+                recommended_follow_up_time=24,
+                conversion_probability=0.5,
+                urgency_level="medium",
+                personalization_notes=f"Service error: {str(e)}"
             )
     
-    async def get_daily_actions(self, rep_id: str) -> List[NextBestAction]:
+    async def analyze_conversation_with_rag(self, conversation_input: RAGConversationInput) -> RAGConversationAnalysis:
         """
-        Get prioritized daily actions for a sales rep
+        Analyze conversation with RAG-enhanced insights using sales knowledge
+        
+        Args:
+            conversation_input: RAG conversation input with knowledge preferences
+            
+        Returns:
+            RAGConversationAnalysis with knowledge-enhanced recommendations
+        """
+        try:
+            if conversation_input.use_rag:
+                # Use RAG service for enhanced analysis
+                base_conversation = ConversationInput(
+                    lead_id=conversation_input.lead_id,
+                    channel=conversation_input.channel,
+                    conversation_text=conversation_input.conversation_text,
+                    rep_id=conversation_input.rep_id,
+                    timestamp=conversation_input.timestamp,
+                    lead_context=conversation_input.lead_context
+                )
+                
+                # Get RAG-enhanced analysis
+                rag_analysis = await self.rag_service.analyze_conversation_with_rag(base_conversation)
+                
+                # Convert to RAG format with knowledge references
+                rag_enhanced_analysis = self._convert_to_rag_analysis(rag_analysis, True)
+                
+                # Store conversation and analysis
+                conversation_id = self.conversation_manager.store_conversation_analysis(
+                    base_conversation, rag_analysis
+                )
+                
+                print(f"RAG-enhanced conversation {conversation_id} analyzed successfully")
+                return rag_enhanced_analysis
+            else:
+                # Use standard analysis
+                base_conversation = ConversationInput(
+                    lead_id=conversation_input.lead_id,
+                    channel=conversation_input.channel,
+                    conversation_text=conversation_input.conversation_text,
+                    rep_id=conversation_input.rep_id,
+                    timestamp=conversation_input.timestamp,
+                    lead_context=conversation_input.lead_context
+                )
+                
+                analysis = await self.analyze_conversation(base_conversation)
+                return self._convert_to_rag_analysis(analysis, False)
+                
+        except Exception as e:
+            print(f"Error in RAG conversation analysis: {e}")
+            
+            # Fallback to standard analysis
+            base_conversation = ConversationInput(
+                lead_id=conversation_input.lead_id,
+                channel=conversation_input.channel,
+                conversation_text=conversation_input.conversation_text,
+                rep_id=conversation_input.rep_id,
+                timestamp=conversation_input.timestamp or datetime.now(),
+                lead_context=conversation_input.lead_context
+            )
+            
+            fallback_analysis = await self.analyze_conversation(base_conversation)
+            return self._convert_to_rag_analysis(fallback_analysis, False)
+    
+    async def analyze_conversation_batch(
+        self, 
+        conversations: List[ConversationInput]
+    ) -> List[ConversationAnalysis]:
+        """
+        Analyze multiple conversations in batch for efficiency
+        
+        Args:
+            conversations: List of conversations to analyze
+            
+        Returns:
+            List of ConversationAnalysis results
+        """
+        tasks = [self.analyze_conversation(conv) for conv in conversations]
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        
+        # Filter out exceptions and return successful analyses
+        successful_results = [r for r in results if isinstance(r, ConversationAnalysis)]
+        
+        print(f"Batch analysis completed: {len(successful_results)}/{len(conversations)} successful")
+        return successful_results
+    
+    # DAILY ACTION PLANNING
+    
+    async def get_daily_actions(
+        self, 
+        rep_id: str,
+        include_low_priority: bool = False,
+        max_actions: int = 10,
+        focus_area: Optional[str] = None
+    ) -> DailyActionsSummary:
+        """
+        Generate prioritized daily action list for a sales rep
+        
+        Args:
+            rep_id: Sales representative ID
+            include_low_priority: Whether to include low priority actions
+            max_actions: Maximum number of actions to return
+            focus_area: Specific focus area for actions
+            
+        Returns:
+            DailyActionsSummary with prioritized actions and metrics
+        """
+        try:
+            # Get recent conversations for the rep
+            conversations_data = self.conversation_manager.get_conversations_for_rep(
+                rep_id, days_back=7, limit=20
+            )
+            
+            if not conversations_data:
+                # Generate mock data for development/demo
+                print(f"No conversation data found for rep {rep_id}, generating mock data")
+                mock_conversations = self.mock_generator.generate_sample_conversations(rep_id, 5)
+                
+                # Analyze mock conversations
+                for conv in mock_conversations:
+                    await self.analyze_conversation(conv)
+                
+                # Reload conversation data
+                conversations_data = self.conversation_manager.get_conversations_for_rep(
+                    rep_id, days_back=7
+                )
+            
+            # Generate actions with Bedrock AI
+            actions_summary = await self.bedrock_service.generate_daily_actions_with_bedrock(
+                rep_id, conversations_data, max_actions
+            )
+            
+            # Filter by focus area if specified
+            if focus_area:
+                filtered_actions = [
+                    action for action in actions_summary.actions 
+                    if focus_area.lower() in [tag.lower() for tag in action.tags]
+                ]
+                actions_summary.actions = filtered_actions[:max_actions]
+            
+            # Filter out low priority if requested
+            if not include_low_priority:
+                filtered_actions = [
+                    action for action in actions_summary.actions
+                    if action.urgency_level != "low"
+                ]
+                actions_summary.actions = filtered_actions[:max_actions]
+            
+            return actions_summary
+            
+        except Exception as e:
+            print(f"Error generating daily actions: {e}")
+            
+            # Return fallback actions
+            return DailyActionsSummary(
+                total_actions=1,
+                high_priority_count=0,
+                estimated_total_time=30,
+                conversion_opportunities=0,
+                actions=[
+                    NextBestAction(
+                        lead_id=f"fallback_{rep_id}",
+                        action_type="update_crm",
+                        suggested_message="Review recent conversations and update lead statuses",
+                        reason=f"Service temporarily unavailable: {str(e)}",
+                        priority_score=50,
+                        urgency_level="medium",
+                        estimated_time_minutes=30,
+                        expected_outcome="Updated CRM data",
+                        follow_up_reminder=None,
+                        tags=["fallback", "manual"]
+                    )
+                ]
+            )
+    
+    # ANALYTICS AND INSIGHTS
+    
+    def get_rep_performance_metrics(self, rep_id: str) -> PipelineMetrics:
+        """
+        Get comprehensive performance metrics for a sales rep
         
         Args:
             rep_id: Sales representative ID
             
         Returns:
-            List of NextBestAction objects
+            PipelineMetrics with performance data
         """
         try:
-            return await get_daily_actions_for_rep(rep_id)
+            # Get conversation data and analytics
+            conversations = self.conversation_manager.get_conversations_for_rep(rep_id, days_back=30)
+            analytics = self.conversation_manager.get_rep_analytics(rep_id)
+            
+            if not conversations:
+                return PipelineMetrics(
+                    rep_id=rep_id,
+                    total_conversations=0,
+                    meeting_booking_rate=0.0,
+                    no_show_rate=0.0,
+                    conversion_rate=0.0,
+                    average_response_time=0.0,
+                    objection_resolution_rate=0.0
+                )
+            
+            # Calculate metrics from conversation data
+            total_conversations = len(conversations)
+            
+            # Mock calculations (in real system, would integrate with CRM data)
+            booking_rate = analytics.get('avg_conversion_probability', 0.5) * 0.8  # Estimate
+            no_show_rate = max(0.1, 0.3 - (analytics.get('avg_sentiment', 0) * 0.2))  # Estimate
+            conversion_rate = analytics.get('avg_conversion_probability', 0.5) * 0.6  # Estimate
+            
+            # Calculate average response time (mock)
+            avg_response_time = 6.0  # hours - would calculate from actual data
+            
+            # Calculate objection resolution rate
+            objection_resolution = min(0.9, 0.6 + (analytics.get('avg_sentiment', 0) * 0.3))
+            
+            return PipelineMetrics(
+                rep_id=rep_id,
+                total_conversations=total_conversations,
+                meeting_booking_rate=booking_rate,
+                no_show_rate=no_show_rate,
+                conversion_rate=conversion_rate,
+                average_response_time=avg_response_time,
+                objection_resolution_rate=objection_resolution
+            )
+            
         except Exception as e:
-            # Fallback response if AI service fails
-            return [
-                NextBestAction(
-                    lead_id="fallback_001",
-                    action_type="UPDATE_CRM",
-                    suggested_message="Review and update lead statuses manually",
-                    reason=f"AI service unavailable: {str(e)}"
+            print(f"Error calculating rep metrics: {e}")
+            return PipelineMetrics(
+                rep_id=rep_id,
+                total_conversations=0,
+                meeting_booking_rate=0.0,
+                no_show_rate=0.0,
+                conversion_rate=0.0,
+                average_response_time=0.0,
+                objection_resolution_rate=0.0
+            )
+    
+    def get_conversation_insights(self, rep_id: str) -> ConversationInsights:
+        """
+        Get coaching insights for a sales rep based on conversation analysis
+        
+        Args:
+            rep_id: Sales representative ID
+            
+        Returns:
+            ConversationInsights with coaching recommendations
+        """
+        try:
+            analytics = self.conversation_manager.get_rep_analytics(rep_id)
+            conversations = self.conversation_manager.get_conversations_for_rep(rep_id, days_back=14)
+            
+            # Analyze strengths and weaknesses
+            strengths = []
+            improvement_areas = []
+            training_suggestions = []
+            
+            # Analyze intent distribution
+            intent_dist = analytics.get('intent_distribution', {})
+            
+            if intent_dist.get('ready_to_book', 0) > intent_dist.get('not_interested', 0):
+                strengths.append("Good at building interest and moving leads towards booking")
+            
+            if intent_dist.get('price_sensitive', 0) > len(conversations) * 0.3:
+                improvement_areas.append("High number of price objections - work on value communication")
+                training_suggestions.append("Value-based selling techniques")
+            
+            if analytics.get('avg_sentiment', 0) > 0.3:
+                strengths.append("Maintains positive conversation tone")
+            elif analytics.get('avg_sentiment', 0) < -0.1:
+                improvement_areas.append("Conversation sentiment tends to be negative")
+                training_suggestions.append("Positive communication and rapport building")
+            
+            # Analyze urgency patterns
+            urgency_dist = analytics.get('urgency_distribution', {})
+            if urgency_dist.get('high', 0) < urgency_dist.get('low', 0):
+                improvement_areas.append("Low urgency creation - work on creating time-sensitive value")
+                training_suggestions.append("Urgency and scarcity techniques")
+            
+            # Best performing strategies (mock analysis)
+            best_strategies = [
+                "Asking discovery questions about career goals",
+                "Sharing success stories and testimonials",
+                "Addressing concerns directly and thoroughly"
+            ]
+            
+            return ConversationInsights(
+                rep_id=rep_id,
+                strengths=strengths if strengths else ["Maintains professional communication"],
+                improvement_areas=improvement_areas if improvement_areas else ["Continue current approach"],
+                suggested_training=training_suggestions if training_suggestions else ["Advanced objection handling"],
+                best_performing_strategies=best_strategies
+            )
+            
+        except Exception as e:
+            print(f"Error generating conversation insights: {e}")
+            return ConversationInsights(
+                rep_id=rep_id,
+                strengths=["Manual analysis required"],
+                improvement_areas=["Data collection needed"],
+                suggested_training=["System training"],
+                best_performing_strategies=["Standard sales process"]
+            )
+    
+    # KNOWLEDGE MANAGEMENT
+    
+    def add_sales_knowledge(self, knowledge_input: SalesKnowledgeInput) -> str:
+        """
+        Add new sales knowledge document to the knowledge base
+        
+        Args:
+            knowledge_input: Sales knowledge document to add
+            
+        Returns:
+            Document ID of the added knowledge
+        """
+        try:
+            doc_id = self.knowledge_manager.add_document(
+                title=knowledge_input.title,
+                content=knowledge_input.content,
+                doc_type=knowledge_input.doc_type,
+                category=knowledge_input.category,
+                tags=knowledge_input.tags,
+                priority=knowledge_input.priority
+            )
+            
+            print(f"Sales knowledge added successfully: {doc_id}")
+            return doc_id
+            
+        except Exception as e:
+            print(f"Error adding sales knowledge: {e}")
+            raise Exception(f"Failed to add knowledge: {str(e)}")
+    
+    def search_sales_knowledge(self, query: KnowledgeQuery) -> List[KnowledgeSearchResult]:
+        """
+        Search sales knowledge base for relevant information
+        
+        Args:
+            query: Knowledge query with search parameters
+            
+        Returns:
+            List of relevant knowledge search results
+        """
+        try:
+            # Retrieve knowledge using the manager
+            retrieval_results = self.knowledge_manager.retrieve_relevant_knowledge(
+                query=query.query,
+                doc_types=query.doc_types,
+                categories=query.categories,
+                top_k=query.top_k,
+                min_similarity=query.min_similarity
+            )
+            
+            # Convert to search result format
+            search_results = []
+            for result in retrieval_results:
+                doc = result.document
+                search_result = KnowledgeSearchResult(
+                    doc_id=doc.doc_id,
+                    title=doc.title,
+                    content=doc.content,
+                    doc_type=doc.doc_type,
+                    category=doc.category,
+                    tags=doc.tags,
+                    similarity_score=result.similarity_score,
+                    relevance_reason=result.relevance_reason,
+                    priority=doc.priority
+                )
+                search_results.append(search_result)
+            
+            return search_results
+            
+        except Exception as e:
+            print(f"Error searching sales knowledge: {e}")
+            return []
+    
+    def get_knowledge_base_stats(self) -> KnowledgeStats:
+        """Get statistics about the sales knowledge base"""
+        try:
+            stats_data = self.knowledge_manager.get_knowledge_stats()
+            return KnowledgeStats(**stats_data)
+        except Exception as e:
+            print(f"Error getting knowledge stats: {e}")
+            return KnowledgeStats(
+                total_documents=0,
+                document_types={},
+                categories={},
+                last_updated=datetime.now().isoformat()
+            )
+    
+    # UTILITY METHODS
+    
+    def _convert_to_rag_analysis(self, analysis: ConversationAnalysis, rag_enhanced: bool) -> RAGConversationAnalysis:
+        """Convert standard analysis to RAG analysis format"""
+        
+        # Mock knowledge references for demonstration
+        # In production, this would come from actual RAG processing
+        knowledge_used = []
+        knowledge_confidence = 0.0
+        
+        if rag_enhanced:
+            knowledge_used = [
+                KnowledgeReference(
+                    doc_id="sales_demo_001",
+                    title="Sample Sales Knowledge",
+                    relevance_score=0.8,
+                    doc_type="objection_script",
+                    category="price_objections"
                 )
             ]
+            knowledge_confidence = 0.85
+        
+        return RAGConversationAnalysis(
+            lead_id=analysis.lead_id,
+            summary=analysis.summary,
+            detailed_summary=analysis.detailed_summary,
+            detected_intent=analysis.detected_intent,
+            intent_confidence=analysis.intent_confidence,
+            objections=analysis.objections,
+            sentiment_analysis=analysis.sentiment_analysis,
+            key_topics=analysis.key_topics,
+            next_steps=analysis.next_steps,
+            recommended_follow_up_time=analysis.recommended_follow_up_time,
+            conversion_probability=analysis.conversion_probability,
+            urgency_level=analysis.urgency_level,
+            personalization_notes=analysis.personalization_notes,
+            knowledge_used=knowledge_used,
+            rag_enhanced=rag_enhanced,
+            knowledge_confidence=knowledge_confidence
+        )
+    
+    def get_high_priority_leads(self, rep_id: str) -> List[Dict[str, Any]]:
+        """Get high priority leads requiring immediate attention"""
+        return self.conversation_manager.get_high_priority_leads(rep_id)
+    
+    def get_pending_follow_ups(self, rep_id: str) -> List[Dict[str, Any]]:
+        """Get leads that need follow-up based on timing"""
+        return self.conversation_manager.get_pending_follow_ups(rep_id)
+    
+    def get_lead_conversation_history(self, lead_id: str) -> List[Dict[str, Any]]:
+        """Get complete conversation history for a specific lead"""
+        return self.conversation_manager.get_lead_history(lead_id)
+    
+    # LEGACY COMPATIBILITY
+    
+    async def analyze_legacy_conversation(
+        self, 
+        conversation_input: LegacyConversationInput
+    ) -> LegacyConversationAnalysis:
+        """
+        Legacy compatibility method for existing integrations
+        
+        Args:
+            conversation_input: Legacy conversation input format
+            
+        Returns:
+            LegacyConversationAnalysis in old format
+        """
+        try:
+            # Convert to new format
+            new_input = ConversationInput(
+                lead_id=conversation_input.lead_id,
+                channel=conversation_input.channel,
+                conversation_text=conversation_input.conversation_text,
+                rep_id="legacy_rep",  # Default rep ID for legacy calls
+                timestamp=datetime.now()
+            )
+            
+            # Analyze with new system
+            analysis = await self.analyze_conversation(new_input)
+            
+            # Convert back to legacy format
+            return LegacyConversationAnalysis(
+                summary=analysis.summary,
+                detected_intent=analysis.detected_intent.value,
+                objections=[obj.objection_text for obj in analysis.objections],
+                suggested_next_steps=analysis.next_steps
+            )
+            
+        except Exception as e:
+            print(f"Legacy analysis error: {e}")
+            return LegacyConversationAnalysis(
+                summary="Legacy analysis failed",
+                detected_intent="needs_more_info",
+                objections=[],
+                suggested_next_steps=["Manual review required"]
+            )

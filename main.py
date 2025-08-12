@@ -1,25 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from database import connect_to_mongo, close_mongo_connection
-from contextlib import asynccontextmanager
 import os
 from dotenv import load_dotenv
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Startup
-    await connect_to_mongo()
-    yield
-    # Shutdown
-    await close_mongo_connection()
 
 load_dotenv()
 
 app = FastAPI(
     title="Odin School - EdTech Solutions",
     description="AI-driven solutions for EdTech problems",
-    version="1.0.0",
-    lifespan=lifespan
+    version="1.0.0"
 )
 
 # CORS middleware
