@@ -1,14 +1,152 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException
+from fastapi.responses import JSONResponse
+from typing import Dict, Any, Optional
+import json
+
+from .service import CreatorFitService
+from .models import AnalysisRequest, PredictionResponse, ErrorResponse, ProgramType
 
 router = APIRouter()
 
-@router.get("/")
-async def creatorfit_home():
-    """CreatorFit - Influencer Marketing Optimization"""
+def get_service():
+    """Get CreatorFit service instance"""
+    return CreatorFitService()
+
+
+
+@router.post("/analyze", response_model=PredictionResponse)
+async def analyze_creators_csv(
+    file: UploadFile = File(..., description="CSV file with creator data"),
+    program_type: ProgramType = Form(default=ProgramType.DATA_SCIENCE, description="Program type for analysis"),
+    campaign_budget: float = Form(default=100000, ge=0, description="Campaign budget for CPL calculation")
+):
+    """
+    COMPREHENSIVE CREATOR ANALYSIS - Upload CSV and get full business intelligence
+    
+    This endpoint provides:
+    1. Creator fit scores and rankings
+    2. Lead predictions with confidence levels  
+    3. Business metrics (CPL, ROI, budget allocation)
+    4. Strategic recommendations for campaign optimization
+    
+    Perfect for: Campaign planning, budget allocation, strategic decision making
+    """
+    try:
+        # Validate file
+        if not file.filename.endswith('.csv'):
+            raise HTTPException(status_code=400, detail="File must be a CSV")
+        
+        # Read CSV content
+        csv_content = await file.read()
+        
+        # Get service and analyze
+        service = get_service()
+        result = await service.analyze_csv(
+            csv_content=csv_content,
+            program_type=program_type.value,
+            campaign_budget=campaign_budget
+        )
+        
+        if result.get('success'):
+            return JSONResponse(content=result)
+        else:
+            raise HTTPException(
+                status_code=400, 
+                detail=result.get('error', 'Analysis failed')
+            )
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Server error: {str(e)}")
+
+@router.post("/forecast")
+async def forecast_creator_leads(
+    file: UploadFile = File(..., description="CSV file with creator data for lead forecasting"),
+    program_type: ProgramType = Form(default=ProgramType.DATA_SCIENCE, description="Program type for forecasting")
+):
+    """
+    LEAD FORECASTING - Upload CSV and get qualified leads predictions
+    
+    This endpoint focuses on lead prediction and booking recommendations:
+    - Predicted qualified leads for each creator
+    - Confidence scores for prediction reliability
+    - Immediate booking recommendations (BOOK/REVIEW/SKIP)
+    - Forecasting insights for lead planning
+    
+    Perfect for: Lead planning, creator booking decisions, performance forecasting
+    """
+    try:
+        # Validate file
+        if not file.filename.endswith('.csv'):
+            raise HTTPException(status_code=400, detail="File must be a CSV")
+        
+        # Read CSV content
+        csv_content = await file.read()
+        
+        # Get service and forecast
+        service = get_service()
+        result = await service.forecast_leads_csv(
+            csv_content=csv_content,
+            program_type=program_type.value
+        )
+        
+        if result.get('success'):
+            return JSONResponse(content=result)
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail=result.get('error', 'Forecasting failed')
+            )
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Server error: {str(e)}")
+
+
+
+@router.get("/programs")
+async def get_available_programs():
+    """Get list of available program types"""
     return {
-        "problem": "CreatorFit - Influencer Marketing",
-        "description": "AI-driven creator scoring and audience analysis",
-        "status": "Ready for development"
+        "programs": [
+            {"value": "data_science", "label": "Data Science"},
+            {"value": "web_development", "label": "Web Development"}, 
+            {"value": "digital_marketing", "label": "Digital Marketing"},
+            {"value": "ai_ml", "label": "AI/ML"}
+        ],
+        "default": "data_science"
     }
 
-# TODO: Add your routes here
+@router.get("/health")
+async def health_check():
+    """Health check for CreatorFit service"""
+    try:
+        # Check if ML pipeline is available
+        try:
+            from pathlib import Path
+            # Use absolute path to models directory
+            models_dir = Path(__file__).parent.parent.parent / "models"
+            model_files = [
+                "creatorfit_lgb_model.pkl",
+                "creatorfit_preprocessor.pkl", 
+                "creatorfit_metadata.pkl"
+            ]
+            
+            ml_status = "available" if all((models_dir / f).exists() for f in model_files) else "models_missing"
+        except Exception:
+            ml_status = "error"
+        
+        return {
+            "status": "healthy",
+            "service": "CreatorFit",
+            "ml_pipeline": ml_status,
+            "models_location": "models/"
+        }
+        
+    except Exception as e:
+        return {
+            "status": "degraded",
+            "error": str(e)
+        }
