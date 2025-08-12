@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import json
 from datetime import datetime, timedelta
 from typing import Dict, List, Any, Optional
@@ -13,8 +14,14 @@ class OnetruthService:
     """Service class for OneTruth analytics operations"""
     
     def __init__(self):
-        self.db = get_database()
         self.collection_name = "business_analytics"
+    
+    def _get_database(self):
+        """Get database connection at runtime"""
+        db = get_database()
+        if db is None:
+            raise Exception("Database not connected")
+        return db
         
     async def train_model(self, size: int = 2000) -> Dict[str, Any]:
         """Train the OneTruth anomaly detection model"""
@@ -23,7 +30,7 @@ class OnetruthService:
             data = generate_synthetic_analytics_data(num_samples=size)
             
             # Train the model
-            metrics = onetruth_model.train(data, target_column="business_health_anomaly")
+            metrics = await onetruth_model.train(data, target_column="business_health_anomaly")
             
             return {
                 "message": "OneTruth model trained successfully",
@@ -37,10 +44,8 @@ class OnetruthService:
     async def get_dashboard_data(self, time_range: str = "7d", include_anomalies: bool = True) -> Dict[str, Any]:
         """Get unified analytics dashboard data"""
         try:
-            if not self.db:
-                raise Exception("Database not connected")
-            
-            collection = self.db[self.collection_name]
+            db = self._get_database()
+            collection = db[self.collection_name]
             
             # Calculate date range
             days = int(time_range.replace('d', ''))
@@ -66,6 +71,10 @@ class OnetruthService:
             
             # Convert to DataFrame for analysis
             data_df = pd.DataFrame(data_records)
+            
+            # Add derived features if using anomaly detection
+            if include_anomalies and onetruth_model.model is not None:
+                data_df = self._add_derived_features(data_df)
             
             # Business health analysis
             health_analysis = onetruth_model.analyze_business_health(data_df)
@@ -118,10 +127,8 @@ class OnetruthService:
             if onetruth_model.model is None:
                 raise Exception("Model not trained. Please train the model first.")
             
-            if not self.db:
-                raise Exception("Database not connected")
-            
-            collection = self.db[self.collection_name]
+            db = self._get_database()
+            collection = db[self.collection_name]
             
             # Get recent data
             days = int(time_range.replace('d', ''))
@@ -144,6 +151,8 @@ class OnetruthService:
             else:
                 data_records = [self._convert_mongo_record(record) for record in records]
                 data_df = pd.DataFrame(data_records)
+                # Add derived features required by the model
+                data_df = self._add_derived_features(data_df)
             
             # Detect anomalies
             anomaly_results = onetruth_model.detect_anomalies(data_df)
@@ -159,12 +168,9 @@ class OnetruthService:
             dashboard_data = await self.get_dashboard_data(time_range=f"{horizon_days}d")
             
             # Generate executive decisions
-            if not self.db:
-                sample_data = generate_synthetic_analytics_data(num_samples=horizon_days)
-                data_df = sample_data
-            else:
-                # Use real data if available
-                collection = self.db[self.collection_name]
+            try:
+                db = self._get_database()
+                collection = db[self.collection_name]
                 cursor = collection.find().sort("week_date", -1).limit(horizon_days)
                 records = await cursor.to_list(length=horizon_days)
                 
@@ -173,6 +179,9 @@ class OnetruthService:
                     data_df = pd.DataFrame(data_records)
                 else:
                     data_df = generate_synthetic_analytics_data(num_samples=horizon_days)
+            except Exception:
+                # Fallback to synthetic data if database unavailable
+                data_df = generate_synthetic_analytics_data(num_samples=horizon_days)
             
             # Generate executive decisions
             decisions = onetruth_model.generate_executive_decisions(data_df)
@@ -218,17 +227,20 @@ class OnetruthService:
                 raise Exception("Model not trained. Please train the model first.")
             
             # Get test data
-            if self.db:
-                collection = self.db[self.collection_name]
+            try:
+                db = self._get_database()
+                collection = db[self.collection_name]
                 cursor = collection.find().sort("week_date", -1).limit(sample_size)
                 records = await cursor.to_list(length=sample_size)
                 
                 if records:
                     test_data = [self._convert_mongo_record(record) for record in records]
                     test_df = pd.DataFrame(test_data)
+                    # Add derived features required by the model
+                    test_df = self._add_derived_features(test_df)
                 else:
                     test_df = generate_synthetic_analytics_data(num_samples=sample_size)
-            else:
+            except Exception:
                 test_df = generate_synthetic_analytics_data(num_samples=sample_size)
             
             # Prepare features and targets
@@ -269,7 +281,7 @@ class OnetruthService:
                     for actual, pred, conf in zip(y_test, predictions, probabilities.max(axis=1))
                 ],
                 top_features=[{"feature": name, "importance": f"{imp:.3f}"} for name, imp in top_features],
-                model_info=onetruth_model.get_model_info()
+                ml_model_info=onetruth_model.get_model_info()
             )
         except Exception as e:
             raise Exception(f"Model evaluation failed: {e}")
@@ -291,12 +303,16 @@ class OnetruthService:
                 documents.append(doc)
             
             # Insert into MongoDB if connected
-            if self.db:
-                collection = self.db[self.collection_name]
+            try:
+                db = self._get_database()
+                collection = db[self.collection_name]
                 # Clear existing data
                 await collection.delete_many({})
                 # Insert new data
                 await collection.insert_many(documents)
+            except Exception as db_error:
+                print(f"Warning: Could not insert data to MongoDB: {db_error}")
+                # Continue without database - model training will still work
             
             # Train model with the generated data
             await self.train_model(size)
@@ -350,34 +366,73 @@ class OnetruthService:
     async def record_analytics_outcome(self, outcome: AnalyticsOutcome) -> Dict[str, Any]:
         """Record analytics prediction outcome for model improvement"""
         try:
-            if not self.db:
+            try:
+                db = self._get_database()
+                collection = db["analytics_outcomes"]
+                
+                outcome_doc = {
+                    "metric_name": outcome.metric_name,
+                    "predicted_value": outcome.predicted_value,
+                    "actual_value": outcome.actual_value,
+                    "timestamp": outcome.timestamp.isoformat(),
+                    "prediction_error": abs(outcome.predicted_value - outcome.actual_value),
+                    "accuracy_score": 1 - (abs(outcome.predicted_value - outcome.actual_value) / max(outcome.actual_value, 0.01))
+                }
+                
+                await collection.insert_one(outcome_doc)
+                
+                return {
+                    "message": "Analytics outcome recorded successfully",
+                    "metric": outcome.metric_name,
+                    "accuracy": f"{outcome_doc['accuracy_score'] * 100:.1f}%"
+                }
+            except Exception:
                 return {"message": "Database not connected, outcome stored in memory"}
-            
-            collection = self.db["analytics_outcomes"]
-            
-            outcome_doc = {
-                "metric_name": outcome.metric_name,
-                "predicted_value": outcome.predicted_value,
-                "actual_value": outcome.actual_value,
-                "timestamp": outcome.timestamp.isoformat(),
-                "prediction_error": abs(outcome.predicted_value - outcome.actual_value),
-                "accuracy_score": 1 - (abs(outcome.predicted_value - outcome.actual_value) / max(outcome.actual_value, 0.01))
-            }
-            
-            await collection.insert_one(outcome_doc)
-            
-            return {
-                "message": "Analytics outcome recorded successfully",
-                "metric": outcome.metric_name,
-                "accuracy": f"{outcome_doc['accuracy_score'] * 100:.1f}%"
-            }
         except Exception as e:
             raise Exception(f"Failed to record outcome: {e}")
     
     async def get_analytics(self, sample_size: int = 500) -> Dict[str, Any]:
         """Get analytics performance and model insights"""
         try:
-            if not self.db:
+            try:
+                db = self._get_database()
+                collection = db[self.collection_name]
+                
+                # Get total record count
+                total_records = await collection.count_documents({})
+                
+                # Get recent records for analysis
+                cursor = collection.find().sort("week_date", -1).limit(min(sample_size, 100))
+                records = await cursor.to_list(length=None)
+                
+                if not records:
+                    return {"message": "No analytics data found. Please run /seed endpoint first."}
+                
+                # Calculate analytics metrics
+                data_records = [self._convert_mongo_record(record) for record in records]
+                data_df = pd.DataFrame(data_records)
+                
+                # Business health analysis
+                health_analysis = onetruth_model.analyze_business_health(data_df)
+                
+                # Anomaly rate
+                anomaly_rate = data_df['business_health_anomaly'].mean() * 100 if 'business_health_anomaly' in data_df.columns else 0
+                
+                return {
+                    "total_records": total_records,
+                    "avg_health_score": health_analysis.get("overall_health_score", 0),
+                    "anomaly_rate": round(anomaly_rate, 1),
+                    "data_quality_score": 94.2,
+                    "recent_predictions": [
+                        {
+                            "date": record.get("week_date", ""),
+                            "health_score": health_analysis.get("overall_health_score", 0),
+                            "anomaly": bool(record.get("business_health_anomaly", False))
+                        }
+                        for record in data_records[:5]
+                    ]
+                }
+            except Exception:
                 # Return mock analytics if no database
                 return {
                     "total_records": sample_size,
@@ -395,43 +450,6 @@ class OnetruthService:
                         {"date": "2025-08-09", "anomaly_score": 0.23, "health_grade": "GOOD"}
                     ]
                 }
-            
-            collection = self.db[self.collection_name]
-            
-            # Get total record count
-            total_records = await collection.count_documents({})
-            
-            # Get recent records for analysis
-            cursor = collection.find().sort("week_date", -1).limit(min(sample_size, 100))
-            records = await cursor.to_list(length=None)
-            
-            if not records:
-                return {"message": "No analytics data found. Please run /seed endpoint first."}
-            
-            # Calculate analytics metrics
-            data_records = [self._convert_mongo_record(record) for record in records]
-            data_df = pd.DataFrame(data_records)
-            
-            # Business health analysis
-            health_analysis = onetruth_model.analyze_business_health(data_df)
-            
-            # Anomaly rate
-            anomaly_rate = data_df['business_health_anomaly'].mean() * 100 if 'business_health_anomaly' in data_df.columns else 0
-            
-            return {
-                "total_records": total_records,
-                "avg_health_score": health_analysis.get("overall_health_score", 0),
-                "anomaly_rate": round(anomaly_rate, 1),
-                "data_quality_score": 94.2,
-                "recent_predictions": [
-                    {
-                        "date": record.get("week_date", ""),
-                        "health_score": health_analysis.get("overall_health_score", 0),
-                        "anomaly": bool(record.get("business_health_anomaly", False))
-                    }
-                    for record in data_records[:5]
-                ]
-            }
         except Exception as e:
             raise Exception(f"Analytics retrieval failed: {e}")
     
@@ -457,6 +475,28 @@ class OnetruthService:
                 record[field] = float(record[field]) if field not in ['crm_lead_volume', 'ga4_sessions', 'support_ticket_volume', 'telephony_call_volume', 'lms_active_users', 'week_of_month', 'is_month_end', 'business_health_anomaly'] else int(record[field])
         
         return record
+    
+    def _add_derived_features(self, data_df: pd.DataFrame) -> pd.DataFrame:
+        """Add derived features required by the model"""
+        # Ensure week_date is datetime
+        if 'week_date' in data_df.columns:
+            data_df['week_date'] = pd.to_datetime(data_df['week_date'])
+            
+            # Create week_of_month feature
+            data_df['week_of_month'] = ((data_df['week_date'].dt.day - 1) // 7 + 1).astype(int)
+            
+            # Create is_month_end feature (1 if day > 25, else 0)
+            data_df['is_month_end'] = (data_df['week_date'].dt.day > 25).astype(int)
+            
+            # Create seasonal_factor feature (sine wave based on month)
+            data_df['seasonal_factor'] = 0.8 + 0.4 * np.sin(2 * np.pi * data_df['week_date'].dt.month / 12)
+        else:
+            # If no week_date, use default values
+            data_df['week_of_month'] = 2  # Default to week 2
+            data_df['is_month_end'] = 0   # Default to not month end
+            data_df['seasonal_factor'] = 1.0  # Default seasonal factor
+            
+        return data_df
     
     async def _generate_llm_insights(self, dashboard_data: Dict[str, Any], decisions: Dict[str, Any]) -> str:
         """Generate LLM-powered insights for executive brief"""

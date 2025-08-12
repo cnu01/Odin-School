@@ -52,14 +52,14 @@ class OneTruthModel(BaseMLModel):
         
         return np.array(features)
     
-    def train(self, data: pd.DataFrame, target_column: str) -> Dict[str, Any]:
+    async def train(self, data: pd.DataFrame, target_column: str) -> Dict[str, Any]:
         """
         Train the model using pandas DataFrame
         """
         try:
             # Convert DataFrame to list of dicts for base class compatibility
             training_data = data.to_dict('records')
-            return super().train(training_data, target_column)
+            return await super().train(training_data, target_column)
         except Exception as e:
             raise ValueError(f"Training failed: {e}")
     

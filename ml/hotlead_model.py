@@ -472,6 +472,7 @@ def generate_synthetic_training_data(num_samples: int = 2000) -> List[Dict[str, 
         # Create lead record
         lead_data = {
             "lead_id": f"LEAD_{datetime.now().strftime('%Y%m%d')}_{i:04d}",
+            "email": f"lead_{i}@example.com",
             "created_at": (datetime.now() - timedelta(days=random.randint(0, 90))).isoformat(),
             "source": source,
             "utm_campaign": utm_campaign,
@@ -496,13 +497,17 @@ def generate_synthetic_training_data(num_samples: int = 2000) -> List[Dict[str, 
             "source_quality_score": source_quality,
             "location_quality_score": location_quality,
             "contacted": contacted,
+            "contacted_at": datetime.now().isoformat() if contacted else None,
             "meeting_booked": meeting_booked,
             "enrolled": enrolled,
             "converted": converted,
             "conversion_probability": conversion_probability,
             "intent_score": intent_multiplier / 3.0,
             "behavior_score": behavior_score,
-            "lead_score": min(100, conversion_probability * 100),
+            "priority_score": min(100, int(conversion_probability * 100)),
+            "is_priority": conversion_probability > 0.7,
+            "lead_temperature": "🔥 HOT" if conversion_probability > 0.8 else ("🟡 WARM" if conversion_probability > 0.6 else "🟦 COOL"),
+            "status": "contacted" if contacted else "new",
             "priority": "HIGH" if conversion_probability > 0.7 else ("MEDIUM" if conversion_probability > 0.4 else "LOW")
         }
         

@@ -87,7 +87,7 @@ class ModelEvaluationResponse(BaseModel):
     evaluation_results: Dict[str, Any]
     predictions: List[Dict[str, Any]]
     top_features: List[Dict[str, Any]]
-    model_info: Dict[str, Any]
+    ml_model_info: Dict[str, Any]  # Renamed to avoid conflict with protected namespace
 
 class StatusResponse(BaseModel):
     """Response model for system status"""

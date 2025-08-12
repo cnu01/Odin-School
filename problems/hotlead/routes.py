@@ -65,7 +65,7 @@ async def ingest_lead(lead_request: LeadIngestRequest):
 @router.get("/priority-queue", response_model=PriorityQueueResponse)
 async def get_priority_queue(
     limit: Optional[int] = Query(20, description="Number of leads to return"),
-    min_score: Optional[int] = Query(70, description="Minimum priority score"),
+    min_score: Optional[int] = Query(0, description="Minimum priority score"),
     status_filter: Optional[str] = Query(None, description="Filter by lead status"),
     source_filter: Optional[str] = Query(None, description="Filter by lead source")
 ):
@@ -131,12 +131,8 @@ async def get_prioritization_analytics():
     - ML model effectiveness
     """
     try:
-        # Implementation will be added based on MongoDB data
-        return {
-            "analytics_summary": "AI-driven prioritization performance analysis",
-            "message": "Analytics endpoint ready - will be implemented with live data",
-            "status": "development"
-        }
+        analytics_data = await hotlead_service.get_analytics()
+        return analytics_data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

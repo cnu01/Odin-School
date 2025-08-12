@@ -58,21 +58,21 @@ async def onetruth_status():
     )
 
 @router.post("/train")
-async def train_onetruth_model(request: TrainingRequest):
+async def train_onetruth_model(size: int = 2000):
     """Train the OneTruth anomaly detection model"""
     try:
-        result = await onetruth_service.train_model(request.size)
+        result = await onetruth_service.train_model(size)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Training failed: {e}")
 
 @router.get("/dashboard")
-async def get_unified_dashboard(request: DashboardRequest = DashboardRequest()):
+async def get_unified_dashboard(time_range: str = "7d", include_anomalies: bool = True):
     """Get unified analytics dashboard with business health metrics"""
     try:
         dashboard_data = await onetruth_service.get_dashboard_data(
-            time_range=request.time_range,
-            include_anomalies=request.include_anomalies
+            time_range=time_range,
+            include_anomalies=include_anomalies
         )
         return dashboard_data
     except Exception as e:
@@ -88,12 +88,12 @@ async def detect_anomalies(time_range: str = "7d"):
         raise HTTPException(status_code=500, detail=f"Anomaly detection failed: {e}")
 
 @router.post("/executive-brief")
-async def generate_executive_brief(request: ExecutiveBriefRequest):
+async def generate_executive_brief(use_llm: bool = False, horizon_days: int = 7):
     """Generate AI-powered executive brief with anomalies and decision recommendations"""
     try:
         brief = await onetruth_service.generate_executive_brief(
-            use_llm=request.use_llm,
-            horizon_days=request.horizon_days
+            use_llm=use_llm,
+            horizon_days=horizon_days
         )
         return brief
     except Exception as e:
@@ -127,12 +127,14 @@ async def seed_onetruth(size: int = 2000):
         raise HTTPException(status_code=500, detail=f"Data seeding failed: {e}")
 
 @router.post("/verify")
-async def verify_data_consistency(request: DataVerificationRequest):
+async def verify_data_consistency(systems: list = None, time_range_days: int = 7):
     """Verify data consistency and quality across integrated business systems"""
     try:
+        if systems is None:
+            systems = ["CRM", "GA4", "Ads", "Support", "Telephony", "LMS"]
         verification = await onetruth_service.verify_data_consistency(
-            systems=request.systems,
-            time_range_days=request.time_range_days
+            systems=systems,
+            time_range_days=time_range_days
         )
         return verification
     except Exception as e:

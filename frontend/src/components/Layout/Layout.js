@@ -29,6 +29,8 @@ import {
   Notifications as NotificationsIcon,
   AccountCircle as AccountIcon,
   ChatBubble as ChatIcon,
+  Psychology as PsychologyIcon,
+  Analytics as AnalyticsIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -36,16 +38,28 @@ const drawerWidth = 260;
 
 const menuItems = [
   {
+    text: 'OneTruth Analytics',
+    icon: <AnalyticsIcon />,
+    path: '/onetruth',
+    subtitle: 'Unified Intelligence',
+  },
+  {
     text: 'Dashboard',
     icon: <DashboardIcon />,
     path: '/dashboard',
-    subtitle: 'OneTruth Analytics',
+    subtitle: 'Overview',
   },
   {
     text: 'Lead Management',
     icon: <PeopleIcon />,
     path: '/leads',
-    subtitle: 'HotLead & FirstTouch BOT',
+    subtitle: 'FirstTouch BOT',
+  },
+  {
+    text: 'HotLead AI',
+    icon: <PsychologyIcon />,
+    path: '/hotlead',
+    subtitle: 'ML-Powered Scoring',
   },
   {
     text: 'Conversation Management',

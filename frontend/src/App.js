@@ -7,12 +7,14 @@ import { Box } from '@mui/material';
 import Layout from './components/Layout/Layout';
 import Dashboard from './pages/Dashboard/Dashboard';
 import LeadManagement from './pages/LeadManagement/LeadManagement';
+import HotLead from './pages/HotLead/HotLead';
 import InfluencerHub from './pages/InfluencerHub/InfluencerHub';
 import BrandReputation from './pages/BrandReputation/BrandReputation';
 import AdPerformance from './pages/AdPerformance/AdPerformance';
 
 import PricingInsights from './pages/PricingInsights/PricingInsights';
 import CloseMore from './pages/CloseMore/CloseMore';
+import OneTruth from './pages/OneTruth';
 
 // Odin School brand theme
 const theme = createTheme({
@@ -79,11 +81,13 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/leads" element={<LeadManagement />} />
+            <Route path="/hotlead" element={<HotLead />} />
             <Route path="/influencers" element={<InfluencerHub />} />
             <Route path="/reputation" element={<BrandReputation />} />
             <Route path="/ads" element={<AdPerformance />} />
             <Route path="/pricing" element={<PricingInsights />} />
             <Route path="/closemore" element={<CloseMore />} />
+            <Route path="/onetruth" element={<OneTruth />} />
           </Routes>
         </Layout>
       </Router>

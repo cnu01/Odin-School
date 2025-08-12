@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
+from database import connect_to_mongo, close_mongo_connection
 
 load_dotenv()
 
@@ -10,6 +11,15 @@ app = FastAPI(
     description="AI-driven solutions for EdTech problems",
     version="1.0.0"
 )
+
+# Database connection events
+@app.on_event("startup")
+async def startup_event():
+    await connect_to_mongo()
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    await close_mongo_connection()
 
 # CORS middleware
 # Read CORS origins from env: comma-separated list, e.g. "http://localhost:8000,http://localhost:8001"
