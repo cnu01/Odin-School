@@ -927,8 +927,18 @@
         }
 
         // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             console.log('CreatorFit Analysis Tool Loaded');
+            
+            // Check FastAPI server health
+            const health = await checkFastAPIHealth();
+            if (health.status === 'healthy') {
+                console.log('✅ FastAPI server is running and healthy');
+                console.log('ML Pipeline Status:', health.ml_pipeline);
+            } else {
+                console.warn('⚠️ FastAPI server is not available');
+                console.warn('Please start the server: uvicorn main:app --reload');
+            }
         });
 
         // Enhanced prediction functionality
@@ -936,56 +946,145 @@
         
         document.getElementById('enhancedAnalyzeButton').addEventListener('click', async function() {
             const fileInput = document.getElementById('enhancedCsvFile');
-            console.log('fileInput:', fileInput)
             const programSelect = document.getElementById('enhancedProgramSelect');
             const budgetInput = document.getElementById('campaignBudget');
             
             if (!fileInput.files[0]) {
-                alert('Please select a CSV file to upload');
+                showEnhancedError('Please select a CSV file to upload');
                 return;
             }
             
             showEnhancedLoading();
             
             try {
-                // Look for prediction results JSON
-                const fileName = fileInput.files[0].name.replace('.csv', '_prediction_results.json');
-                console.log('fileName:', fileName)
-                const result = await loadEnhancedResults(fileName);
-                console.log('result:', result)
+                // Call FastAPI endpoint
+                const result = await callFastAPIAnalyze(fileInput.files[0], programSelect.value, budgetInput.value);
                 
                 hideEnhancedLoading();
                 
                 if (result && result.success) {
                     displayEnhancedResults(result);
                 } else {
-                    showEnhancedError(`Please run: python prediction_pipeline.py ${fileInput.files[0].name} ${programSelect.value}`);
+                    showEnhancedError(result?.error || 'Analysis failed. Please check your data and try again.');
                 }
                 
             } catch (error) {
                 hideEnhancedLoading();
-                showEnhancedError(`Prediction results not found. Please run:\n\npython prediction_pipeline.py ${fileInput.files[0].name} ${programSelect.value}`);
+                console.error('Analysis error:', error);
+                showEnhancedError(`Analysis failed: ${error.message}. Please ensure the FastAPI server is running.`);
             }
         });
 
-        async function loadEnhancedResults(fileName) {
+        // FastAPI Integration with Strong Error Handling
+        const FASTAPI_BASE_URL = 'http://localhost:8000/api/creatorfit';
+        
+        async function callFastAPIAnalyze(file, programType, campaignBudget) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('program_type', programType);
+            formData.append('campaign_budget', campaignBudget || 100000);
+            
             try {
-                console.log('Attempting to fetch:', fileName);
-                const response = await fetch(fileName);
-                console.log('Response status:', response.status);
-                console.log('Response ok:', response.ok);
+                console.log('Calling FastAPI analyze endpoint...');
+                console.log('File:', file.name, 'Program:', programType, 'Budget:', campaignBudget);
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('Data loaded successfully:', data);
-                    return data;
-                } else {
-                    console.error('Response not ok:', response.status, response.statusText);
-                    return null;
+                const response = await fetch(`${FASTAPI_BASE_URL}/analyze`, {
+                    method: 'POST',
+                    body: formData,
+                    // Don't set Content-Type header - let browser set it for FormData
+                });
+                
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                    
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.detail || errorMessage;
+                    } catch (e) {
+                        // If can't parse JSON, use the HTTP error
+                    }
+                    
+                    throw new Error(errorMessage);
                 }
+                
+                const result = await response.json();
+                console.log('Analysis completed successfully:', result);
+                return result;
+                
             } catch (error) {
-                console.error('Fetch error:', error);
-                return null;
+                console.error('FastAPI call failed:', error);
+                
+                // Enhanced error messages for common issues
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    throw new Error('Cannot connect to FastAPI server. Please ensure it\'s running on http://localhost:8000');
+                } else if (error.message.includes('413')) {
+                    throw new Error('File too large. Please use a smaller CSV file.');
+                } else if (error.message.includes('400')) {
+                    throw new Error('Invalid request. Please check your CSV format and try again.');
+                } else if (error.message.includes('500')) {
+                    throw new Error('Server error during analysis. Please check the server logs.');
+                } else {
+                    throw error; // Re-throw the original error
+                }
+            }
+        }
+        
+        async function callFastAPIForecast(creatorData, programType) {
+            try {
+                console.log('Calling FastAPI forecast endpoint...');
+                console.log('Creator data:', creatorData, 'Program:', programType);
+                
+                const response = await fetch(`${FASTAPI_BASE_URL}/forecast?program_type=${programType}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(creatorData),
+                });
+                
+                console.log('Forecast response status:', response.status);
+                
+                if (!response.ok) {
+                    let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                    
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.detail || errorMessage;
+                    } catch (e) {
+                        // If can't parse JSON, use the HTTP error
+                    }
+                    
+                    throw new Error(errorMessage);
+                }
+                
+                const result = await response.json();
+                console.log('Forecast completed successfully:', result);
+                return result;
+                
+            } catch (error) {
+                console.error('FastAPI forecast failed:', error);
+                
+                // Enhanced error messages
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    throw new Error('Cannot connect to FastAPI server. Please ensure it\'s running on http://localhost:8000');
+                } else {
+                    throw error;
+                }
+            }
+        }
+        
+        // Health check function
+        async function checkFastAPIHealth() {
+            try {
+                const response = await fetch(`${FASTAPI_BASE_URL}/health`);
+                const health = await response.json();
+                console.log('FastAPI Health:', health);
+                return health;
+            } catch (error) {
+                console.error('Health check failed:', error);
+                return { status: 'unavailable', error: error.message };
             }
         }
 
@@ -999,7 +1098,40 @@
         }
 
         function showEnhancedError(message) {
-            alert(message);
+            // Create a more user-friendly error display
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.style.cssText = `
+                background: #ffebee;
+                border: 1px solid #f44336;
+                border-radius: 8px;
+                padding: 15px;
+                margin: 15px 0;
+                color: #c62828;
+                font-weight: 500;
+                display: block;
+            `;
+            errorDiv.innerHTML = `
+                <strong>⚠️ Analysis Error:</strong><br>
+                ${message.replace(/\n/g, '<br>')}
+            `;
+            
+            // Remove any existing error messages
+            const existingError = document.querySelector('.error-message');
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            // Add error message to the enhanced section
+            const enhancedSection = document.querySelector('.enhanced-section');
+            enhancedSection.insertBefore(errorDiv, enhancedSection.firstChild);
+            
+            // Auto-remove after 10 seconds
+            setTimeout(() => {
+                if (errorDiv.parentNode) {
+                    errorDiv.remove();
+                }
+            }, 10000);
         }
 
         function displayEnhancedResults(result) {
