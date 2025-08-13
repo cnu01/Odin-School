@@ -114,26 +114,41 @@ class AdliftService:
             raise Exception(f"Analysis failed: {str(e)}")
     
     def _format_performance_variance(self, segment_stats) -> Dict:
-        """Format existing analysis results for API response"""
+        """Format existing analysis results for API response using REAL DATA"""
         try:
-            # Extract key metrics from existing analysis
-            return {
-                "ctr_range": "0.7% to 3.8%",  # From your existing analysis
-                "ctr_variance": "5.4x",
-                "cpql_range": "₹200 to ₹800",
-                "cpql_variance": "4.0x",
-                "qpi_range": "0.0010 to 0.0040",
-                "total_campaigns": len(segment_stats) if hasattr(segment_stats, '__len__') else 128
-            }
-        except:
-            return {
-                "ctr_range": "0.7% to 3.8%",
-                "ctr_variance": "5.4x",
-                "cpql_range": "₹200 to ₹800",
-                "cpql_variance": "4.0x",
-                "qpi_range": "0.0010 to 0.0040",
-                "total_campaigns": 128
-            }
+            # Use the temp file to get real metrics
+            temp_csv_path = "temp_upload.csv"
+            if os.path.exists(temp_csv_path):
+                df = pd.read_csv(temp_csv_path)
+                df['QPI'] = df['CTR'] * df['CVR'] * df['qualified_rate']
+                df['CPQL'] = df['spend'] / df['qualified_leads'].clip(lower=1)
+                df_filtered = df[df['impressions'] >= 500].copy()
+                
+                ctr_stats = df_filtered['CTR'].describe()
+                cpql_stats = df_filtered['CPQL'].describe()
+                qpi_stats = df_filtered['QPI'].describe()
+                
+                return {
+                    "ctr_range": f"{ctr_stats['min']:.1%} to {ctr_stats['max']:.1%}",
+                    "ctr_variance": f"{ctr_stats['max']/ctr_stats['min']:.1f}x",
+                    "cpql_range": f"₹{cpql_stats['min']:.0f} to ₹{cpql_stats['max']:.0f}",
+                    "cpql_variance": f"{cpql_stats['max']/cpql_stats['min']:.1f}x",
+                    "qpi_range": f"{qpi_stats['min']:.4f} to {qpi_stats['max']:.4f}",
+                    "total_campaigns": len(df_filtered)
+                }
+        except Exception as e:
+            print(f"Warning: Could not calculate real metrics, using fallback: {e}")
+            pass
+        
+        # Fallback to hardcoded values if calculation fails
+        return {
+            "ctr_range": "",
+            "ctr_variance": "", 
+            "cpql_range": "",
+            "cpql_variance": "",
+            "qpi_range": "",
+            "total_campaigns": 0
+        }
     
     def _format_root_causes(self, mismatch_evidence, qualification_issues) -> List[Dict]:
         """Format existing root cause analysis for API response"""
