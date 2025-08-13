@@ -1,0 +1,43 @@
+date,campaign,ad_group,audience_segment,placement,headline,description,keywords,impressions,clicks,spend,leads,qualified_leads,CTR,CPC,CVR,qualified_rate
+2025-07-21,DSA-India,DSA-Core,Graduates,search,Master DSA Fast,Solve 200+ problems,"dsa, interview prep",12080,190,6958.88,25,11,0.015728,36.63,0.131579,0.44
+2025-07-22,DSA-India,DSA-Core,Graduates,search,Master DSA Fast,Solve 200+ problems,"dsa, interview prep",9939,290,11602.58,29,14,0.029178,40.01,0.1,0.482759
+2025-07-23,DSA-India,DSA-Core,Graduates,search,Master DSA Fast,Solve 200+ problems,"dsa, interview prep",10532,270,11466.63,31,11,0.025636,42.47,0.114815,0.354839
+2025-07-24,DSA-India,DSA-Core,Graduates,search,Master DSA Fast,Solve 200+ problems,"dsa, interview prep",7956,180,6613.14,24,11,0.022624,36.74,0.133333,0.458333
+2025-07-25,DSA-India,DSA-Core,Graduates,search,Master DSA Fast,Solve 200+ problems,"dsa, interview prep",9172,181,9768.1,24,10,0.019734,53.97,0.132597,0.416667
+2025-07-26,DSA-India,DSA-Core,Graduates,search,Master DSA Fast,Solve 200+ problems,"dsa, interview prep",13800,317,13487.06,45,23,0.022971,42.55,0.141956,0.511111
+2025-07-27,DSA-India,DSA-Core,Graduates,search,Master DSA Fast,Solve 200+ problems,"dsa, interview prep",8282,174,7169.8,19,10,0.021009,41.21,0.109195,0.526316
+2025-07-28,DSA-India,DSA-Core,Graduates,search,Master DSA Fast,Solve 200+ problems,"dsa, interview prep",10224,174,7028.11,20,11,0.017019,40.39,0.114943,0.55
+2025-07-29,DSA-India,DSA-Core,Graduates,search,Master DSA Fast,Solve 200+ problems,"dsa, interview prep",13671,337,13949.25,38,11,0.024651,41.39,0.11276,0.289474
+2025-07-30,DSA-India,DSA-Core,Graduates,search,Master DSA Fast,Solve 200+ problems,"dsa, interview prep",8924,212,9072.6,22,12,0.023756,42.8,0.103774,0.545455
+2025-07-31,DSA-India,DSA-Core,Graduates,search,Master DSA Fast,Solve 200+ problems,"dsa, interview prep",12786,299,11850.41,28,13,0.023385,39.63,0.093645,0.464286
+2025-08-01,DSA-India,DSA-Core,Graduates,search,Master DSA Fast,Solve 200+ problems,"dsa, interview prep",12963,278,10475.87,39,14,0.021446,37.68,0.140288,0.358974
+2025-08-02,DSA-India,DSA-Core,Graduates,search,Master DSA Fast,Solve 200+ problems,"dsa, interview prep",13508,330,12946.04,34,16,0.02443,39.23,0.10303,0.470588
+2025-08-03,DSA-India,DSA-Core,Graduates,search,Master DSA Fast,Solve 200+ problems,"dsa, interview prep",10698,231,10306.87,31,19,0.021593,44.62,0.134199,0.612903
+2025-07-21,DSA-India,DSA-Core,Graduates,search,Crack FAANG Interviews,20-week live cohort,"faang, coding interview",10676,155,7367.31,17,3,0.014519,47.53,0.109677,0.176471
+2025-07-22,DSA-India,DSA-Core,Graduates,search,Crack FAANG Interviews,20-week live cohort,"faang, coding interview",8290,122,5484.84,15,7,0.014717,44.96,0.122951,0.466667
+2025-07-23,DSA-India,DSA-Core,Graduates,search,Crack FAANG Interviews,20-week live cohort,"faang, coding interview",7007,103,6359.52,11,3,0.0147,61.74,0.106796,0.272727
+2025-07-24,DSA-India,DSA-Core,Graduates,search,Crack FAANG Interviews,20-week live cohort,"faang, coding interview",8597,158,7045.6,14,7,0.018379,44.59,0.088608,0.5
+2025-07-25,DSA-India,DSA-Core,Graduates,search,Crack FAANG Interviews,20-week live cohort,"faang, coding interview",10983,154,5694.91,16,6,0.014022,36.98,0.103896,0.375
+2025-07-26,DSA-India,DSA-Core,Graduates,search,Crack FAANG Interviews,20-week live cohort,"faang, coding interview",7013,113,6113.12,16,4,0.016113,54.1,0.141593,0.25
+2025-07-27,DSA-India,DSA-Core,Graduates,search,Crack FAANG Interviews,20-week live cohort,"faang, coding interview",10336,133,7234.76,13,8,0.012868,54.4,0.097744,0.615385
+2025-07-28,DSA-India,DSA-Core,Graduates,search,Crack FAANG Interviews,20-week live cohort,"faang, coding interview",8883,102,4515.43,10,1,0.011483,44.27,0.098039,0.1
+2025-07-29,DSA-India,DSA-Core,Graduates,search,Crack FAANG Interviews,20-week live cohort,"faang, coding interview",7472,138,7158.48,10,3,0.018469,51.87,0.072464,0.3
+2025-07-30,DSA-India,DSA-Core,Graduates,search,Crack FAANG Interviews,20-week live cohort,"faang, coding interview",8582,132,6899.13,20,8,0.015381,52.27,0.151515,0.4
+2025-07-31,DSA-India,DSA-Core,Graduates,search,Crack FAANG Interviews,20-week live cohort,"faang, coding interview",9926,109,5298.21,12,3,0.010981,48.61,0.110092,0.25
+2025-08-01,DSA-India,DSA-Core,Graduates,search,Crack FAANG Interviews,20-week live cohort,"faang, coding interview",8017,155,6780.45,15,8,0.019334,43.74,0.096774,0.533333
+2025-08-02,DSA-India,DSA-Core,Graduates,search,Crack FAANG Interviews,20-week live cohort,"faang, coding interview",8635,79,4390.87,9,6,0.009149,55.58,0.113924,0.666667
+2025-08-03,DSA-India,DSA-Core,Graduates,search,Crack FAANG Interviews,20-week live cohort,"faang, coding interview",8862,129,5892.3,14,4,0.014557,45.68,0.108527,0.285714
+2025-07-21,DSA-India,DSA-Core,Graduates,search,DSA in 8 Weeks,Live mentor support,"dsa, coding practice",10752,209,6685.59,16,7,0.019438,31.99,0.076555,0.4375
+2025-07-22,DSA-India,DSA-Core,Graduates,search,DSA in 8 Weeks,Live mentor support,"dsa, coding practice",10270,204,6583.68,21,11,0.019864,32.27,0.102941,0.52381
+2025-07-23,DSA-India,DSA-Core,Graduates,search,DSA in 8 Weeks,Live mentor support,"dsa, coding practice",10677,245,10487.68,16,3,0.022947,42.81,0.065306,0.1875
+2025-07-24,DSA-India,DSA-Core,Graduates,search,DSA in 8 Weeks,Live mentor support,"dsa, coding practice",10619,220,8579.07,27,12,0.020718,39.0,0.122727,0.444444
+2025-07-25,DSA-India,DSA-Core,Graduates,search,DSA in 8 Weeks,Live mentor support,"dsa, coding practice",8240,175,9039.96,19,7,0.021238,51.66,0.108571,0.368421
+2025-07-26,DSA-India,DSA-Core,Graduates,search,DSA in 8 Weeks,Live mentor support,"dsa, coding practice",8157,124,5432.08,13,9,0.015202,43.81,0.104839,0.692308
+2025-07-27,DSA-India,DSA-Core,Graduates,search,DSA in 8 Weeks,Live mentor support,"dsa, coding practice",10965,197,7456.23,18,10,0.017966,37.85,0.091371,0.555556
+2025-07-28,DSA-India,DSA-Core,Graduates,search,DSA in 8 Weeks,Live mentor support,"dsa, coding practice",12472,186,7131.4,21,9,0.014913,38.34,0.112903,0.428571
+2025-07-29,DSA-India,DSA-Core,Graduates,search,DSA in 8 Weeks,Live mentor support,"dsa, coding practice",9699,150,6293.97,9,5,0.015466,41.96,0.06,0.555556
+2025-07-30,DSA-India,DSA-Core,Graduates,search,DSA in 8 Weeks,Live mentor support,"dsa, coding practice",9493,176,7842.78,22,11,0.01854,44.56,0.125,0.5
+2025-07-31,DSA-India,DSA-Core,Graduates,search,DSA in 8 Weeks,Live mentor support,"dsa, coding practice",12293,237,11461.42,22,12,0.019279,48.36,0.092827,0.545455
+2025-08-01,DSA-India,DSA-Core,Graduates,search,DSA in 8 Weeks,Live mentor support,"dsa, coding practice",10375,163,6736.09,12,5,0.015711,41.33,0.07362,0.416667
+2025-08-02,DSA-India,DSA-Core,Graduates,search,DSA in 8 Weeks,Live mentor support,"dsa, coding practice",11978,262,8620.23,34,13,0.021873,32.9,0.129771,0.382353
+2025-08-03,DSA-India,DSA-Core,Graduates,search,DSA in 8 Weeks,Live mentor support,"dsa, coding practice",8940,167,6573.99,22,14,0.01868,39.37,0.131737,0.636364

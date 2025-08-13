@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdLift Marketing Optimizer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>📊 AdLift Marketing Optimizer</h1>
+            <p>AI-driven ad optimization and creative generation</p>
+        </header>
+
+        <section class="upload-section">
+            <div class="upload-card">
+                <h2>📁 Upload CSV File</h2>
+                
+                <!-- Drag & Drop Area -->
+                <div class="drag-drop-area" id="dragDropArea">
+                    <div class="drag-drop-content">
+                        <div class="upload-icon">📁</div>
+                        <h3>Drag & Drop CSV File</h3>
+                        <p>Or click to browse files</p>
+                        <input type="file" id="csvFile" name="file" accept=".csv" style="display: none;">
+                    </div>
+                </div>
+                
+                <!-- File Status Display -->
+                <div class="file-status" id="fileStatus" style="display: none;">
+                    <div class="file-info">
+                        <span class="file-icon">📄</span>
+                        <div class="file-details">
+                            <div class="file-name" id="fileName">No file selected</div>
+                            <div class="file-size" id="fileSize">0 KB</div>
+                        </div>
+                        <button class="remove-file-btn" id="removeFileBtn">✕</button>
+                    </div>
+                </div>
+                
+                <!-- Analyze Button -->
+                <button class="analyze-btn" id="analyzeBtn" disabled>
+                    🚀 Analyze Campaign Data
+                </button>
+            </div>
+        </section>
+
+        <div id="loadingSection" class="loading-section" style="display: none;">
+            <div class="loading-spinner"></div>
+            <p>Analyzing your ad campaign data...</p>
+        </div>
+
+        <section class="results-section" id="resultsSection" style="display: none;">
+            <div class="results-header">
+                <h2>Marketing Analysis Report</h2>
+            </div>
+
+            <!-- 1. DIAGNOSE THE PROBLEM (1-2 reasons) -->
+            <div class="result-card diagnosis-card">
+                <h3>Problem Diagnosis</h3>
+                <p class="section-desc">Identified 1-2 main reasons for weak creatives/keywords:</p>
+                <div class="causes-list" id="rootCauses">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- 2. PROPOSE SOLUTIONS (AI-driven ways) -->
+            <div class="result-card solutions-card">
+                <h3>AI-Driven Solutions</h3>
+                <p class="section-desc">Recommended approaches to generate fresh variants and rotate winners:</p>
+                <div class="solutions-list" id="proposedSolutions">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- 3. PRIORITIZE & JUSTIFY (Ranked with metrics) -->
+            <div class="result-card priority-card">
+                <h3>Priority Ranking</h3>
+                <p class="section-desc">Solutions ranked by expected impact with projected metrics:</p>
+                <div class="priority-list" id="priorityRanking">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

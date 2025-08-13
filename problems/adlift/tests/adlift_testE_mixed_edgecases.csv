@@ -1,0 +1,46 @@
+date,campaign,ad_group,audience_segment,placement,headline,description,keywords,impressions,clicks,spend,leads,qualified_leads,CTR,CPC,CVR,qualified_rate
+2025-07-21,AI-India,NLP-Core,Graduates,search,NLP with Transformers,Hands-on BERT/GPT,"nlp, transformers",6662,97,3951.37,13,3,0.01456,40.74,0.134021,0.230769
+2025-07-22,AI-India,NLP-Core,Graduates,search,NLP with Transformers,Hands-on BERT/GPT,"nlp, transformers",7135,120,7115.46,5,2,0.016819,59.3,0.041667,0.4
+2025-07-23,AI-India,NLP-Core,Graduates,search,NLP with Transformers,Hands-on BERT/GPT,"nlp, transformers",8012,120,5009.78,8,2,0.014978,41.75,0.066667,0.25
+2025-07-24,AI-India,NLP-Core,Graduates,search,NLP with Transformers,Hands-on BERT/GPT,"nlp, transformers",6855,136,6897.6,16,4,0.01984,50.72,0.117647,0.25
+2025-07-25,AI-India,NLP-Core,Graduates,search,NLP with Transformers,Hands-on BERT/GPT,"nlp, transformers",7396,97,3957.04,11,3,0.013115,40.79,0.113402,0.272727
+2025-07-26,AI-India,NLP-Core,Graduates,search,NLP with Transformers,Hands-on BERT/GPT,"nlp, transformers",6815,96,4315.76,6,2,0.014087,44.96,0.0625,0.333333
+2025-07-27,AI-India,NLP-Core,Graduates,search,NLP with Transformers,Hands-on BERT/GPT,"nlp, transformers",7595,123,5386.24,10,7,0.016195,43.79,0.081301,0.7
+2025-07-28,AI-India,NLP-Core,Graduates,search,NLP with Transformers,Hands-on BERT/GPT,"nlp, transformers",7029,154,8586.61,10,5,0.021909,55.76,0.064935,0.5
+2025-07-29,AI-India,NLP-Core,Graduates,search,NLP with Transformers,Hands-on BERT/GPT,"nlp, transformers",7431,124,5310.23,10,4,0.016687,42.82,0.080645,0.4
+2025-07-30,AI-India,NLP-Core,Graduates,search,NLP with Transformers,Hands-on BERT/GPT,"nlp, transformers",8669,137,6267.23,12,5,0.015803,45.75,0.087591,0.416667
+2025-07-31,AI-India,NLP-Core,Graduates,search,NLP with Transformers,Hands-on BERT/GPT,"nlp, transformers",5116,114,4898.76,11,5,0.022283,42.97,0.096491,0.454545
+2025-08-01,AI-India,NLP-Core,Graduates,search,NLP with Transformers,Hands-on BERT/GPT,"nlp, transformers",6414,119,5486.86,15,5,0.018553,46.11,0.12605,0.333333
+2025-08-02,AI-India,NLP-Core,Graduates,search,NLP with Transformers,Hands-on BERT/GPT,"nlp, transformers",6296,89,4063.26,14,5,0.014136,45.65,0.157303,0.357143
+2025-08-03,AI-India,NLP-Core,Graduates,search,NLP with Transformers,Hands-on BERT/GPT,"nlp, transformers",6693,93,4752.98,8,3,0.013895,51.11,0.086022,0.375
+2025-08-04,AI-India,NLP-Core,Graduates,search,NLP with Transformers,Hands-on BERT/GPT,"nlp, transformers",6634,122,5901.65,6,3,0.01839,48.37,0.04918,0.5
+2025-07-21,AI-India,CV-Core,Graduates,youtube,Computer Vision Bootcamp,OpenCV to CNNs,"opencv, cnn",8995,72,1665.47,2,0,0.008004,23.13,0.027778,0.0
+2025-07-22,AI-India,CV-Core,Graduates,youtube,Computer Vision Bootcamp,OpenCV to CNNs,"opencv, cnn",17956,166,4124.27,22,7,0.009245,24.85,0.13253,0.318182
+2025-07-23,AI-India,CV-Core,Graduates,youtube,Computer Vision Bootcamp,OpenCV to CNNs,"opencv, cnn",12910,124,2679.21,8,4,0.009605,21.61,0.064516,0.5
+2025-07-24,AI-India,CV-Core,Graduates,youtube,Computer Vision Bootcamp,OpenCV to CNNs,"opencv, cnn",18047,185,4352.16,13,5,0.010251,23.53,0.07027,0.384615
+2025-07-25,AI-India,CV-Core,Graduates,youtube,Computer Vision Bootcamp,OpenCV to CNNs,"opencv, cnn",14488,153,3219.68,7,3,0.01056,21.04,0.045752,0.428571
+2025-07-26,AI-India,CV-Core,Graduates,youtube,Computer Vision Bootcamp,OpenCV to CNNs,"opencv, cnn",11327,140,2864.02,12,6,0.01236,20.46,0.085714,0.5
+2025-07-27,AI-India,CV-Core,Graduates,youtube,Computer Vision Bootcamp,OpenCV to CNNs,"opencv, cnn",17117,195,3856.29,14,4,0.011392,19.78,0.071795,0.285714
+2025-07-28,AI-India,CV-Core,Graduates,youtube,Computer Vision Bootcamp,OpenCV to CNNs,"opencv, cnn",13809,140,2877.99,12,7,0.010138,20.56,0.085714,0.583333
+2025-07-29,AI-India,CV-Core,Graduates,youtube,Computer Vision Bootcamp,OpenCV to CNNs,"opencv, cnn",14963,145,3392.23,8,1,0.009691,23.39,0.055172,0.125
+2025-07-30,AI-India,CV-Core,Graduates,youtube,Computer Vision Bootcamp,OpenCV to CNNs,"opencv, cnn",14104,111,2637.33,9,5,0.00787,23.76,0.081081,0.555556
+2025-07-31,AI-India,CV-Core,Graduates,youtube,Computer Vision Bootcamp,OpenCV to CNNs,"opencv, cnn",15416,124,2465.0,2,2,0.008044,19.88,0.016129,1.0
+2025-08-01,AI-India,CV-Core,Graduates,youtube,Computer Vision Bootcamp,OpenCV to CNNs,"opencv, cnn",16399,168,3812.04,16,8,0.010245,22.69,0.095238,0.5
+2025-08-02,AI-India,CV-Core,Graduates,youtube,Computer Vision Bootcamp,OpenCV to CNNs,"opencv, cnn",12387,151,3807.99,11,6,0.01219,25.22,0.072848,0.545455
+2025-08-03,AI-India,CV-Core,Graduates,youtube,Computer Vision Bootcamp,OpenCV to CNNs,"opencv, cnn",17953,170,3046.85,13,4,0.009469,17.92,0.076471,0.307692
+2025-08-04,AI-India,CV-Core,Graduates,youtube,Computer Vision Bootcamp,OpenCV to CNNs,"opencv, cnn",13963,148,3139.44,7,1,0.010599,21.21,0.047297,0.142857
+2025-07-21,AI-India,NLP-Pro,Working Professionals,search,LLMs for Product Teams,Prompting to RAG,"llm, rag",9306,100,4227.83,9,5,0.010746,42.28,0.09,0.555556
+2025-07-22,AI-India,NLP-Pro,Working Professionals,search,LLMs for Product Teams,Prompting to RAG,"llm, rag",6148,77,4935.93,8,6,0.012524,64.1,0.103896,0.75
+2025-07-23,AI-India,NLP-Pro,Working Professionals,search,LLMs for Product Teams,Prompting to RAG,"llm, rag",9006,94,5956.63,5,3,0.010437,63.37,0.053191,0.6
+2025-07-24,AI-India,NLP-Pro,Working Professionals,search,LLMs for Product Teams,Prompting to RAG,"llm, rag",6399,100,5140.87,14,8,0.015627,51.41,0.14,0.571429
+2025-07-25,AI-India,NLP-Pro,Working Professionals,search,LLMs for Product Teams,Prompting to RAG,"llm, rag",6881,89,4919.02,10,4,0.012934,55.27,0.11236,0.4
+2025-07-26,AI-India,NLP-Pro,Working Professionals,search,LLMs for Product Teams,Prompting to RAG,"llm, rag",8232,115,7789.58,7,3,0.01397,67.74,0.06087,0.428571
+2025-07-27,AI-India,NLP-Pro,Working Professionals,search,LLMs for Product Teams,Prompting to RAG,"llm, rag",6006,86,5208.52,16,4,0.014319,60.56,0.186047,0.25
+2025-07-28,AI-India,NLP-Pro,Working Professionals,search,LLMs for Product Teams,Prompting to RAG,"llm, rag",7485,119,5213.44,15,12,0.015898,43.81,0.12605,0.8
+2025-07-29,AI-India,NLP-Pro,Working Professionals,search,LLMs for Product Teams,Prompting to RAG,"llm, rag",6737,80,4593.69,6,3,0.011875,57.42,0.075,0.5
+2025-07-30,AI-India,NLP-Pro,Working Professionals,search,LLMs for Product Teams,Prompting to RAG,"llm, rag",7853,102,6250.49,9,3,0.012989,61.28,0.088235,0.333333
+2025-07-31,AI-India,NLP-Pro,Working Professionals,search,LLMs for Product Teams,Prompting to RAG,"llm, rag",9398,98,5901.76,13,5,0.010428,60.22,0.132653,0.384615
+2025-08-01,AI-India,NLP-Pro,Working Professionals,search,LLMs for Product Teams,Prompting to RAG,"llm, rag",6917,79,4694.08,13,9,0.011421,59.42,0.164557,0.692308
+2025-08-02,AI-India,NLP-Pro,Working Professionals,search,LLMs for Product Teams,Prompting to RAG,"llm, rag",6979,72,4106.73,8,4,0.010317,57.04,0.111111,0.5
+2025-08-03,AI-India,NLP-Pro,Working Professionals,search,LLMs for Product Teams,Prompting to RAG,"llm, rag",7774,95,5605.68,14,2,0.01222,59.01,0.147368,0.142857
+2025-08-04,AI-India,NLP-Pro,Working Professionals,search,LLMs for Product Teams,Prompting to RAG,"llm, rag",7502,69,4523.2,4,1,0.009198,65.55,0.057971,0.25

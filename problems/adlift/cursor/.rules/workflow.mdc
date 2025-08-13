@@ -1,0 +1,301 @@
+---
+alwaysApply: true
+---
+# AdLift - Marketing Optimization 2-Hour Practical MVP Workflow
+
+## Project Overview
+**Goal**: Deliver one comprehensive AI-driven solution that diagnoses weak ad performance, generates fresh variants, and provides rule-based rotation with immediate actionable outputs.
+
+**Output**: Three concrete deliverables ready for marketing team execution: diagnosis.md, variants.csv, prioritization.csv
+
+---
+
+## Alignment Check ✅
+**Original Ask**: Diagnose 1–2 reasons → Propose AI-driven way to generate fresh variants & rotate winners → Prioritize with metrics
+**This Plan**: One solution (Copy Refresh + Rule-Based Rotation) with concrete outputs
+
+### Core Deliverables (2 Hours)
+```
+adlift-mvp/
+├── outputs/
+│   ├── diagnosis.md      # 1 page with 1–2 reasons + evidence
+│   ├── variants.csv      # 8–10 headlines, 4–5 descriptions, 3 keyword sets
+│   └── prioritization.csv # QPI, CPQL, Score, decision, reason
+└── data/
+    └── ad_performance.csv # Input data
+```
+
+### Business-Native KPIs
+```python
+# Core Metrics (per segment × placement)
+QPI = CTR × CVR × qualified_rate    # Quality per impression
+CPQL = CPC / (CVR × qualified_rate) # Cost per qualified lead
+
+# Decision Thresholds
+KEEP_CRITERIA = "QPI ≥ Q3 and CPQL ≤ median"
+PAUSE_CRITERIA = "QPI ≤ Q1 or CPQL ≥ 1.2 × median"
+SCORE_FORMULA = "z(QPI) - 0.7 × z(CPQL)"  # Within segment
+```
+
+---
+
+## Implementation Timeline
+
+### Phase 1: Problem Diagnosis (T+0 to T+25-30 min)
+
+#### 1.1 Data Loading & Metric Computation
+- [ ] **Load ad data**: headline, description, keywords, segment, placement, impressions, CTR, CPC, CVR, qualified_rate
+- [ ] **Compute business-native metrics** (per segment × placement):
+  ```python
+  # Core business KPIs
+  QPI = CTR × CVR × qualified_rate    # Quality per impression
+  CPQL = CPC / (CVR × qualified_rate) # Cost per qualified lead
+  ```
+- [ ] **Fast sanity checks**:
+  - Filter: impressions ≥ 500 (stable samples)
+  - Use segment medians & quartiles (no heavy significance tests)
+
+#### 1.2 Root Cause Identification with Evidence
+- [ ] **Copy-Intent Mismatch Detection**:
+  ```python
+  # Identify low QPI/CTR on specific keyword themes
+  mismatch_evidence = df[
+      (df['QPI'] < df.groupby('segment')['QPI'].transform('quantile', 0.25)) &
+      (df['impressions'] >= 1000)  # High impression, low performance
+  ]
+  ```
+- [ ] **Qualification Gap Analysis**:
+```python
+  # OK CTR but high CPQL (weak benefit/CTA clarity)
+  qualification_issues = df[
+      (df['CTR'] >= df.groupby('segment')['CTR'].transform('median')) &
+      (df['CPQL'] >= df.groupby('segment')['CPQL'].transform('quantile', 0.75))
+  ]
+  ```
+
+#### 1.3 Optional Fatigue Detection
+- [ ] **Fatigue flag**: 7-day CTR ≤ 80% of first-3-day CTR (if date data available)
+
+#### Deliverable: 1-2 root causes with 2-3 evidence rows each
+
+---
+
+### Phase 2: Copy Refresh + Rule-Based Rotation (T+25-30 to T+85-90 min)
+
+#### 2.1 LLM-Assisted Variant Generation
+- [ ] **Few-shot learning from top performers**:
+```python
+  def generate_variants(top_performers, segment_context):
+      """
+      LLM prompt with winning examples for maximum relevance
+      - Input: 3-5 best performing headlines/descriptions per segment
+      - Output: 8-10 headlines, 4-5 descriptions, 3 keyword sets
+      - Context: Audience pain points, competitive positioning
+      """
+      system_prompt = "You are a performance ads copywriter for edtech..."
+      user_prompt = f"""
+      Audience: {segment_context}
+      Top performers: {top_performers}
+      Generate variants that maintain winning patterns while avoiding fatigue.
+      """
+  ```
+- [ ] **Quality filtering pipeline**:
+  ```python
+  # Multi-layer filtering for highest accuracy
+  filters = [
+      jaccard_similarity_filter(threshold=0.8),  # vs known losers
+      winning_bigram_boost(),                    # include ≥1 winning bigram
+      length_compliance_check(),                 # platform requirements
+      deduplication_filter()                     # remove near-duplicates
+  ]
+  ```
+- [ ] **Export variants.csv**: Ready-to-launch creative variants
+
+#### 2.2 Rule-Based Rotation Logic
+- [ ] **Segment-wise performance thresholds**:
+  ```python
+  def make_rotation_decisions(df_segment):
+      """
+      Business-native decision rules for immediate implementation
+      - KEEP: QPI ≥ Q3 and CPQL ≤ median
+      - PAUSE: QPI ≤ Q1 or CPQL ≥ 1.2 × median  
+      - REPLACE: All PAUSE + fatigue-flagged variants
+      """
+      q1_qpi = df_segment['QPI'].quantile(0.25)
+      q3_qpi = df_segment['QPI'].quantile(0.75)
+      median_cpql = df_segment['CPQL'].median()
+      
+      decisions = []
+      for _, row in df_segment.iterrows():
+          if row['QPI'] >= q3_qpi and row['CPQL'] <= median_cpql:
+              decisions.append('KEEP')
+          elif row['QPI'] <= q1_qpi or row['CPQL'] >= 1.2 * median_cpql:
+              decisions.append('PAUSE')
+          else:
+              decisions.append('MONITOR')
+      return decisions
+  ```
+- [ ] **Scoring for tie-breaking**: Score = z(QPI) - 0.7 × z(CPQL) within segment
+- [ ] **Export prioritization.csv**: Decision matrix with rationale
+
+#### Deliverable: variants.csv + prioritization.csv ready for marketing execution
+
+---
+
+### Phase 3: Prioritize & Write-Up (T+85-90 to T+120 min)
+
+#### 3.1 Draft diagnosis.md (≤1 page)
+- [ ] **Executive Summary**: Clear statement of 1-2 root causes
+- [ ] **Evidence Table**: 2-3 concrete examples per root cause with metrics
+- [ ] **Rotation Policy**: Business rules for KEEP/PAUSE/REPLACE decisions
+- [ ] **Expected Impact**: Conservative projections with confidence levels
+
+#### 3.2 Impact Projections & Justification
+- [ ] **Conservative estimates**:
+```python
+  expected_impact = {
+      "ctr_improvement": "15-25%",     # Based on segment analysis
+      "cpql_reduction": "10-20%",      # Through better qualification
+      "timeline": "30 days",           # Realistic implementation
+      "confidence": "Medium-High"      # Evidence-based projections
+  }
+  ```
+- [ ] **Risk Assessment**: Implementation challenges and mitigation strategies
+- [ ] **Success Metrics**: Clear KPIs and measurement framework
+
+#### 3.3 Quality Assurance & Final Checks
+- [ ] **Technical validation**:
+  - No division by zero errors in calculations
+  - Segment-wise quartiles computed correctly
+  - All filters applied consistently
+  - CSV schemas match requirements
+- [ ] **Business validation**:
+  - Decisions align with marketing team workflows
+  - Variants ready for immediate platform upload
+  - Impact projections realistic and achievable
+
+#### Deliverable: Complete package ready for immediate marketing team execution
+
+---
+
+## Final Deliverables
+
+### 1. diagnosis.md (1 page)
+- **Root Cause Analysis**: 1-2 primary reasons for weak performance
+- **Evidence Table**: 2-3 concrete examples per root cause with QPI/CPQL metrics
+- **Rotation Policy**: Clear KEEP/PAUSE/REPLACE business rules
+- **Expected Impact**: +15-25% CTR, -10-20% CPQL in 30 days (conservative)
+
+### 2. variants.csv
+```csv
+headline,description,keyword_set,type,segment,similarity_score,bigram_score
+"Master Data Science in 12 Weeks","Transform your career with hands-on projects","data science, machine learning, python",winner-like,professionals,0.65,0.82
+"Launch Your Tech Career Fast","Industry-ready skills in 3 months guaranteed","career change, tech jobs, bootcamp",explorer,career-switchers,0.42,0.71
+```
+
+### 3. prioritization.csv  
+```csv
+campaign,ad_group,segment,headline,QPI,CPQL,Score,decision,reason
+Campaign_A,DataScience_Pros,professionals,"Current headline A",0.0045,125.50,1.23,KEEP,"QPI above Q3, CPQL below median"
+Campaign_A,DataScience_Pros,professionals,"Current headline B",0.0012,380.20,-1.87,PAUSE,"QPI below Q1, CPQL 2.1x median"
+```
+
+### Why This Approach Works
+- **Business-Native**: Uses QPI/CPQL metrics marketers understand
+- **Immediately Actionable**: CSVs ready for platform upload tomorrow
+- **Explainable Logic**: Rule-based decisions beat "black box" ML
+- **Realistic Timeline**: Conservative 30-day impact projections
+
+---
+
+## Execution Checklist
+
+### Analysis Phase
+- [ ] **T+30**: Problem diagnosis complete with 1-2 root causes identified
+- [ ] Statistical validation of performance variance patterns
+- [ ] Creative fatigue cycle analysis documented
+- [ ] Audience-creative mismatch patterns identified
+
+### Solution Design Phase  
+- [ ] **T+90**: Two AI solutions fully designed with technical specifications
+- [ ] Thompson Sampling framework architecture complete
+- [ ] LLM variant generation methodology defined
+- [ ] Impact projections calculated and validated
+
+### Prioritization Phase
+- [ ] **T+120**: Implementation roadmap complete with priority ranking
+- [ ] ROI analysis and risk assessment finalized
+- [ ] Success metrics and KPIs clearly defined
+- [ ] Next steps and action items documented
+
+### Quality Assurance
+- [ ] Root cause analysis supported by statistical evidence
+- [ ] Solution designs technically feasible and well-architected
+- [ ] Impact projections realistic and achievable
+- [ ] Implementation plan actionable and resource-appropriate
+
+### Final Delivery
+- [ ] All 4 deliverable documents complete
+- [ ] Executive summary ready for stakeholder review
+- [ ] Technical specifications ready for development team
+- [ ] Clear next steps for immediate implementation
+
+---
+
+## Success Criteria
+
+**Immediate Actionability:**
+- ✅ Clear 1-2 data-backed reasons for weak performance
+- ✅ High-quality, filtered variants ready to launch this week
+- ✅ Keep/Pause/Replace decisions with QPI/CPQL rationale
+- ✅ Realistic targets stated; actions executable immediately
+
+**Technical Quality:**
+- Business-native KPIs (QPI, CPQL) with segment context → reliable decisions
+- Explainable thresholds beat fragile "quick ML" under time pressure
+- Quality filtering: Jaccard < 0.8 vs losers, winning bigram inclusion
+- No technical errors: div/0 protection, consistent filters, valid schemas
+
+**Strategic Impact:**
+- Conservative impact projections: +15-25% CTR, -10-20% CPQL in 30 days
+- Evidence-based diagnosis with concrete performance examples
+- Rule-based rotation policy aligned with marketing workflows
+- Future upgrade path to Thompson Sampling (V2) clearly defined
+
+**Acceptance Criteria:**
+- ✅ Produces exactly what stakeholders need to act tomorrow
+- ✅ One comprehensive solution vs trying to build two separate systems
+- ✅ CSV outputs ready for immediate platform upload
+- ✅ Diagnosis explains variance patterns with business context
+
+---
+
+## Risks & Mitigations
+
+**Small Samples**: 
+- Mitigation: Min impressions filter (≥500); segment-wise ranks instead of global comparisons
+
+**Copy/Policy Issues**: 
+- Mitigation: Length/compliance filters + Jaccard similarity vs known losers < 0.8
+
+**No Date Data**: 
+- Mitigation: Skip fatigue detection; still meets core brief requirements
+
+**LLM Availability**: 
+- Mitigation: Template-based fallback using winning bigrams and patterns
+
+---
+
+## Why This Approach Achieves Highest Accuracy
+
+**Business-Native KPIs**: QPI and CPQL metrics align with marketing team mental models → better adoption
+
+**Segment Context**: All decisions made within audience segments → avoids cross-segment noise
+
+**Evidence-Based**: Root cause analysis backed by concrete performance examples, not theoretical models
+
+**Conservative Projections**: 15-25% CTR improvement is achievable vs overly optimistic 25%+ targets
+
+**Explainable Logic**: Rule-based thresholds marketers can understand and trust vs "black box" ML
+
+**Immediate Value**: Produces actionable CSVs tomorrow vs theoretical framework requiring months to implement

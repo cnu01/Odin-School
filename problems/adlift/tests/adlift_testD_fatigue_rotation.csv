@@ -1,0 +1,33 @@
+date,campaign,ad_group,audience_segment,placement,headline,description,keywords,impressions,clicks,spend,leads,qualified_leads,CTR,CPC,CVR,qualified_rate
+2025-07-21,FS-India,FS-Advanced,Working Professionals,search,Backend with Python,APIs and Databases,"python, backend",10162,203,9973.98,17,9,0.019976,49.13,0.083744,0.529412
+2025-07-22,FS-India,FS-Advanced,Working Professionals,search,Backend with Python,APIs and Databases,"python, backend",9394,179,7865.66,16,9,0.019055,43.94,0.089385,0.5625
+2025-07-23,FS-India,FS-Advanced,Working Professionals,search,Backend with Python,APIs and Databases,"python, backend",8818,151,8332.16,20,11,0.017124,55.18,0.13245,0.55
+2025-07-24,FS-India,FS-Advanced,Working Professionals,search,Backend with Python,APIs and Databases,"python, backend",9181,159,7740.77,16,9,0.017318,48.68,0.100629,0.5625
+2025-07-25,FS-India,FS-Advanced,Working Professionals,search,Backend with Python,APIs and Databases,"python, backend",8397,160,6787.62,20,10,0.019054,42.42,0.125,0.5
+2025-07-26,FS-India,FS-Advanced,Working Professionals,search,Backend with Python,APIs and Databases,"python, backend",8254,193,11357.02,30,11,0.023383,58.84,0.15544,0.366667
+2025-07-27,FS-India,FS-Advanced,Working Professionals,search,Backend with Python,APIs and Databases,"python, backend",8104,184,9075.9,23,9,0.022705,49.33,0.125,0.391304
+2025-07-28,FS-India,FS-Advanced,Working Professionals,search,Backend with Python,APIs and Databases,"python, backend",9205,183,7108.95,9,3,0.01988,38.85,0.04918,0.333333
+2025-07-29,FS-India,FS-Advanced,Working Professionals,search,Backend with Python,APIs and Databases,"python, backend",8800,175,8292.43,10,6,0.019886,47.39,0.057143,0.6
+2025-07-30,FS-India,FS-Advanced,Working Professionals,search,Backend with Python,APIs and Databases,"python, backend",10993,272,15131.91,33,20,0.024743,55.63,0.121324,0.606061
+2025-07-31,FS-India,FS-Advanced,Working Professionals,search,Backend with Python,APIs and Databases,"python, backend",9952,162,8469.35,15,4,0.016278,52.28,0.092593,0.266667
+2025-08-01,FS-India,FS-Advanced,Working Professionals,search,Backend with Python,APIs and Databases,"python, backend",8911,152,8216.49,18,9,0.017058,54.06,0.118421,0.5
+2025-08-02,FS-India,FS-Advanced,Working Professionals,search,Backend with Python,APIs and Databases,"python, backend",9670,171,9351.58,18,8,0.017684,54.69,0.105263,0.444444
+2025-08-03,FS-India,FS-Advanced,Working Professionals,search,Backend with Python,APIs and Databases,"python, backend",7241,116,6103.05,12,10,0.01602,52.61,0.103448,0.833333
+2025-08-04,FS-India,FS-Advanced,Working Professionals,search,Backend with Python,APIs and Databases,"python, backend",6304,104,5150.36,10,4,0.016497,49.52,0.096154,0.4
+2025-08-05,FS-India,FS-Advanced,Working Professionals,search,Backend with Python,APIs and Databases,"python, backend",8700,147,7164.65,18,5,0.016897,48.74,0.122449,0.277778
+2025-07-21,FS-India,FS-Advanced,Working Professionals,search,Microservices in Go,Distributed systems,"golang, microservices",7994,128,5089.99,14,8,0.016012,39.77,0.109375,0.571429
+2025-07-22,FS-India,FS-Advanced,Working Professionals,search,Microservices in Go,Distributed systems,"golang, microservices",7574,140,6045.47,22,12,0.018484,43.18,0.157143,0.545455
+2025-07-23,FS-India,FS-Advanced,Working Professionals,search,Microservices in Go,Distributed systems,"golang, microservices",8665,128,5825.57,15,6,0.014772,45.51,0.117188,0.4
+2025-07-24,FS-India,FS-Advanced,Working Professionals,search,Microservices in Go,Distributed systems,"golang, microservices",8214,126,4846.91,7,3,0.01534,38.47,0.055556,0.428571
+2025-07-25,FS-India,FS-Advanced,Working Professionals,search,Microservices in Go,Distributed systems,"golang, microservices",6222,94,4735.36,14,4,0.015108,50.38,0.148936,0.285714
+2025-07-26,FS-India,FS-Advanced,Working Professionals,search,Microservices in Go,Distributed systems,"golang, microservices",9690,120,5428.91,12,11,0.012384,45.24,0.1,0.916667
+2025-07-27,FS-India,FS-Advanced,Working Professionals,search,Microservices in Go,Distributed systems,"golang, microservices",7517,99,3940.43,10,6,0.01317,39.8,0.10101,0.6
+2025-07-28,FS-India,FS-Advanced,Working Professionals,search,Microservices in Go,Distributed systems,"golang, microservices",7470,108,5505.44,11,4,0.014458,50.98,0.101852,0.363636
+2025-07-29,FS-India,FS-Advanced,Working Professionals,search,Microservices in Go,Distributed systems,"golang, microservices",8440,118,6144.59,14,6,0.013981,52.07,0.118644,0.428571
+2025-07-30,FS-India,FS-Advanced,Working Professionals,search,Microservices in Go,Distributed systems,"golang, microservices",8052,140,6887.66,14,9,0.017387,49.2,0.1,0.642857
+2025-07-31,FS-India,FS-Advanced,Working Professionals,search,Microservices in Go,Distributed systems,"golang, microservices",10055,139,6202.06,12,7,0.013824,44.62,0.086331,0.583333
+2025-08-01,FS-India,FS-Advanced,Working Professionals,search,Microservices in Go,Distributed systems,"golang, microservices",11784,174,5835.91,11,4,0.014766,33.54,0.063218,0.363636
+2025-08-02,FS-India,FS-Advanced,Working Professionals,search,Microservices in Go,Distributed systems,"golang, microservices",8524,123,4695.29,11,5,0.01443,38.17,0.089431,0.454545
+2025-08-03,FS-India,FS-Advanced,Working Professionals,search,Microservices in Go,Distributed systems,"golang, microservices",7498,95,4107.17,11,4,0.01267,43.23,0.115789,0.363636
+2025-08-04,FS-India,FS-Advanced,Working Professionals,search,Microservices in Go,Distributed systems,"golang, microservices",6870,111,4838.26,20,14,0.016157,43.59,0.18018,0.7
+2025-08-05,FS-India,FS-Advanced,Working Professionals,search,Microservices in Go,Distributed systems,"golang, microservices",5876,74,3590.99,3,2,0.012594,48.53,0.040541,0.666667
