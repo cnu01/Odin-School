@@ -8,7 +8,7 @@ import Layout from './components/Layout/Layout';
 import Dashboard from './pages/Dashboard/Dashboard';
 import LeadManagement from './pages/LeadManagement/LeadManagement';
 import HotLead from './pages/HotLead/HotLead';
-import InfluencerHub from './pages/InfluencerHub/InfluencerHub';
+import InfluencerHub from './pages/InfluencerHub';
 import BrandReputation from './pages/BrandReputation/BrandReputation';
 import AdPerformance from './pages/AdPerformance/AdPerformance';
 

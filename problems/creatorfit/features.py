@@ -5,7 +5,15 @@ from typing import Tuple, Dict, List, Optional, Iterable
 
 import numpy as np
 import pandas as pd
-from sentence_transformers import SentenceTransformer
+
+# Handle sentence transformers import gracefully
+try:
+    from sentence_transformers import SentenceTransformer
+    SENTENCE_TRANSFORMERS_AVAILABLE = True
+except ImportError as e:
+    print(f"[INFO] SentenceTransformers not available: {e}")
+    SentenceTransformer = None
+    SENTENCE_TRANSFORMERS_AVAILABLE = False
 
 # --------------------------------------------------------------------------------------
 # EDTECH FEATURE ENGINEERING CONFIG
@@ -15,7 +23,7 @@ DEFAULT_EMB_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
 # Simple in-process cache so repeated calls don't re-load the model from disk/network.
 # This avoids slowdowns when you run train.py multiple times.
-_MODEL_CACHE: Dict[str, SentenceTransformer] = {}
+_MODEL_CACHE: Dict[str, any] = {}
 
 # EdTech-specific topics for content validation (imported from data_preprocessing)
 EDTECH_TOPICS = [
@@ -35,8 +43,10 @@ ODIN_SCHOOL_PROGRAMS = {
 }
 
 
-def _get_emb_model(name: str) -> SentenceTransformer:
+def _get_emb_model(name: str):
     """Return a cached SentenceTransformer instance for the given model name."""
+    if not SENTENCE_TRANSFORMERS_AVAILABLE:
+        return None
     if name not in _MODEL_CACHE:
         _MODEL_CACHE[name] = SentenceTransformer(name)
     return _MODEL_CACHE[name]
@@ -116,7 +126,7 @@ def compute_fit_scores(
     df: pd.DataFrame,
     program_text: str,
     emb_model_name: str = DEFAULT_EMB_MODEL,
-    model: Optional[SentenceTransformer] = None,
+    model = None,
     batch_size: int = 256,
     to_unit_interval: bool = True,
 ) -> pd.Series:
@@ -144,7 +154,15 @@ def compute_fit_scores(
     creator_mat = _encode_texts(texts, emb, batch_size=batch_size, normalize=True)      # (N, d)
 
     # Cosine similarity via dot (since both are normalized)
-    cos = (creator_mat @ prog_vec.T).ravel()  # shape: (N,)
+    if emb is None:
+        # Fallback: use simple text matching for similarity
+        program_words = set(program_text.lower().split())
+        cos = np.array([
+            len(program_words.intersection(set(str(text).lower().split()))) / (len(program_words) + 1)
+            for text in texts
+        ])
+    else:
+        cos = (creator_mat @ prog_vec.T).ravel()  # shape: (N,)
 
     # Optional: map cosine [-1, 1] -> [0, 1]
     if to_unit_interval:
@@ -163,7 +181,7 @@ def build_features(
     df_clean: pd.DataFrame,
     program_type: str = "data_science",
     emb_model_name: str = DEFAULT_EMB_MODEL,
-    model: Optional[SentenceTransformer] = None,
+    model = None,
 ) -> Tuple[pd.DataFrame, pd.Series, Dict[str, List[str]]]:
     """
     Build EdTech-specific features for predicting qualified leads.

@@ -1,0 +1,11 @@
+creator_id,topic,recent_video_transcript,posting_cadence_days,views_90d,clicks,leads,qualified_leads,enrollments,refunds,geography,language,category_tag
+EDU_0001,React,Full-stack development bootcamp: MERN stack with authentication and deployment strategies,4,30825,1570,305,274,186,7,INDIA,English,beginner-friendly
+EDU_0002,React;Node.js,React Native mobile development: cross-platform apps with navigation and state management,6,5912,186,22,14,9,0,INDIA,Telugu,quick-start
+EDU_0003,Algorithms,Coding interview bootcamp: problem-solving techniques and whiteboard coding strategies,3,4701,189,26,18,10,0,INDIA,Hindi,beginner-friendly
+EDU_0004,Software Engineering,Full-stack development bootcamp: MERN stack with authentication and deployment strategies,5,57608,1778,193,124,69,2,INDIA,Telugu,beginner-friendly
+EDU_0005,DevOps,"DevOps engineering essentials: Docker containers, Kubernetes orchestration, and CI/CD automation",4,25000,754,101,71,40,4,INDIA,English,practical
+EDU_0006,Java,Data structures and algorithms: coding interview preparation with 200+ practice problems,5,9033,339,39,30,13,0,INDIA,English,project-based
+EDU_0007,Web Development;Interview Preparation,Frontend development with React and Redux: building scalable web applications with modern practices,2,22835,1359,319,271,202,24,INDIA,English,theory
+EDU_0008,Web Development,Frontend development with React and Redux: building scalable web applications with modern practices,2,50020,2003,216,181,83,6,INDIA,Hindi,interview-prep
+EDU_0009,Algorithms;React,Data structures and algorithms: coding interview preparation with 200+ practice problems,4,20988,825,117,96,66,4,INDIA,Telugu,practical
+EDU_0010,Artificial Intelligence,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,5,52497,1835,194,166,95,8,INDIA,English,career-guidance
