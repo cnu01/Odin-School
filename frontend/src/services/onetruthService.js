@@ -114,6 +114,26 @@ export const onetruthService = {
     }
   },
 
+  // Problem Analysis - REQUIRED BY REFERENCE
+  async getProblemAnalysis() {
+    try {
+      const response = await api.get(`${ONETRUTH_BASE_URL}/problem-analysis`);
+      return response.data;
+    } catch (error) {
+      throw new Error(`Failed to get problem analysis: ${error.response?.data?.detail || error.message}`);
+    }
+  },
+
+  // Enhanced Dashboard Data - REQUIRED BY REFERENCE
+  async getDashboardData() {
+    try {
+      const response = await api.get(`${ONETRUTH_BASE_URL}/dashboard-data`);
+      return response.data;
+    } catch (error) {
+      throw new Error(`Failed to get dashboard data: ${error.response?.data?.detail || error.message}`);
+    }
+  },
+
   // System Status
   async getSystemStatus() {
     try {
@@ -122,6 +142,54 @@ export const onetruthService = {
     } catch (error) {
       throw new Error(`Failed to get system status: ${error.response?.data?.detail || error.message}`);
     }
+  },
+
+  // Helper Functions for UI Formatting
+  formatMetricValue(value, type = 'number') {
+    if (type === 'currency') {
+      return `₹${(value / 100000).toFixed(1)}L`;
+    }
+    if (type === 'percentage') {
+      return `${(value * 100).toFixed(1)}%`;
+    }
+    if (type === 'days') {
+      return `${value} days`;
+    }
+    return value;
+  },
+
+  getHealthColor(score) {
+    if (score >= 85) return '#4caf50'; // Green
+    if (score >= 75) return '#2196f3'; // Blue  
+    if (score >= 65) return '#ff9800'; // Orange
+    return '#f44336'; // Red
+  },
+
+  getSeverityColor(severity) {
+    switch (severity?.toLowerCase()) {
+      case 'high':
+        return '#f44336'; // Red
+      case 'medium':
+        return '#ff9800'; // Orange
+      case 'low':
+        return '#2196f3'; // Blue
+      default:
+        return '#9e9e9e'; // Gray
+    }
+  },
+
+  // Create mock executive summary for fallback
+  createMockExecutiveSummary() {
+    return {
+      total_revenue: 23400000,
+      revenue_growth: 0.18,
+      new_enrollments: 342,
+      enrollment_growth: 0.12,
+      customer_satisfaction: 4.3,
+      satisfaction_trend: 0.05,
+      operational_efficiency: 0.87,
+      efficiency_trend: 0.03
+    };
   }
 };
 

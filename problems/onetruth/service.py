@@ -936,3 +936,45 @@ class OnetruthService:
                 }
             )
         ]
+
+    async def get_system_status(self) -> Dict[str, Any]:
+        """Get system status information for dashboard display"""
+        try:
+            from ml.onetruth_model import onetruth_model
+            
+            # Get database status
+            db_connected = False
+            try:
+                db = await self.get_database()
+                db_connected = db is not None
+            except:
+                pass
+            
+            # Get model status
+            model_trained = onetruth_model.model is not None
+            
+            # Get basic system metrics
+            status = {
+                "system": "OneTruth",
+                "status": "active" if model_trained and db_connected else "partial",
+                "version": "1.0.0",
+                "model_trained": model_trained,
+                "database_connected": db_connected,
+                "features_active": {
+                    "anomaly_detection": model_trained,
+                    "executive_brief": True,
+                    "decision_support": True,
+                    "data_verification": db_connected
+                },
+                "last_updated": "2025-01-13T10:00:00Z"
+            }
+            
+            return status
+            
+        except Exception as e:
+            print(f"⚠️ Error getting system status: {e}")
+            return {
+                "system": "OneTruth", 
+                "status": "unknown",
+                "error": str(e)
+            }

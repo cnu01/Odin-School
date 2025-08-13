@@ -435,6 +435,129 @@ class HotLeadService {
       }
     };
   }
+  /**
+   * Get problem analysis and business insights - REQUIRED BY REFERENCE
+   * @returns {Promise} Problem analysis data
+   */
+  async getProblemAnalysis() {
+    try {
+      const response = await api.get('/api/hotlead/problem-analysis');
+      return {
+        success: true,
+        data: response.data
+      };
+    } catch (error) {
+      console.error('Error fetching problem analysis:', error);
+      return {
+        success: false,
+        error: error.response?.data?.detail || error.message
+      };
+    }
+  }
+
+  /**
+   * Get dashboard data including problems and metrics - ENHANCED
+   * @returns {Promise} Dashboard data
+   */
+  async getDashboardData() {
+    try {
+      const response = await api.get('/api/hotlead/dashboard-data');
+      return {
+        success: true,
+        data: response.data
+      };
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+      return {
+        success: false,
+        error: error.response?.data?.detail || error.message
+      };
+    }
+  }
+
+  /**
+   * Helper: Format lead temperature with color
+   * @param {string} temperature - Lead temperature
+   */
+  getTemperatureColor(temperature) {
+    switch (temperature?.toLowerCase()) {
+      case 'hot':
+        return '#f44336'; // Red
+      case 'warm':
+        return '#ff9800'; // Orange
+      case 'cold':
+        return '#2196f3'; // Blue
+      default:
+        return '#9e9e9e'; // Gray
+    }
+  }
+
+  /**
+   * Helper: Format priority score with level
+   * @param {number} score - Priority score
+   */
+  getPriorityLevel(score) {
+    if (score >= 80) return { level: 'Critical', color: '#f44336' };
+    if (score >= 60) return { level: 'High', color: '#ff9800' };
+    if (score >= 40) return { level: 'Medium', color: '#2196f3' };
+    return { level: 'Low', color: '#4caf50' };
+  }
+
+  /**
+   * Helper: Get source icon
+   * @param {string} source - Lead source
+   */
+  getSourceIcon(source) {
+    switch (source?.toLowerCase()) {
+      case 'organic':
+      case 'seo':
+        return '🔍';
+      case 'paid_search':
+      case 'google_ads':
+        return '📢';
+      case 'social_media':
+      case 'facebook':
+      case 'linkedin':
+        return '📱';
+      case 'referral':
+        return '👥';
+      case 'email':
+        return '📧';
+      case 'website_form':
+        return '🌐';
+      default:
+        return '📊';
+    }
+  }
+
+  /**
+   * Create sample lead for testing - REFERENCE COMPLIANT
+   */
+  createSampleLead() {
+    return {
+      email: 'student@example.com',
+      phone: '+91-9876543210',
+      source: 'website_form',
+      utm_source: 'google',
+      utm_medium: 'cpc',
+      utm_campaign: 'data_science_2025',
+      page_views: 8,
+      time_on_site: 245.5,
+      course_pages_viewed: 3,
+      downloads_count: 2,
+      form_submissions: 1,
+      demo_requests: 1,
+      location: 'Bangalore',
+      device: 'desktop',
+      referrer_url: 'https://google.com/search',
+      first_name: 'John',
+      last_name: 'Doe',
+      company: 'Tech Solutions',
+      job_title: 'Software Engineer',
+      experience_level: 'intermediate',
+      is_return_visitor: false
+    };
+  }
 }
 
 // Export singleton instance

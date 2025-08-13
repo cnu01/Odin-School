@@ -90,7 +90,13 @@ const menuItems = [
     text: 'Ad Performance',
     icon: <TrendingUpIcon />,
     path: '/ads',
-    subtitle: 'AdLift',
+    subtitle: 'Campaign Overview',
+  },
+  {
+    text: 'AdLift Optimization',
+    icon: <PsychologyIcon />,
+    path: '/adlift',
+    subtitle: 'AI Creative Analysis',
   },
   {
     text: 'Referral Management',

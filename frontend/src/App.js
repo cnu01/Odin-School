@@ -17,6 +17,7 @@ import CloseMore from './pages/CloseMore/CloseMore';
 import OneTruth from './pages/OneTruth';
 import ReferralManagement from './pages/ReferralManagement/ReferralManagement';
 import FirstTouch from './pages/FirstTouch/FirstTouch';
+import AdLift from './pages/AdLift/AdLift';
 
 // Odin School brand theme
 const theme = createTheme({
@@ -88,6 +89,7 @@ function App() {
             <Route path="/influencers" element={<InfluencerHub />} />
             <Route path="/reputation" element={<BrandReputation />} />
             <Route path="/ads" element={<AdPerformance />} />
+            <Route path="/adlift" element={<AdLift />} />
             <Route path="/pricing" element={<PricingInsights />} />
             <Route path="/closemore" element={<CloseMore />} />
             <Route path="/onetruth" element={<OneTruth />} />

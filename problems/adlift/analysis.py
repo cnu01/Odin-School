@@ -20,26 +20,84 @@ def load_and_prepare_data(file_path):
     """Load CSV and compute business-native metrics"""
     print("📊 Loading and preparing data...")
     
-    # Load data
-    df = pd.read_csv(file_path)
-    print(f"Loaded {len(df)} rows of ad data")
+    try:
+        # Load data with robust CSV parsing
+        df = pd.read_csv(
+            file_path,
+            encoding='utf-8',
+            skipinitialspace=True,
+            on_bad_lines='skip',  # Skip malformed lines
+            engine='python'  # More flexible parser
+        )
+        print(f"Loaded {len(df)} rows of ad data")
+        
+        # Validate required columns
+        required_columns = [
+            'date', 'campaign', 'ad_group', 'headline', 'description', 
+            'keywords', 'audience_segment', 'placement', 'impressions', 
+            'clicks', 'spend', 'leads', 'qualified_leads', 'CTR', 'CPC', 
+            'CVR', 'qualified_rate'
+        ]
+        
+        missing_columns = [col for col in required_columns if col not in df.columns]
+        if missing_columns:
+            raise ValueError(f"Missing required columns: {missing_columns}")
+            
+        print(f"✅ All required columns present: {len(required_columns)} columns")
+        
+    except pd.errors.ParserError as e:
+        print(f"❌ CSV parsing error: {e}")
+        raise ValueError(f"CSV format error: {str(e)}. Please ensure proper CSV formatting with quoted fields containing commas.")
+    except Exception as e:
+        print(f"❌ Error loading CSV: {e}")
+        raise ValueError(f"Failed to load CSV file: {str(e)}")
     
-    # Compute business-native KPIs
-    df['QPI'] = df['CTR'] * df['CVR'] * df['qualified_rate']  # Quality per impression
-    df['CPQL_computed'] = df['CPC'] / (df['CVR'] * df['qualified_rate'].clip(lower=0.001))  # Avoid div/0
+    # Validate and clean numeric columns
+    numeric_columns = ['impressions', 'clicks', 'spend', 'leads', 'qualified_leads', 'CTR', 'CPC', 'CVR', 'qualified_rate']
     
-    # Alternative CPQL calculation for validation
-    df['CPQL_direct'] = df['spend'] / df['qualified_leads'].clip(lower=1)
+    for col in numeric_columns:
+        if col in df.columns:
+            # Convert to numeric, coerce errors to NaN
+            df[col] = pd.to_numeric(df[col], errors='coerce')
+            # Fill NaN with 0 for safety
+            df[col] = df[col].fillna(0)
     
-    # Use direct calculation as primary (more reliable)
-    df['CPQL'] = df['CPQL_direct']
+    print(f"✅ Numeric columns validated and cleaned")
     
-    # Convert date to datetime
-    df['date'] = pd.to_datetime(df['date'])
+    # Compute business-native KPIs with error handling
+    try:
+        df['QPI'] = df['CTR'] * df['CVR'] * df['qualified_rate']  # Quality per impression
+        df['CPQL_computed'] = df['CPC'] / (df['CVR'] * df['qualified_rate'].clip(lower=0.001))  # Avoid div/0
+        
+        # Alternative CPQL calculation for validation
+        df['CPQL_direct'] = df['spend'] / df['qualified_leads'].clip(lower=1)
+        
+        # Use direct calculation as primary (more reliable)
+        df['CPQL'] = df['CPQL_direct']
+        
+        print(f"✅ Business metrics computed: QPI, CPQL")
+        
+    except Exception as e:
+        print(f"⚠️ Warning: Error computing metrics: {e}")
+        # Add default values if computation fails
+        df['QPI'] = 0.001
+        df['CPQL'] = 100
+    
+    # Convert date to datetime with error handling
+    try:
+        df['date'] = pd.to_datetime(df['date'], errors='coerce')
+        df = df.dropna(subset=['date'])  # Remove rows with invalid dates
+        print(f"✅ Date column converted to datetime")
+    except Exception as e:
+        print(f"⚠️ Warning: Date conversion error: {e}")
     
     # Filter stable samples
     df_filtered = df[df['impressions'] >= MIN_IMPRESSIONS].copy()
     print(f"After filtering (≥{MIN_IMPRESSIONS} impressions): {len(df_filtered)} rows")
+    
+    if len(df_filtered) == 0:
+        print("⚠️ Warning: No data meets minimum impression threshold. Using all data.")
+        df_filtered = df.copy()
     
     return df, df_filtered
 

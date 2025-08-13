@@ -287,7 +287,7 @@ async def get_dashboard_data():
         problem_analysis = await hotlead_service.get_problem_analysis()
         
         # Get current analytics
-        analytics = await hotlead_service.get_analytics(limit=100)
+        analytics = await hotlead_service.get_analytics()
         
         # Create dashboard summary
         dashboard_data = {
