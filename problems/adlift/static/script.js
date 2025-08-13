@@ -267,16 +267,36 @@ function displayExpectedImpact(impact) {
 function downloadVariants() {
     if (!currentAnalysisData) return;
     
-    // For MVP, we'll create a sample variants CSV
-    const variantsData = generateSampleVariants();
+    // Use real variants data from the analysis
+    const variants = currentAnalysisData.variants_data.variants || [];
+    if (variants.length === 0) {
+        alert('No variants data available. Please run analysis first.');
+        return;
+    }
+    
+    const variantsData = [
+        ['Headline', 'Description', 'Type', 'Target Segment', 'Placement'],
+        ...variants.map(v => [v.headline, v.description, v.type, v.segment, v.placement])
+    ];
     downloadCSV(variantsData, 'adlift_variants.csv');
 }
 
 function downloadPrioritization() {
     if (!currentAnalysisData) return;
     
-    // For MVP, we'll create a sample prioritization CSV
-    const prioritizationData = generateSamplePrioritization();
+    // Use real campaign decisions data from the analysis
+    const decisions = currentAnalysisData.campaign_decisions;
+    if (!decisions) {
+        alert('No prioritization data available. Please run analysis first.');
+        return;
+    }
+    
+    const prioritizationData = [
+        ['Decision', 'Count', 'Percentage'],
+        ['PAUSE', decisions.pause_count, `${((decisions.pause_count / (decisions.pause_count + decisions.keep_count + decisions.monitor_count)) * 100).toFixed(1)}%`],
+        ['KEEP', decisions.keep_count, `${((decisions.keep_count / (decisions.pause_count + decisions.keep_count + decisions.monitor_count)) * 100).toFixed(1)}%`],
+        ['MONITOR', decisions.monitor_count, `${((decisions.monitor_count / (decisions.pause_count + decisions.keep_count + decisions.monitor_count)) * 100).toFixed(1)}%`]
+    ];
     downloadCSV(prioritizationData, 'adlift_prioritization.csv');
 }
 
@@ -285,23 +305,7 @@ function downloadAllFiles() {
     setTimeout(() => downloadPrioritization(), 500);
 }
 
-function generateSampleVariants() {
-    // Sample data structure for variants
-    return [
-        ['Headline', 'Description', 'Keywords', 'Type', 'Target Segment', 'Quality Score'],
-        ['Boost Your Career with Data Science', 'Master data science skills for better job prospects', 'data science, career, skills', 'Winner-like', 'Graduates', '0.85'],
-        ['Data Science for Working Professionals', 'Advance your career with data science expertise', 'data science, professional, career', 'Explorer', 'Working Professionals', '0.78']
-    ];
-}
-
-function generateSamplePrioritization() {
-    // Sample data structure for prioritization
-    return [
-        ['Campaign', 'Ad Group', 'Headline', 'Decision', 'Reason', 'QPI', 'CPQL'],
-        ['Data Science', 'Graduates', 'Learn Data Science', 'KEEP', 'High QPI, Low CPQL', '0.0023', '₹450'],
-        ['Data Science', 'Professionals', 'Career Boost', 'PAUSE', 'Low QPI, High CPQL', '0.0011', '₹1200']
-    ];
-}
+// Sample data functions removed - now using real analysis data
 
 function downloadCSV(data, filename) {
     const csvContent = data.map(row => row.join(',')).join('\n');
