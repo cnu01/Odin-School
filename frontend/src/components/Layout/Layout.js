@@ -39,22 +39,46 @@ const drawerWidth = 260;
 
 const menuItems = [
   {
-    text: 'OneTruth Analytics',
-    icon: <AnalyticsIcon />,
-    path: '/onetruth',
-    subtitle: 'Unified Intelligence',
-  },
-  {
     text: 'Dashboard',
     icon: <DashboardIcon />,
     path: '/dashboard',
     subtitle: 'Overview',
   },
   {
-    text: 'Lead Management',
+    text: 'HotLead AI',
     icon: <PeopleIcon />,
-    path: '/leads',
-    subtitle: 'Lead Overview',
+    path: '/hotlead',
+    subtitle: 'Sales Lead Scoring',
+  },
+  {
+    text: 'CreatorFit',
+    icon: <StarIcon />,
+    path: '/influencers',
+    subtitle: 'Influencer Marketing',
+  },
+  {
+    text: 'TrustDesk',
+    icon: <ForumIcon />,
+    path: '/reputation',
+    subtitle: 'Brand Reputation',
+  },
+  {
+    text: 'AdLift',
+    icon: <PsychologyIcon />,
+    path: '/adlift',
+    subtitle: 'Marketing Optimization',
+  },
+  {
+    text: 'ReferMore',
+    icon: <PersonAddIcon />,
+    path: '/referrals',
+    subtitle: 'Referral Program',
+  },
+  {
+    text: 'PriceSense',
+    icon: <MoneyIcon />,
+    path: '/pricing',
+    subtitle: 'Price Optimization',
   },
   {
     text: 'FirstTouch AI',
@@ -63,52 +87,16 @@ const menuItems = [
     subtitle: 'Call Optimization',
   },
   {
-    text: 'HotLead AI',
-    icon: <PeopleIcon />,
-    path: '/hotlead',
-    subtitle: 'ML-Powered Scoring',
+    text: 'OneTruth',
+    icon: <AnalyticsIcon />,
+    path: '/onetruth',
+    subtitle: 'Unified Analytics',
   },
   {
-    text: 'Conversation Management',
+    text: 'CloseMore',
     icon: <ChatIcon />,
     path: '/closemore',
-    subtitle: 'CloseMore',
-  },
-  {
-    text: 'Influencer Hub',
-    icon: <StarIcon />,
-    path: '/influencers',
-    subtitle: 'CreatorFit',
-  },
-  {
-    text: 'Brand Reputation',
-    icon: <ForumIcon />,
-    path: '/reputation',
-    subtitle: 'TrustDesk',
-  },
-  {
-    text: 'Ad Performance',
-    icon: <TrendingUpIcon />,
-    path: '/ads',
-    subtitle: 'Campaign Overview',
-  },
-  {
-    text: 'AdLift Optimization',
-    icon: <PsychologyIcon />,
-    path: '/adlift',
-    subtitle: 'AI Creative Analysis',
-  },
-  {
-    text: 'Referral Management',
-    icon: <PersonAddIcon />,
-    path: '/referrals',
-    subtitle: 'ReferMore AI',
-  },
-  {
-    text: 'Pricing Insights',
-    icon: <MoneyIcon />,
-    path: '/pricing',
-    subtitle: 'PriceSense',
+    subtitle: 'Sales Conversations',
   },
 ];
 

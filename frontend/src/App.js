@@ -6,11 +6,9 @@ import { Box } from '@mui/material';
 
 import Layout from './components/Layout/Layout';
 import Dashboard from './pages/Dashboard/Dashboard';
-import LeadManagement from './pages/LeadManagement/LeadManagement';
 import HotLead from './pages/HotLead/HotLead';
 import InfluencerHub from './pages/InfluencerHub';
 import BrandReputation from './pages/BrandReputation/BrandReputation';
-import AdPerformance from './pages/AdPerformance/AdPerformance';
 
 import PricingInsights from './pages/PricingInsights/PricingInsights';
 import CloseMore from './pages/CloseMore/CloseMore';
@@ -83,17 +81,15 @@ function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/leads" element={<LeadManagement />} />
-            <Route path="/firsttouch" element={<FirstTouch />} />
             <Route path="/hotlead" element={<HotLead />} />
             <Route path="/influencers" element={<InfluencerHub />} />
             <Route path="/reputation" element={<BrandReputation />} />
-            <Route path="/ads" element={<AdPerformance />} />
             <Route path="/adlift" element={<AdLift />} />
-            <Route path="/pricing" element={<PricingInsights />} />
-            <Route path="/closemore" element={<CloseMore />} />
-            <Route path="/onetruth" element={<OneTruth />} />
             <Route path="/referrals" element={<ReferralManagement />} />
+            <Route path="/pricing" element={<PricingInsights />} />
+            <Route path="/firsttouch" element={<FirstTouch />} />
+            <Route path="/onetruth" element={<OneTruth />} />
+            <Route path="/closemore" element={<CloseMore />} />
           </Routes>
         </Layout>
       </Router>

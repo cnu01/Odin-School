@@ -257,7 +257,7 @@ class FirsttouchService:
                 recommendations=[]
             )
 
-    async def evaluate_model(self) -> ModelEvaluationResponse:
+    async def evaluate_model(self, sample_size: int = 100) -> ModelEvaluationResponse:
         """Evaluate model performance"""
         try:
             # Ensure model is trained
@@ -266,7 +266,7 @@ class FirsttouchService:
                 await firsttouch_model.train(training_data, target_column="call_success")
             
             # Generate test data
-            test_data = generate_synthetic_training_data(400)
+            test_data = generate_synthetic_training_data(sample_size)
             correct_predictions = 0
             
             for row in test_data:
