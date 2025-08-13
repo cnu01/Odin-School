@@ -47,6 +47,7 @@
 - [x] **fix_upload_issues**: Fix frontend upload issues: file status display, drag & drop, download buttons
 - [x] **enhance_csv_details**: Enhanced CSV downloads to include detailed campaign information (names, metrics, reasons)
 - [x] **remove_fake_scores**: Removed hardcoded similarity_score and bigram_score from CSV - keeping only real, calculated data
+- [x] **inline_download_buttons**: Moved download buttons inline with AI-Driven Solutions for better UX - removed separate download section
 
 ## 🔄 **IN PROGRESS TASKS**
 

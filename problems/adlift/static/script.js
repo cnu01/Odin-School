@@ -225,22 +225,32 @@ function displayProposedSolutions(data) {
     
     const solutionsHTML = `
         <div class="solution-item">
-            <h4>🤖 AI-Driven Variant Generation</h4>
+            <h4>AI-Driven Variant Generation</h4>
             <p>Generate fresh headlines and descriptions based on top-performing patterns from your data.</p>
             <div class="solution-details">
                 <span class="detail-badge">✨ ${variantsCount} variants generated</span>
                 <span class="detail-badge">🎯 Pattern-based templates</span>
                 <span class="detail-badge">🔍 Quality filtered</span>
             </div>
+            <div class="solution-download">
+                <button class="inline-download-btn" onclick="downloadVariants()">
+                    📊 Download Variants CSV
+                </button>
+            </div>
         </div>
         
         <div class="solution-item">
-            <h4>⚡ Smart Campaign Rotation</h4>
+            <h4>Smart Campaign Rotation</h4>
             <p>Automatically pause underperformers and scale winning creatives using statistical thresholds.</p>
             <div class="solution-details">
                 <span class="detail-badge">⏸️ ${pauseCount} to pause</span>
                 <span class="detail-badge">🚀 ${keepCount} to scale</span>
                 <span class="detail-badge">📊 Data-driven decisions</span>
+            </div>
+            <div class="solution-download">
+                <button class="inline-download-btn" onclick="downloadPrioritization()">
+                    📋 Download Decisions CSV
+                </button>
             </div>
         </div>
     `;
@@ -263,7 +273,7 @@ function displayPriorityRanking(data) {
     const rankingHTML = `
         <div class="priority-item priority-1">
             <div class="priority-header">
-                <h4>🥇 Priority #1: Smart Campaign Rotation</h4>
+                <h4>Priority #1: Smart Campaign Rotation</h4>
                 <span class="priority-badge">Highest Impact</span>
             </div>
             <div class="priority-metrics">
@@ -288,7 +298,7 @@ function displayPriorityRanking(data) {
         
         <div class="priority-item priority-2">
             <div class="priority-header">
-                <h4>🥈 Priority #2: AI Variant Generation</h4>
+                <h4>Priority #2: AI Variant Generation</h4>
                 <span class="priority-badge">Medium-High Impact</span>
             </div>
             <div class="priority-metrics">
@@ -445,11 +455,7 @@ function downloadPrioritization() {
     }
 }
 
-function downloadAllFiles() {
-    console.log('📦 Downloading all files...');
-    downloadVariants();
-    setTimeout(() => downloadPrioritization(), 500);
-}
+
 
 function downloadCSV(data, filename) {
     const csvContent = data.map(row => 
