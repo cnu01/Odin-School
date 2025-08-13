@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from database import connect_to_mongo, close_mongo_connection
 from contextlib import asynccontextmanager
 import os
@@ -40,6 +41,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Mount static files for AdLift frontend
+app.mount("/adlift", StaticFiles(directory="problems/adlift/static"), name="adlift")
 
 # Include routers for each problem
 from problems.hotlead.routes import router as hotlead_router
