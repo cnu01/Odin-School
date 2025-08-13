@@ -327,7 +327,7 @@ function downloadVariants() {
     
     const variants = currentAnalysisData.variants_data.variants;
     const variantsData = [
-        ['Headline', 'Description', 'Type', 'Target Segment', 'Placement', 'Keyword Set', 'Keyword Type', 'Similarity Score', 'Bigram Score', 'Generated From', 'Use Case']
+        ['Headline', 'Description', 'Type', 'Target Segment', 'Placement', 'Keyword Set', 'Keyword Type', 'Generated From', 'Use Case']
     ];
     
     variants.forEach((v, index) => {
@@ -342,8 +342,6 @@ function downloadVariants() {
             v.placement || 'N/A',
             v.keyword_set || 'N/A',
             v.keyword_type || 'N/A',
-            v.similarity_score || 'N/A',
-            v.bigram_score || 'N/A',
             generatedFrom,
             useCase
         ]);

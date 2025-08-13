@@ -16,7 +16,7 @@ class AdliftService:
         # Import existing logic modules
         try:
             from analysis import load_and_prepare_data, analyze_performance_variance, identify_root_causes, detect_fatigue_patterns
-            from variant_generator import extract_winning_patterns, generate_template_variants, make_rotation_decisions
+            from variant_generator import extract_winning_patterns, generate_template_variants, make_rotation_decisions, generate_keyword_sets
             
             self.analysis_module = {
                 'load_and_prepare': load_and_prepare_data,
@@ -28,7 +28,8 @@ class AdliftService:
             self.variant_module = {
                 'extract_patterns': extract_winning_patterns,
                 'generate_variants': generate_template_variants,
-                'make_decisions': make_rotation_decisions
+                'make_decisions': make_rotation_decisions,
+                'generate_keyword_sets': generate_keyword_sets
             }
             
             print("✅ Successfully imported existing analysis and variant generation logic")
@@ -77,14 +78,25 @@ class AdliftService:
                     # Get dynamic fallback description from top performers
                     fallback_description = self._get_dynamic_fallback_description(top_performers, segment)
                     
-                    # Create variant combinations (simplified for API response)
+                    # Generate keyword sets for this segment/placement
+                    keyword_sets = self.variant_module['generate_keyword_sets'](segment, placement)
+                    
+                    # Create variant combinations with FULL data
                     for i, headline in enumerate(headlines[:5]):  # Limit for API
+                        variant_type = "winner-like" if i < 3 else "explorer"
+                        
+                        # Get keyword set and type
+                        keyword_set = keyword_sets[i % len(keyword_sets)] if keyword_sets else "N/A"
+                        keyword_type = ["core", "problem-aware", "negative"][i % 3] if keyword_sets else "N/A"
+                        
                         all_variants.append({
                             'headline': headline,
                             'description': descriptions[min(i, len(descriptions)-1)] if descriptions else fallback_description,
                             'segment': segment,
                             'placement': placement,
-                            'type': "winner-like" if i < 3 else "explorer"
+                            'type': variant_type,
+                            'keyword_set': keyword_set,
+                            'keyword_type': keyword_type
                         })
             
             # Get rotation decisions using existing logic
