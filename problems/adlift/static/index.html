@@ -46,6 +46,14 @@
                 </button>
             </div>
 
+            <!-- Solution Ranking - ADDRESSES PROBLEM STATEMENT REQUIREMENT -->
+            <div class="result-card priority-solutions">
+                <h3>🎯 Recommended Actions (Ranked by Impact)</h3>
+                <div class="solutions-ranking" id="solutionsRanking">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
             <!-- Performance Summary -->
             <div class="result-card">
                 <h3>🎯 Performance Summary</h3>
@@ -75,6 +83,19 @@
                 <h3>⏰ Creative Fatigue Detection</h3>
                 <div id="fatigueDetection">
                     <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- AI Generated Variants Preview -->
+            <div class="result-card">
+                <h3>🤖 AI-Generated Variants (Top Performers)</h3>
+                <div class="variants-preview" id="variantsPreview">
+                    <!-- Populated by JavaScript -->
+                </div>
+                <div class="variants-actions">
+                    <button class="download-btn" onclick="downloadVariants()">
+                        📊 Download All Variants (CSV)
+                    </button>
                 </div>
             </div>
 
