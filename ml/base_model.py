@@ -38,7 +38,7 @@ class BaseMLModel:
         self.training_metadata = {}
         
         # Model storage paths - updated for Odin-School
-        self.model_dir = os.path.join(os.path.dirname(__file__), "models")
+        self.model_dir = "/Users/batman/Movies/odinschool/Odin-School/ml/models"
         self.model_path = os.path.join(self.model_dir, f"{model_name}_model.pkl")
         self.scaler_path = os.path.join(self.model_dir, f"{model_name}_scaler.pkl")
         self.metadata_path = os.path.join(self.model_dir, f"{model_name}_metadata.json")

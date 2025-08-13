@@ -31,6 +31,7 @@ import {
   ChatBubble as ChatIcon,
   Psychology as PsychologyIcon,
   Analytics as AnalyticsIcon,
+  PersonAdd as PersonAddIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -53,11 +54,17 @@ const menuItems = [
     text: 'Lead Management',
     icon: <PeopleIcon />,
     path: '/leads',
-    subtitle: 'FirstTouch BOT',
+    subtitle: 'Lead Overview',
+  },
+  {
+    text: 'FirstTouch AI',
+    icon: <PsychologyIcon />,
+    path: '/firsttouch',
+    subtitle: 'Call Optimization',
   },
   {
     text: 'HotLead AI',
-    icon: <PsychologyIcon />,
+    icon: <PeopleIcon />,
     path: '/hotlead',
     subtitle: 'ML-Powered Scoring',
   },
@@ -83,7 +90,13 @@ const menuItems = [
     text: 'Ad Performance',
     icon: <TrendingUpIcon />,
     path: '/ads',
-    subtitle: 'AdLift & ReferMore',
+    subtitle: 'AdLift',
+  },
+  {
+    text: 'Referral Management',
+    icon: <PersonAddIcon />,
+    path: '/referrals',
+    subtitle: 'ReferMore AI',
   },
   {
     text: 'Pricing Insights',

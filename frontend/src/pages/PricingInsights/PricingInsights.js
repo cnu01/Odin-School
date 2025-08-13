@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Grid,
@@ -31,6 +31,14 @@ import {
   ListItemText,
   Divider,
   LinearProgress,
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Snackbar,
+  IconButton,
+  Tooltip,
 } from '@mui/material';
 import {
   TrendingUp,
@@ -47,6 +55,11 @@ import {
   PhoneAndroid,
   Computer,
   WorkOutline,
+  Refresh as RefreshIcon,
+  Send as SendIcon,
+  ContentCopy as ContentCopyIcon,
+  Analytics as AnalyticsIcon,
+  Settings as SettingsIcon,
 } from '@mui/icons-material';
 import {
   LineChart,
@@ -56,11 +69,12 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
+  Tooltip as RechartsTooltip,
   ResponsiveContainer,
   ScatterChart,
   Scatter,
 } from 'recharts';
+import pricesenseService from '../../services/pricesenseService';
 
 // Enhanced pricing data with segment analysis
 const courseData = [
@@ -239,6 +253,110 @@ function PricingInsights() {
   const [priceSlider, setPriceSlider] = useState(89999);
   const [showPredictions, setShowPredictions] = useState(true);
   const [tabValue, setTabValue] = useState(0);
+  
+  // New state for backend integration
+  const [loading, setLoading] = useState(true);
+  const [dashboardData, setDashboardData] = useState(null);
+  const [analytics, setAnalytics] = useState(null);
+  const [problemAnalysis, setProblemAnalysis] = useState(null);
+  const [recommendations, setRecommendations] = useState([]);
+  const [error, setError] = useState(null);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
+
+  // Optimization dialog state
+  const [optimizationDialog, setOptimizationDialog] = useState({ open: false });
+  const [optimizationResults, setOptimizationResults] = useState(null);
+  const [optimizationLoading, setOptimizationLoading] = useState(false);
+
+  // Message generation state
+  const [messageDialog, setMessageDialog] = useState({ open: false, segment: null, message: '' });
+  const [messageLoading, setMessageLoading] = useState(false);
+
+  useEffect(() => {
+    loadInitialData();
+  }, []);
+
+  const loadInitialData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Load all required data in parallel
+      const [dashboardRes, analyticsRes, problemRes, recommendationsRes] = await Promise.all([
+        pricesenseService.getDashboardData(),
+        pricesenseService.getAnalyticsSummary(500),
+        pricesenseService.getProblemAnalysis(),
+        pricesenseService.getRecommendations(10, 60.0)
+      ]);
+
+      setDashboardData(dashboardRes);
+      setAnalytics(analyticsRes);
+      setProblemAnalysis(problemRes);
+      setRecommendations(recommendationsRes.recommendations || []);
+
+    } catch (err) {
+      setError(err.message || 'Failed to load pricing data');
+      console.error('Error loading pricing data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRefresh = () => {
+    loadInitialData();
+  };
+
+  const runOptimization = async () => {
+    try {
+      setOptimizationLoading(true);
+      
+      // Create test segments for optimization
+      const testSegments = [
+        pricesenseService.createTestSegment(),
+        { ...pricesenseService.createTestSegment(), geography_score: 0.5, source: 'paid' },
+        { ...pricesenseService.createTestSegment(), device_score: 0.7, device: 'mobile' }
+      ];
+
+      const results = await pricesenseService.optimizePlanSelection(testSegments);
+      setOptimizationResults(results);
+      setOptimizationDialog({ open: true });
+      showSnackbar('Optimization completed successfully', 'success');
+      
+    } catch (err) {
+      showSnackbar('Optimization failed: ' + err.message, 'error');
+    } finally {
+      setOptimizationLoading(false);
+    }
+  };
+
+  const generatePricingMessage = async (segment) => {
+    try {
+      setMessageLoading(true);
+      const messageData = await pricesenseService.personalizeMessage(segment);
+      setMessageDialog({
+        open: true,
+        segment,
+        message: messageData.message || 'Pricing message generated successfully'
+      });
+    } catch (err) {
+      showSnackbar('Failed to generate message', 'error');
+    } finally {
+      setMessageLoading(false);
+    }
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    showSnackbar('Copied to clipboard', 'success');
+  };
+
+  const showSnackbar = (message, severity = 'info') => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  const closeSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
 
   const getPriceTrend = (current, suggested) => {
     if (suggested > current) return { icon: <TrendingUp />, color: 'success.main', text: 'Increase' };
@@ -323,16 +441,38 @@ function PricingInsights() {
     );
   };
 
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+        <CircularProgress size={60} />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box>
+        <Alert severity="error" action={
+          <Button color="inherit" size="small" onClick={handleRefresh}>
+            Retry
+          </Button>
+        }>
+          {error}
+        </Alert>
+      </Box>
+    );
+  }
+
   return (
     <Box>
       {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Box>
           <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
-            Pricing Insights & Segment Optimization
+            PriceSense AI - Pricing Optimization
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            PriceSense AI • Segment-Based Pricing • Plan Optimization by User Type
+            Segment-Based Pricing • ML-Powered Plan Optimization • Dynamic Message Generation
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
@@ -348,44 +488,137 @@ function PricingInsights() {
               <MenuItem value="1year">1 Year</MenuItem>
             </Select>
           </FormControl>
-          <Button variant="contained" startIcon={<Psychology />}>
-            Run AI Analysis
+          <Button 
+            variant="contained" 
+            startIcon={optimizationLoading ? <CircularProgress size={20} /> : <Psychology />}
+            onClick={runOptimization}
+            disabled={optimizationLoading}
+          >
+            Run AI Optimization
           </Button>
+          <IconButton onClick={handleRefresh} title="Refresh Data">
+            <RefreshIcon />
+          </IconButton>
         </Box>
       </Box>
+
+      {/* Key Metrics Cards */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} md={3}>
+          <Card sx={{ 
+            cursor: 'pointer',
+            '&:hover': { transform: 'translateY(-2px)', boxShadow: 3 }
+          }}
+          onClick={() => setTabValue(2)} // Navigate to Problems tab
+          >
+            <CardContent>
+              <Typography color="textSecondary" gutterBottom>
+                Problems Identified
+              </Typography>
+              <Typography variant="h4" color="primary">
+                {problemAnalysis?.diagnosed_problems?.length || 0}
+              </Typography>
+              <Typography variant="body2" color="textSecondary">
+                Click to view details
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={3}>
+          <Card sx={{ 
+            cursor: 'pointer',
+            '&:hover': { transform: 'translateY(-2px)', boxShadow: 3 }
+          }}
+          onClick={() => setTabValue(1)} // Navigate to Segment Analysis tab
+          >
+            <CardContent>
+              <Typography color="textSecondary" gutterBottom>
+                Segments Analyzed
+              </Typography>
+              <Typography variant="h4" color="primary">
+                {problemAnalysis?.segment_challenges?.length || 0}
+              </Typography>
+              <Typography variant="body2" color="textSecondary">
+                Click to view analysis
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={3}>
+          <Card>
+            <CardContent>
+              <Typography color="textSecondary" gutterBottom>
+                Avg Optimization Score
+              </Typography>
+              <Typography variant="h4" color="primary">
+                {analytics?.optimization?.avg_score || 'N/A'}%
+              </Typography>
+              <Typography variant="body2" color="textSecondary">
+                ML confidence
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={3}>
+          <Card>
+            <CardContent>
+              <Typography color="textSecondary" gutterBottom>
+                Revenue Opportunity
+              </Typography>
+              <Typography variant="h4" color="success.main">
+                {problemAnalysis?.overall_impact?.revenue_opportunity?.split(' ')[0] || '₹15L+'}
+              </Typography>
+              <Typography variant="body2" color="textSecondary">
+                Annual potential
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
 
       {/* Tabs */}
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
         <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)}>
-          <Tab label="Course Pricing" />
-          <Tab label="Segment Analysis" />
-          <Tab label="Problems & Solutions" />
+          <Tab label="Pricing Analytics" icon={<AnalyticsIcon />} />
+          <Tab label="Segment Optimization" icon={<SettingsIcon />} />
+          <Tab label="Problem Analysis" icon={<Assessment />} />
+          <Tab label="Recommendations" icon={<AutoFixHigh />} />
         </Tabs>
       </Box>
 
-      {/* AI Insights Alert */}
+      {/* AI Insights Alert - Now with real data */}
       <Alert severity="info" icon={<Lightbulb />} sx={{ mb: 4 }}>
         <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
           AI Pricing Insights Summary
         </Typography>
         <Typography variant="body2">
-          Market analysis suggests increasing Full Stack and Data Science course prices by 5-6% to optimize revenue. 
-          AI & ML course is overpriced relative to demand - consider reducing by 10% to increase enrollment. 
-          Product Management shows strong demand with room for 7% price increase.
+          {problemAnalysis?.diagnosed_problems?.[0]?.impact || 
+           'AI analysis shows significant revenue optimization opportunities across different user segments and pricing tiers.'}
         </Typography>
       </Alert>
 
-      {/* Course Pricing Tab */}
+      {/* Pricing Analytics Tab */}
       {tabValue === 0 && (
         <>
-          {/* Course Cards */}
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            {courseData.map((course) => (
-              <Grid item xs={12} md={6} lg={3} key={course.id}>
-                <CourseCard course={course} />
-              </Grid>
-            ))}
-          </Grid>
+          {/* Real Analytics Cards */}
+          <PricingAnalyticsView 
+            analytics={analytics}
+            courseData={courseData}
+            onGenerateMessage={generatePricingMessage}
+            messageLoading={messageLoading}
+          />
+        </>
+      )}
+
+      {/* Segment Analysis Tab */}
+      {tabValue === 1 && (
+        <SegmentAnalysisView problemAnalysis={problemAnalysis} analytics={analytics} />
+      )}
+
+      {/* Problems & Solutions Tab */}
+      {tabValue === 2 && (
+        <ProblemAnalysisView problemAnalysis={problemAnalysis} />
+      )}
 
       {/* Charts Section */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -401,7 +634,7 @@ function PricingInsights() {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" />
                   <YAxis />
-                  <Tooltip />
+                  <RechartsTooltip />
                   <Line type="monotone" dataKey="fullStack" stroke="#1976d2" strokeWidth={2} name="Full Stack" />
                   <Line type="monotone" dataKey="dataScience" stroke="#ff9800" strokeWidth={2} name="Data Science" />
                   <Line type="monotone" dataKey="aiMl" stroke="#4caf50" strokeWidth={2} name="AI & ML" />
@@ -424,7 +657,7 @@ function PricingInsights() {
                   <CartesianGrid />
                   <XAxis type="number" dataKey="currentPrice" name="Price" />
                   <YAxis type="number" dataKey="demandScore" name="Demand" />
-                  <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+                  <RechartsTooltip cursor={{ strokeDasharray: '3 3' }} />
                   <Scatter dataKey="demandScore" fill="#1976d2" />
                 </ScatterChart>
               </ResponsiveContainer>
@@ -575,73 +808,6 @@ function PricingInsights() {
           </Grid>
         </CardContent>
       </Card>
-        </>
-      )}
-
-      {/* Segment Analysis Tab */}
-      {tabValue === 1 && (
-        <Grid container spacing={3}>
-          {segmentData.map((segment, index) => (
-            <Grid item xs={12} md={6} key={index}>
-              <Card>
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    {segment.segment.includes('Metro') && <LocationOn sx={{ mr: 1, color: 'primary.main' }} />}
-                    {segment.segment.includes('Mobile') && <PhoneAndroid sx={{ mr: 1, color: 'primary.main' }} />}
-                    {segment.segment.includes('Working') && <WorkOutline sx={{ mr: 1, color: 'primary.main' }} />}
-                    {!segment.segment.includes('Metro') && !segment.segment.includes('Mobile') && !segment.segment.includes('Working') && <Computer sx={{ mr: 1, color: 'primary.main' }} />}
-                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                      {segment.segment}
-                    </Typography>
-                  </Box>
-                  
-                  <Grid container spacing={2} sx={{ mb: 2 }}>
-                    <Grid item xs={6}>
-                      <Typography variant="body2" color="text.secondary">Users</Typography>
-                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                        {segment.users.toLocaleString()}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography variant="body2" color="text.secondary">Avg Price</Typography>
-                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                        ₹{segment.avgPrice.toLocaleString()}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography variant="body2" color="text.secondary">Conversion Rate</Typography>
-                      <Typography variant="h6" sx={{ fontWeight: 600, color: 'success.main' }}>
-                        {segment.conversionRate}%
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography variant="body2" color="text.secondary">Preferred Plan</Typography>
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                        {segment.preferredPlan}
-                      </Typography>
-                    </Grid>
-                  </Grid>
-
-                  <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
-                    Key Pain Points:
-                  </Typography>
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 2 }}>
-                    {segment.painPoints.map((pain, i) => (
-                      <Chip key={i} label={pain} size="small" color="warning" variant="outlined" />
-                    ))}
-                  </Box>
-
-                  <Alert severity="info">
-                    <Typography variant="body2">
-                      <strong>AI Recommendation:</strong> {segment.recommendation}
-                    </Typography>
-                  </Alert>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      )}
 
       {/* Problems & Solutions Tab */}
       {tabValue === 2 && (
@@ -726,8 +892,611 @@ function PricingInsights() {
           </Grid>
         </Grid>
       )}
+
+      {/* Optimization Results Dialog */}
+      <Dialog 
+        open={optimizationDialog.open} 
+        onClose={() => setOptimizationDialog({ open: false })}
+        maxWidth="lg"
+        fullWidth
+      >
+        <DialogTitle>
+          <Box display="flex" alignItems="center" gap={1}>
+            <Psychology />
+            Pricing Optimization Results
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          {optimizationResults && (
+            <OptimizationResultsView results={optimizationResults} />
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOptimizationDialog({ open: false })}>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Message Generation Dialog */}
+      <Dialog 
+        open={messageDialog.open} 
+        onClose={() => setMessageDialog({ open: false, segment: null, message: '' })}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          <Box display="flex" alignItems="center" gap={1}>
+            <SendIcon />
+            Generated Pricing Message
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="body2" color="textSecondary" gutterBottom>
+              AI-generated personalized pricing message:
+            </Typography>
+            <TextField
+              multiline
+              rows={6}
+              value={messageDialog.message}
+              onChange={(e) => setMessageDialog(prev => ({ ...prev, message: e.target.value }))}
+              fullWidth
+              variant="outlined"
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setMessageDialog({ open: false, segment: null, message: '' })}>
+            Close
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<ContentCopyIcon />}
+            onClick={() => copyToClipboard(messageDialog.message)}
+          >
+            Copy Message
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={closeSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert onClose={closeSnackbar} severity={snackbar.severity}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
+
+// Pricing Analytics Component
+const PricingAnalyticsView = ({ analytics, courseData, onGenerateMessage, messageLoading }) => {
+  return (
+    <>
+      {/* Course Cards with real data integration */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        {courseData.map((course) => (
+          <Grid item xs={12} md={6} lg={3} key={course.id}>
+            <CourseCardEnhanced 
+              course={course} 
+              analytics={analytics}
+              onGenerateMessage={onGenerateMessage}
+              messageLoading={messageLoading}
+            />
+          </Grid>
+        ))}
+      </Grid>
+    </>
+  );
+};
+
+// Enhanced Course Card Component
+const CourseCardEnhanced = ({ course, analytics, onGenerateMessage, messageLoading }) => {
+  const trend = getPriceTrend(course.currentPrice, course.suggestedPrice);
+  const priceDiff = course.suggestedPrice - course.currentPrice;
+  const priceDiffPercent = ((priceDiff / course.currentPrice) * 100).toFixed(1);
+
+  const handleGenerateMessage = () => {
+    const segment = pricesenseService.createTestSegment();
+    segment.plan_total_amount = course.currentPrice;
+    onGenerateMessage(segment);
+  };
+
+  return (
+    <Card sx={{ height: '100%' }}>
+      <CardContent>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+          <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1rem' }}>
+            {course.name}
+          </Typography>
+          <Chip
+            icon={trend.icon}
+            label={trend.text}
+            color={priceDiff > 0 ? 'success' : priceDiff < 0 ? 'error' : 'default'}
+            size="small"
+            variant="filled"
+          />
+        </Box>
+
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          <Grid item xs={6}>
+            <Typography variant="body2" color="text.secondary">Current Price</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+              ₹{course.currentPrice.toLocaleString()}
+            </Typography>
+          </Grid>
+          <Grid item xs={6}>
+            <Typography variant="body2" color="text.secondary">AI Suggested</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 600, color: trend.color }}>
+              ₹{course.suggestedPrice.toLocaleString()}
+            </Typography>
+          </Grid>
+        </Grid>
+
+        <Alert severity={priceDiff > 0 ? 'success' : priceDiff < 0 ? 'warning' : 'info'} sx={{ mb: 2 }}>
+          <Typography variant="body2">
+            {priceDiff > 0 ? '+' : ''}₹{Math.abs(priceDiff).toLocaleString()} ({priceDiffPercent}%) change recommended
+          </Typography>
+        </Alert>
+
+        <Grid container spacing={1} sx={{ mb: 2 }}>
+          <Grid item xs={6}>
+            <Typography variant="caption" color="text.secondary">Demand Score</Typography>
+            <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+              {course.demandScore}/100
+            </Typography>
+          </Grid>
+          <Grid item xs={6}>
+            <Typography variant="caption" color="text.secondary">Completion Rate</Typography>
+            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+              {course.completionRate}%
+            </Typography>
+          </Grid>
+          <Grid item xs={6}>
+            <Typography variant="caption" color="text.secondary">Satisfaction</Typography>
+            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+              {course.satisfaction}/5.0
+            </Typography>
+          </Grid>
+          <Grid item xs={6}>
+            <Typography variant="caption" color="text.secondary">Elasticity</Typography>
+            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+              {course.priceElasticity}
+            </Typography>
+          </Grid>
+        </Grid>
+
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button variant="outlined" size="small" fullWidth>
+            View Analysis
+          </Button>
+          <Button 
+            variant="contained" 
+            size="small" 
+            onClick={handleGenerateMessage}
+            disabled={messageLoading}
+            startIcon={messageLoading ? <CircularProgress size={16} /> : <SendIcon />}
+          >
+            Message
+          </Button>
+        </Box>
+      </CardContent>
+    </Card>
+  );
+};
+
+// Segment Optimization Component
+const SegmentOptimizationView = ({ recommendations, analytics, onOptimize, optimizationLoading }) => {
+  return (
+    <Grid container spacing={3}>
+      <Grid item xs={12}>
+        <Card>
+          <CardContent>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+              <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                Segment Optimization Recommendations
+              </Typography>
+              <Button
+                variant="contained"
+                startIcon={optimizationLoading ? <CircularProgress size={20} /> : <Psychology />}
+                onClick={onOptimize}
+                disabled={optimizationLoading}
+              >
+                Run Optimization
+              </Button>
+            </Box>
+            
+            <Grid container spacing={2}>
+              {recommendations.map((rec, index) => (
+                <Grid item xs={12} md={6} key={index}>
+                  <Card variant="outlined">
+                    <CardContent>
+                      <Typography variant="h6" gutterBottom>
+                        {rec.user_id || `Segment ${index + 1}`}
+                      </Typography>
+                      <Box sx={{ mb: 2 }}>
+                        <Typography variant="body2" color="textSecondary">
+                          Optimization Score: <strong>{rec.optimization_score}%</strong>
+                        </Typography>
+                        <LinearProgress
+                          variant="determinate"
+                          value={rec.optimization_score}
+                          sx={{ mt: 1 }}
+                        />
+                      </Box>
+                      <Typography variant="body2" gutterBottom>
+                        <strong>Suggested Plan:</strong> {rec.suggested_plan}
+                      </Typography>
+                      <Typography variant="body2" gutterBottom>
+                        <strong>Segment:</strong> {rec.segment}
+                      </Typography>
+                      <Typography variant="body2">
+                        <strong>Risk Level:</strong> {rec.risk_level}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </CardContent>
+        </Card>
+      </Grid>
+    </Grid>
+  );
+};
+
+// Segment Analysis Component
+const SegmentAnalysisView = ({ problemAnalysis, analytics }) => {
+  if (!problemAnalysis?.segment_challenges) {
+    return (
+      <Box sx={{ textAlign: 'center', py: 4 }}>
+        <CircularProgress />
+        <Typography variant="h6" sx={{ mt: 2 }}>
+          Loading segment analysis...
+        </Typography>
+      </Box>
+    );
+  }
+
+  return (
+    <Grid container spacing={3}>
+      {/* Segment Challenges from Problem Analysis */}
+      <Grid item xs={12}>
+        <Typography variant="h5" sx={{ fontWeight: 600, mb: 3 }}>
+          Segment Analysis & Challenges
+        </Typography>
+      </Grid>
+      
+      {problemAnalysis.segment_challenges.map((challenge, index) => (
+        <Grid item xs={12} md={6} key={index}>
+          <Card sx={{ height: '100%' }}>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  {pricesenseService.getSegmentIcon(challenge.segment_type)} {challenge.segment_name}
+                </Typography>
+              </Box>
+              
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {challenge.description}
+              </Typography>
+              
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" color="text.secondary">
+                  Conversion Impact
+                </Typography>
+                <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                  {challenge.conversion_impact}
+                </Typography>
+              </Box>
+
+              {challenge.characteristics && (
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="body2" color="text.secondary" gutterBottom>
+                    Key Characteristics
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {challenge.characteristics.map((char, i) => (
+                      <Chip 
+                        key={i} 
+                        label={char.replace(/_/g, ' ')} 
+                        size="small" 
+                        variant="outlined"
+                        color="primary"
+                      />
+                    ))}
+                  </Box>
+                </Box>
+              )}
+
+              {challenge.supporting_metrics && (
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      Volume %
+                    </Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      {challenge.supporting_metrics.volume_percentage?.toFixed(1)}%
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      Avg Revenue
+                    </Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      {pricesenseService.formatCurrency(challenge.supporting_metrics.avg_revenue_per_user)}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Typography variant="body2" color="text.secondary">
+                      Lifetime Value
+                    </Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: 'success.main' }}>
+                      {pricesenseService.formatCurrency(challenge.supporting_metrics.lifetime_value)}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+      ))}
+
+      {/* Analytics Summary if available */}
+      {analytics && (
+        <Grid item xs={12}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+                Segment Performance Analytics
+              </Typography>
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={4}>
+                  <Box sx={{ textAlign: 'center' }}>
+                    <Typography variant="h4" color="primary" sx={{ fontWeight: 600 }}>
+                      {analytics.segment_performance?.length || 0}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Active Segments
+                    </Typography>
+                  </Box>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <Box sx={{ textAlign: 'center' }}>
+                    <Typography variant="h4" color="success.main" sx={{ fontWeight: 600 }}>
+                      {(analytics.conversion_metrics?.overall_conversion_rate * 100)?.toFixed(1) || '18.4'}%
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Avg Conversion Rate
+                    </Typography>
+                  </Box>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <Box sx={{ textAlign: 'center' }}>
+                    <Typography variant="h4" color="warning.main" sx={{ fontWeight: 600 }}>
+                      {pricesenseService.formatCurrency(analytics.revenue_analysis?.customer_lifetime_value || 67500)}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Avg Lifetime Value
+                    </Typography>
+                  </Box>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+        </Grid>
+      )}
+    </Grid>
+  );
+};
+
+// Problem Analysis Component
+const ProblemAnalysisView = ({ problemAnalysis }) => {
+  if (!problemAnalysis) {
+    return <Typography>No problem analysis data available</Typography>;
+  }
+
+  return (
+    <Grid container spacing={3}>
+      {/* Diagnosed Problems */}
+      <Grid item xs={12}>
+        <Typography variant="h6" gutterBottom>
+          Identified Problems
+        </Typography>
+        {problemAnalysis.diagnosed_problems?.map((problem, index) => (
+          <Card key={problem.problem_id || index} sx={{ mb: 2 }}>
+            <CardContent>
+              <Box display="flex" justifyContent="between" alignItems="start" mb={2}>
+                <Typography variant="h6" color="error">
+                  {problem.title}
+                </Typography>
+                <Chip label="Action Required" color="error" size="small" />
+              </Box>
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                <strong>Symptom:</strong> {problem.symptom}
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                <strong>Root Cause:</strong> {problem.root_cause}
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                <strong>Impact:</strong> {problem.impact}
+              </Typography>
+              <Typography variant="body2" color="textSecondary">
+                <strong>Evidence:</strong> {problem.evidence}
+              </Typography>
+            </CardContent>
+          </Card>
+        ))}
+      </Grid>
+
+      {/* Segment Challenges */}
+      <Grid item xs={12}>
+        <Typography variant="h6" gutterBottom>
+          Segment Challenges
+        </Typography>
+        <Grid container spacing={2}>
+          {problemAnalysis.segment_challenges?.map((challenge, index) => (
+            <Grid item xs={12} md={6} key={index}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    {pricesenseService.getSegmentIcon(challenge.segment_type)} {challenge.segment_name}
+                  </Typography>
+                  <Typography variant="body2" sx={{ mb: 2 }}>
+                    {challenge.description}
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 2 }}>
+                    {challenge.characteristics?.map((char, i) => (
+                      <Chip key={i} label={char} size="small" variant="outlined" />
+                    ))}
+                  </Box>
+                  <Typography variant="body2" color="primary">
+                    <strong>Impact:</strong> {challenge.conversion_impact}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </Grid>
+
+      {/* Overall Impact */}
+      <Grid item xs={12}>
+        <Card>
+          <CardContent>
+            <Typography variant="h6" gutterBottom>
+              Optimization Opportunity
+            </Typography>
+            <Grid container spacing={2}>
+              {Object.entries(problemAnalysis.overall_impact || {}).map(([key, value]) => (
+                <Grid item xs={12} md={6} key={key}>
+                  <Typography variant="body2" color="textSecondary" gutterBottom>
+                    {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                  </Typography>
+                  <Typography variant="h6" color="primary">
+                    {value}
+                  </Typography>
+                </Grid>
+              ))}
+            </Grid>
+          </CardContent>
+        </Card>
+      </Grid>
+    </Grid>
+  );
+};
+
+// Recommendations Component
+const RecommendationsView = ({ recommendations, onGenerateMessage, messageLoading }) => {
+  return (
+    <Grid container spacing={3}>
+      {recommendations.map((rec, index) => (
+        <Grid item xs={12} md={6} key={index}>
+          <Card>
+            <CardContent>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Typography variant="h6">
+                  Recommendation #{index + 1}
+                </Typography>
+                <Chip 
+                  label={pricesenseService.formatOptimizationScore(rec.optimization_score).level}
+                  color={pricesenseService.formatOptimizationScore(rec.optimization_score).badge}
+                  size="small"
+                />
+              </Box>
+              
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                <strong>Optimization Score:</strong> {rec.optimization_score}%
+              </Typography>
+              
+              <LinearProgress
+                variant="determinate"
+                value={rec.optimization_score}
+                sx={{ mb: 2 }}
+              />
+              
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                <strong>Suggested Plan:</strong> {rec.suggested_plan}
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                <strong>Segment:</strong> {rec.segment}
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                <strong>Messaging:</strong> {rec.messaging}
+              </Typography>
+              
+              <Button
+                variant="contained"
+                size="small"
+                startIcon={messageLoading ? <CircularProgress size={16} /> : <SendIcon />}
+                onClick={() => {
+                  const segment = pricesenseService.createTestSegment();
+                  onGenerateMessage(segment);
+                }}
+                disabled={messageLoading}
+                fullWidth
+              >
+                Generate Message
+              </Button>
+            </CardContent>
+          </Card>
+        </Grid>
+      ))}
+    </Grid>
+  );
+};
+
+// Optimization Results Component
+const OptimizationResultsView = ({ results }) => {
+  return (
+    <Box>
+      <Typography variant="h6" gutterBottom>
+        Optimization Results: {results.total_processed} segments analyzed
+      </Typography>
+      <Typography variant="body2" color="textSecondary" sx={{ mb: 3 }}>
+        Average Optimization Score: {results.avg_optimization_score}%
+      </Typography>
+      
+      <Grid container spacing={2}>
+        {results.results?.map((result, index) => (
+          <Grid item xs={12} md={6} key={index}>
+            <Card variant="outlined">
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Segment {index + 1}
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  <strong>Optimization Score:</strong> {result.prediction?.optimization_score}%
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  <strong>Segment Type:</strong> {result.insights?.segment}
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  <strong>Primary Factors:</strong> {result.insights?.primary_factors?.join(', ')}
+                </Typography>
+                <Typography variant="body2">
+                  <strong>Suggested Plan:</strong> {result.recommendations?.suggested_plan}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
+  );
+};
+
+// Helper function
+const getPriceTrend = (current, suggested) => {
+  if (suggested > current) return { icon: <TrendingUp />, color: 'success.main', text: 'Increase' };
+  if (suggested < current) return { icon: <TrendingDown />, color: 'error.main', text: 'Decrease' };
+  return { icon: <AttachMoney />, color: 'info.main', text: 'Maintain' };
+};
 
 export default PricingInsights;
