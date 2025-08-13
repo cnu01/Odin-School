@@ -8,105 +8,114 @@
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>🚀 AdLift Marketing Optimizer</h1>
+        <header class="header">
+            <h1>📊 AdLift Marketing Optimizer</h1>
             <p>AI-driven ad optimization and creative generation</p>
         </header>
 
-        <!-- File Upload Section -->
         <section class="upload-section">
-            <div class="upload-area" id="uploadArea">
-                <div class="upload-content">
-                    <div class="upload-icon">📁</div>
-                    <h3>Upload Your CSV File</h3>
-                    <p>Drag & drop your ad performance CSV or click to browse</p>
-                    <input type="file" id="csvFile" accept=".csv" style="display: none;">
-                    <button class="upload-btn" onclick="document.getElementById('csvFile').click()">
-                        Choose File
-                    </button>
+            <div class="upload-card">
+                <h2>📁 Upload CSV File</h2>
+                
+                <!-- Drag & Drop Area -->
+                <div class="drag-drop-area" id="dragDropArea">
+                    <div class="drag-drop-content">
+                        <div class="upload-icon">📁</div>
+                        <h3>Drag & Drop CSV File</h3>
+                        <p>Or click to browse files</p>
+                        <input type="file" id="csvFile" name="file" accept=".csv" style="display: none;">
+                    </div>
                 </div>
-            </div>
-        </section>
-
-        <!-- Loading State -->
-        <section class="loading-section" id="loadingSection" style="display: none;">
-            <div class="loading-content">
-                <div class="spinner"></div>
-                <h3>Analyzing Your Data...</h3>
-                <p>This may take a few moments</p>
-            </div>
-        </section>
-
-        <!-- Results Section -->
-        <section class="results-section" id="resultsSection" style="display: none;">
-            <div class="results-header">
-                <h2>📊 Analysis Results</h2>
-                <button class="download-all-btn" onclick="downloadAllFiles()">
-                    📥 Download All Files
+                
+                <!-- File Status Display -->
+                <div class="file-status" id="fileStatus" style="display: none;">
+                    <div class="file-info">
+                        <span class="file-icon">📄</span>
+                        <div class="file-details">
+                            <div class="file-name" id="fileName">No file selected</div>
+                            <div class="file-size" id="fileSize">0 KB</div>
+                        </div>
+                        <button class="remove-file-btn" id="removeFileBtn">✕</button>
+                    </div>
+                </div>
+                
+                <!-- Analyze Button -->
+                <button class="analyze-btn" id="analyzeBtn" disabled>
+                    🚀 Analyze Campaign Data
                 </button>
             </div>
-
-            <!-- Performance Summary -->
-            <div class="result-card">
-                <h3>🎯 Performance Summary</h3>
-                <div class="metrics-grid" id="performanceMetrics">
-                    <!-- Populated by JavaScript -->
-                </div>
-            </div>
-
-            <!-- Root Causes -->
-            <div class="result-card">
-                <h3>🔍 Root Cause Analysis</h3>
-                <div id="rootCauses">
-                    <!-- Populated by JavaScript -->
-                </div>
-            </div>
-
-            <!-- Campaign Decisions -->
-            <div class="result-card">
-                <h3>⚖️ Campaign Decisions</h3>
-                <div class="decisions-grid" id="campaignDecisions">
-                    <!-- Populated by JavaScript -->
-                </div>
-            </div>
-
-            <!-- Fatigue Detection -->
-            <div class="result-card" id="fatigueSection" style="display: none;">
-                <h3>⏰ Creative Fatigue Detection</h3>
-                <div id="fatigueDetection">
-                    <!-- Populated by JavaScript -->
-                </div>
-            </div>
-
-            <!-- Expected Impact -->
-            <div class="result-card">
-                <h3>📈 Expected Impact (30 Days)</h3>
-                <div class="impact-grid" id="expectedImpact">
-                    <!-- Populated by JavaScript -->
-                </div>
-            </div>
-
-            <!-- Download Section -->
-            <div class="result-card">
-                <h3>📥 Download Results</h3>
-                <div class="download-grid">
-                                         <button class="download-btn" onclick="downloadVariants()">
-                         📊 AI Variants (Detailed CSV)
-                     </button>
-                     <button class="download-btn" onclick="downloadPrioritization()">
-                         ⚖️ Campaign Decisions (Detailed CSV)
-                     </button>
-                </div>
-            </div>
         </section>
 
-        <!-- Error Section -->
-        <section class="error-section" id="errorSection" style="display: none;">
-            <div class="error-content">
-                <div class="error-icon">❌</div>
-                <h3>Analysis Failed</h3>
-                <p id="errorMessage"></p>
-                <button class="retry-btn" onclick="resetForm()">Try Again</button>
+        <div id="loadingSection" class="loading-section" style="display: none;">
+            <div class="loading-spinner"></div>
+            <p>Analyzing your ad campaign data...</p>
+        </div>
+
+        <section class="results-section" id="resultsSection" style="display: none;">
+            <div class="results-header">
+                <h2>📋 Marketing Analysis Report</h2>
+            </div>
+
+            <!-- 1. DIAGNOSE THE PROBLEM (1-2 reasons) -->
+            <div class="result-card diagnosis-card">
+                <h3>🔍 Problem Diagnosis</h3>
+                <p class="section-desc">Identified 1-2 main reasons for weak creatives/keywords:</p>
+                <div class="causes-list" id="rootCauses">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- 2. PROPOSE SOLUTIONS (AI-driven ways) -->
+            <div class="result-card solutions-card">
+                <h3>💡 AI-Driven Solutions</h3>
+                <p class="section-desc">Recommended approaches to generate fresh variants and rotate winners:</p>
+                <div class="solutions-list" id="proposedSolutions">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- 3. PRIORITIZE & JUSTIFY (Ranked with metrics) -->
+            <div class="result-card priority-card">
+                <h3>🏆 Priority Ranking</h3>
+                <p class="section-desc">Solutions ranked by expected impact with projected metrics:</p>
+                <div class="priority-list" id="priorityRanking">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- CSV DOWNLOADS SECTION -->
+            <div class="result-card downloads-card">
+                <h3>📥 Download Implementation Files</h3>
+                <p class="section-desc">Ready-to-use files for immediate campaign implementation:</p>
+                <div class="download-grid">
+                    <div class="download-item">
+                        <div class="download-info">
+                            <h4>🤖 AI Variants</h4>
+                            <p>Fresh headlines, descriptions & keywords ready for ad platforms</p>
+                        </div>
+                        <button class="download-btn" onclick="downloadVariants()">
+                            📊 Download CSV
+                        </button>
+                    </div>
+                    <div class="download-item">
+                        <div class="download-info">
+                            <h4>⚖️ Campaign Decisions</h4>
+                            <p>KEEP/PAUSE/MONITOR decisions with reasoning for each campaign</p>
+                        </div>
+                        <button class="download-btn" onclick="downloadPrioritization()">
+                            📋 Download CSV
+                        </button>
+                    </div>
+                    <div class="download-item download-all">
+                        <div class="download-info">
+                            <h4>📦 Complete Package</h4>
+                            <p>Both files for full marketing implementation</p>
+                        </div>
+                        <button class="download-btn primary" onclick="downloadAllFiles()">
+                            🚀 Download All
+                        </button>
+                    </div>
+                </div>
             </div>
         </section>
     </div>
