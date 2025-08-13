@@ -64,7 +64,7 @@ async function processFile(file) {
         const formData = new FormData();
         formData.append('file', file);
         
-        const response = await fetch('/analyze', {
+        const response = await fetch('/api/adlift/analyze', {
             method: 'POST',
             body: formData
         });
@@ -92,7 +92,7 @@ async function processFile(file) {
 }
 
 function displayResults(data) {
-    // Solution Ranking - ADDRESSES PROBLEM STATEMENT REQUIREMENT
+    // Solution Ranking
     displaySolutionRanking(data);
     
     // Performance Metrics
@@ -271,7 +271,7 @@ function displayExpectedImpact(impact) {
     container.innerHTML = impactHTML;
 }
 
-// Solution Ranking Display - ADDRESSES PROBLEM STATEMENT REQUIREMENT
+// Solution Ranking Display
 function displaySolutionRanking(data) {
     const container = document.getElementById('solutionsRanking');
     
