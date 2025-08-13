@@ -97,6 +97,7 @@ class AdliftService:
             # Format results for API response
             root_causes = self._format_root_causes(mismatch_evidence, qualification_issues)
             campaign_decisions = self._format_campaign_decisions(decisions_df)
+            campaign_details = self._format_campaign_details(decisions_df)
             
             print("✅ Analysis complete using existing logic!")
             
@@ -107,6 +108,7 @@ class AdliftService:
                     "variants": all_variants  # Include full variants for CSV download
                 },
                 "campaign_decisions": campaign_decisions,
+                "campaign_details": campaign_details,  # Include detailed campaign decisions
                 "expected_impact": self._generate_expected_impact(df_filtered, mismatch_evidence, qualification_issues, decisions_df)
             }
             
@@ -155,6 +157,42 @@ class AdliftService:
                 "pause_count": 0,
                 "keep_count": 0,
                 "monitor_count": 0
+            }
+    
+    def _format_campaign_details(self, decisions_df) -> Dict:
+        """Format detailed campaign decisions for API response"""
+        try:
+            # Group campaigns by decision type
+            pause_campaigns = decisions_df[decisions_df['decision'] == 'PAUSE'].to_dict('records')
+            keep_campaigns = decisions_df[decisions_df['decision'] == 'KEEP'].to_dict('records')
+            monitor_campaigns = decisions_df[decisions_df['decision'] == 'MONITOR'].to_dict('records')
+            
+            # Format each campaign with key details
+            def format_campaign(campaign):
+                return {
+                    'campaign_name': campaign.get('campaign', 'N/A'),
+                    'ad_group': campaign.get('ad_group', 'N/A'),
+                    'segment': campaign.get('audience_segment', 'N/A'),
+                    'placement': campaign.get('placement', 'N/A'),
+                    'headline': campaign.get('headline', 'N/A'),
+                    'description': campaign.get('description', 'N/A'),
+                    'qpi': round(campaign.get('QPI', 0), 4),
+                    'cpql': round(campaign.get('CPQL', 0), 2),
+                    'score': round(campaign.get('Score', 0), 2),
+                    'reason': campaign.get('reason', 'N/A')
+                }
+            
+            return {
+                "pause": [format_campaign(c) for c in pause_campaigns],
+                "keep": [format_campaign(c) for c in keep_campaigns],
+                "monitor": [format_campaign(c) for c in monitor_campaigns]
+            }
+        except Exception as e:
+            print(f"⚠️ Error formatting campaign details: {e}")
+            return {
+                "pause": [],
+                "keep": [],
+                "monitor": []
             }
     
     def _get_dynamic_fallback_description(self, top_performers, segment) -> str:

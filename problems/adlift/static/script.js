@@ -323,21 +323,33 @@ function downloadVariants() {
         return;
     }
     
-    console.log('📥 Downloading variants CSV...');
+    console.log('📥 Downloading detailed variants CSV...');
     
     const variants = currentAnalysisData.variants_data.variants;
     const variantsData = [
-        ['Headline', 'Description', 'Type', 'Target Segment', 'Placement'],
-        ...variants.map(v => [
+        ['Headline', 'Description', 'Type', 'Target Segment', 'Placement', 'Keyword Set', 'Keyword Type', 'Similarity Score', 'Bigram Score', 'Generated From', 'Use Case']
+    ];
+    
+    variants.forEach((v, index) => {
+        const useCase = v.type === 'winner-like' ? 'High confidence - based on top performers' : 'Explorer - test new creative directions';
+        const generatedFrom = v.type === 'winner-like' ? 'Top performing patterns' : 'Creative exploration';
+        
+        variantsData.push([
             v.headline || 'N/A',
             v.description || 'N/A', 
             v.type || 'N/A',
             v.segment || 'N/A',
-            v.placement || 'N/A'
-        ])
-    ];
+            v.placement || 'N/A',
+            v.keyword_set || 'N/A',
+            v.keyword_type || 'N/A',
+            v.similarity_score || 'N/A',
+            v.bigram_score || 'N/A',
+            generatedFrom,
+            useCase
+        ]);
+    });
     
-    downloadCSV(variantsData, 'adlift_variants.csv');
+    downloadCSV(variantsData, 'adlift_detailed_variants.csv');
 }
 
 function downloadPrioritization() {
@@ -346,19 +358,93 @@ function downloadPrioritization() {
         return;
     }
     
-    console.log('📥 Downloading prioritization CSV...');
+    console.log('📥 Downloading detailed campaign decisions CSV...');
     
+    // Get detailed campaign data if available
+    const campaignDetails = currentAnalysisData.campaign_details;
     const decisions = currentAnalysisData.campaign_decisions;
-    const totalCampaigns = decisions.pause_count + decisions.keep_count + decisions.monitor_count;
     
-    const prioritizationData = [
-        ['Decision', 'Count', 'Percentage', 'Action Required'],
-        ['PAUSE', decisions.pause_count, `${((decisions.pause_count / totalCampaigns) * 100).toFixed(1)}%`, 'Stop underperforming campaigns immediately'],
-        ['KEEP', decisions.keep_count, `${((decisions.keep_count / totalCampaigns) * 100).toFixed(1)}%`, 'Scale these winning campaigns'],
-        ['MONITOR', decisions.monitor_count, `${((decisions.monitor_count / totalCampaigns) * 100).toFixed(1)}%`, 'Watch performance and decide next week']
-    ];
-    
-    downloadCSV(prioritizationData, 'adlift_prioritization.csv');
+    if (campaignDetails && Object.keys(campaignDetails).length > 0) {
+        // Create detailed CSV with all campaign information
+        const detailedData = [
+            ['Decision', 'Campaign Name', 'Ad Group', 'Segment', 'Placement', 'Headline', 'Description', 'QPI', 'CPQL', 'Score', 'Reason', 'Action Required']
+        ];
+        
+        // Add PAUSE campaigns
+        if (campaignDetails.pause && campaignDetails.pause.length > 0) {
+            campaignDetails.pause.forEach(campaign => {
+                detailedData.push([
+                    'PAUSE',
+                    campaign.campaign_name,
+                    campaign.ad_group,
+                    campaign.segment,
+                    campaign.placement,
+                    campaign.headline,
+                    campaign.description,
+                    campaign.qpi,
+                    campaign.cpql,
+                    campaign.score,
+                    campaign.reason,
+                    'Stop underperforming campaign immediately'
+                ]);
+            });
+        }
+        
+        // Add KEEP campaigns
+        if (campaignDetails.keep && campaignDetails.keep.length > 0) {
+            campaignDetails.keep.forEach(campaign => {
+                detailedData.push([
+                    'KEEP',
+                    campaign.campaign_name,
+                    campaign.ad_group,
+                    campaign.segment,
+                    campaign.placement,
+                    campaign.headline,
+                    campaign.description,
+                    campaign.qpi,
+                    campaign.cpql,
+                    campaign.score,
+                    campaign.reason,
+                    'Scale this winning campaign'
+                ]);
+            });
+        }
+        
+        // Add MONITOR campaigns
+        if (campaignDetails.monitor && campaignDetails.monitor.length > 0) {
+            campaignDetails.monitor.forEach(campaign => {
+                detailedData.push([
+                    'MONITOR',
+                    campaign.campaign_name,
+                    campaign.ad_group,
+                    campaign.segment,
+                    campaign.placement,
+                    campaign.headline,
+                    campaign.description,
+                    campaign.qpi,
+                    campaign.cpql,
+                    campaign.score,
+                    campaign.reason,
+                    'Watch performance and decide next week'
+                ]);
+            });
+        }
+        
+        downloadCSV(detailedData, 'adlift_detailed_campaign_decisions.csv');
+        
+    } else {
+        // Fallback to summary data if detailed data not available
+        const totalCampaigns = decisions.pause_count + decisions.keep_count + decisions.monitor_count;
+        
+        const summaryData = [
+            ['Decision', 'Count', 'Percentage', 'Action Required'],
+            ['PAUSE', decisions.pause_count, `${((decisions.pause_count / totalCampaigns) * 100).toFixed(1)}%`, 'Stop underperforming campaigns immediately'],
+            ['KEEP', decisions.keep_count, `${((decisions.keep_count / totalCampaigns) * 100).toFixed(1)}%`, 'Scale these winning campaigns'],
+            ['MONITOR', decisions.monitor_count, `${((decisions.monitor_count / totalCampaigns) * 100).toFixed(1)}%`, 'Watch performance and decide next week']
+        ];
+        
+        downloadCSV(summaryData, 'adlift_campaign_summary.csv');
+    }
 }
 
 function downloadAllFiles() {
