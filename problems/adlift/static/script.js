@@ -1,48 +1,188 @@
 // Global variable to store current analysis data
 let currentAnalysisData = null;
 
-// File upload and form handling
-document.getElementById('uploadForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
+// Wait for DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 AdLift Frontend Loaded - Initializing...');
     
-    const fileInput = document.getElementById('csvFile');
-    const file = fileInput.files[0];
+    // Get DOM elements
+    const dragDropArea = document.getElementById('dragDropArea');
+    const csvFile = document.getElementById('csvFile');
+    const fileStatus = document.getElementById('fileStatus');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const removeFileBtn = document.getElementById('removeFileBtn');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const loadingSection = document.getElementById('loadingSection');
+    const resultsSection = document.getElementById('resultsSection');
     
-    if (!file) {
-        alert('Please select a CSV file to upload.');
+    if (!dragDropArea || !csvFile || !analyzeBtn) {
+        console.error('❌ Required elements not found');
         return;
     }
     
-    showLoading();
+    console.log('✅ All elements found, setting up event listeners...');
     
-    try {
-        const formData = new FormData();
-        formData.append('file', file);
+    // File selection state
+    let selectedFile = null;
+    
+    // Drag & Drop Events
+    dragDropArea.addEventListener('click', () => csvFile.click());
+    
+    dragDropArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dragDropArea.classList.add('dragover');
+    });
+    
+    dragDropArea.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        dragDropArea.classList.remove('dragover');
+    });
+    
+    dragDropArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dragDropArea.classList.remove('dragover');
         
-        const response = await fetch('/api/adlift/analyze', {
-            method: 'POST',
-            body: formData
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            currentAnalysisData = result.data;
-            displayResults(result.data);
-            showResults();
-        } else {
-            throw new Error(result.message || 'Analysis failed');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            handleFileSelection(files[0]);
         }
-    } catch (error) {
-        console.error('Error:', error);
-        alert(`Analysis failed: ${error.message}`);
-        hideLoading();
+    });
+    
+    // File input change
+    csvFile.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            handleFileSelection(e.target.files[0]);
+        }
+    });
+    
+    // Remove file button
+    removeFileBtn.addEventListener('click', () => {
+        clearFileSelection();
+    });
+    
+    // Analyze button
+    analyzeBtn.addEventListener('click', () => {
+        if (selectedFile) {
+            uploadAndAnalyze(selectedFile);
+        }
+    });
+    
+    // Handle file selection
+    function handleFileSelection(file) {
+        console.log('📁 File selected:', file.name);
+        
+        // Validate file type
+        if (!file.name.toLowerCase().endsWith('.csv')) {
+            alert('Please select a CSV file only.');
+            return;
+        }
+        
+        // Validate file size (max 10MB)
+        if (file.size > 10 * 1024 * 1024) {
+            alert('File size must be less than 10MB.');
+            return;
+        }
+        
+        selectedFile = file;
+        
+        // Update UI
+        fileName.textContent = file.name;
+        fileSize.textContent = formatFileSize(file.size);
+        
+        // Show file status, hide drag area
+        dragDropArea.style.display = 'none';
+        fileStatus.style.display = 'block';
+        analyzeBtn.disabled = false;
+        
+        console.log('✅ File ready for upload:', file.name);
     }
+    
+    // Clear file selection
+    function clearFileSelection() {
+        selectedFile = null;
+        csvFile.value = '';
+        
+        // Reset UI
+        dragDropArea.style.display = 'block';
+        fileStatus.style.display = 'none';
+        analyzeBtn.disabled = true;
+        
+        console.log('🗑️ File selection cleared');
+    }
+    
+    // Format file size
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    // Upload and analyze file
+    async function uploadAndAnalyze(file) {
+        console.log('🚀 Starting upload and analysis...');
+        
+        try {
+            showLoading();
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const response = await fetch('/api/adlift/analyze', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                currentAnalysisData = result.data;
+                displayResults(result.data);
+                showResults();
+                console.log('✅ Analysis completed successfully!');
+            } else {
+                throw new Error(result.message || 'Analysis failed');
+            }
+            
+        } catch (error) {
+            console.error('❌ Analysis failed:', error);
+            alert(`Analysis failed: ${error.message}`);
+        } finally {
+            hideLoading();
+        }
+    }
+    
+    // UI State Functions
+    function showLoading() {
+        loadingSection.style.display = 'block';
+        analyzeBtn.disabled = true;
+        analyzeBtn.textContent = '⏳ Analyzing...';
+    }
+    
+    function hideLoading() {
+        loadingSection.style.display = 'none';
+        analyzeBtn.disabled = false;
+        analyzeBtn.textContent = '🚀 Analyze Campaign Data';
+    }
+    
+    function showResults() {
+        resultsSection.style.display = 'block';
+    }
+    
+    console.log('🎯 Event listeners attached successfully!');
 });
 
-// SIMPLIFIED DISPLAY FUNCTIONS - ONLY 3 SECTIONS AS REQUIRED
+// DISPLAY FUNCTIONS - ONLY 3 SECTIONS AS REQUIRED
 
 function displayResults(data) {
+    console.log('📊 Displaying results:', data);
+    
     // 1. DIAGNOSE THE PROBLEM (1-2 reasons)
     displayProblemDiagnosis(data.root_causes);
     
@@ -111,13 +251,14 @@ function displayProposedSolutions(data) {
 // 3. Priority Ranking Display
 function displayPriorityRanking(data) {
     const container = document.getElementById('priorityRanking');
-    
-    // Use actual expected impact data from API
     const expectedImpact = data.expected_impact || {};
+    
+    // Use dynamic values from API or provide meaningful defaults
     const ctrImprovement = expectedImpact.ctr_improvement || "15-25%";
     const cpqlReduction = expectedImpact.cpql_reduction || "10-20%";
     const variantTimeline = expectedImpact.variant_timeline || "7-14 days";
     const rotationTimeline = expectedImpact.rotation_timeline || "Immediate";
+    const confidenceLevel = expectedImpact.confidence_level || "Medium";
     
     const rankingHTML = `
         <div class="priority-item priority-1">
@@ -136,7 +277,7 @@ function displayPriorityRanking(data) {
                 </div>
                 <div class="metric">
                     <span class="metric-label">Confidence:</span>
-                    <span class="metric-value">High (statistical significance)</span>
+                    <span class="metric-value">${confidenceLevel}</span>
                 </div>
             </div>
             <p class="priority-justification">
@@ -161,12 +302,12 @@ function displayPriorityRanking(data) {
                 </div>
                 <div class="metric">
                     <span class="metric-label">Confidence:</span>
-                    <span class="metric-value">Medium (requires testing)</span>
+                    <span class="metric-value">${confidenceLevel}</span>
                 </div>
             </div>
             <p class="priority-justification">
-                <strong>Why Priority #2:</strong> Higher potential upside but requires testing time. 
-                Deploy after implementing rotation decisions for compound benefits.
+                <strong>Why Priority #2:</strong> Higher potential upside by testing fresh creatives. 
+                Requires some testing time to find new winners.
             </p>
         </div>
     `;
@@ -174,68 +315,40 @@ function displayPriorityRanking(data) {
     container.innerHTML = rankingHTML;
 }
 
-// UI State Management
-function showLoading() {
-    document.getElementById('loadingSection').style.display = 'block';
-    document.getElementById('resultsSection').style.display = 'none';
-    document.getElementById('analyzeBtn').disabled = true;
-}
+// CSV DOWNLOAD FUNCTIONS - Only triggered by button clicks
 
-function hideLoading() {
-    document.getElementById('loadingSection').style.display = 'none';
-    document.getElementById('analyzeBtn').disabled = false;
-}
-
-function showResults() {
-    document.getElementById('loadingSection').style.display = 'none';
-    document.getElementById('resultsSection').style.display = 'block';
-    document.getElementById('analyzeBtn').disabled = false;
-}
-
-// CSV Download Functions
 function downloadVariants() {
-    if (!currentAnalysisData) {
-        alert('No analysis data available. Please run analysis first.');
-        return;
-    }
-
-    // Use real variants data from the analysis
-    const variants = currentAnalysisData.variants_data?.variants || [];
-    if (variants.length === 0) {
+    if (!currentAnalysisData || !currentAnalysisData.variants_data?.variants) {
         alert('No variants data available. Please run analysis first.');
         return;
     }
-
+    
+    console.log('📥 Downloading variants CSV...');
+    
+    const variants = currentAnalysisData.variants_data.variants;
     const variantsData = [
-        ['Headline', 'Description', 'Type', 'Target Segment', 'Placement', 'Keyword Set', 'Keyword Type', 'Similarity Score', 'Bigram Score'],
+        ['Headline', 'Description', 'Type', 'Target Segment', 'Placement'],
         ...variants.map(v => [
             v.headline || 'N/A',
             v.description || 'N/A', 
             v.type || 'N/A',
             v.segment || 'N/A',
-            v.placement || 'N/A',
-            v.keyword_set || 'N/A',
-            v.keyword_type || 'N/A',
-            v.similarity_score || 'N/A',
-            v.bigram_score || 'N/A'
+            v.placement || 'N/A'
         ])
     ];
+    
     downloadCSV(variantsData, 'adlift_variants.csv');
 }
 
 function downloadPrioritization() {
-    if (!currentAnalysisData) {
-        alert('No analysis data available. Please run analysis first.');
-        return;
-    }
-
-    // Use real campaign decisions data from the analysis
-    const decisions = currentAnalysisData.campaign_decisions;
-    if (!decisions) {
+    if (!currentAnalysisData || !currentAnalysisData.campaign_decisions) {
         alert('No prioritization data available. Please run analysis first.');
         return;
     }
-
+    
+    console.log('📥 Downloading prioritization CSV...');
+    
+    const decisions = currentAnalysisData.campaign_decisions;
     const totalCampaigns = decisions.pause_count + decisions.keep_count + decisions.monitor_count;
     
     const prioritizationData = [
@@ -244,10 +357,12 @@ function downloadPrioritization() {
         ['KEEP', decisions.keep_count, `${((decisions.keep_count / totalCampaigns) * 100).toFixed(1)}%`, 'Scale these winning campaigns'],
         ['MONITOR', decisions.monitor_count, `${((decisions.monitor_count / totalCampaigns) * 100).toFixed(1)}%`, 'Watch performance and decide next week']
     ];
+    
     downloadCSV(prioritizationData, 'adlift_prioritization.csv');
 }
 
 function downloadAllFiles() {
+    console.log('📦 Downloading all files...');
     downloadVariants();
     setTimeout(() => downloadPrioritization(), 500);
 }
@@ -268,6 +383,10 @@ function downloadCSV(data, filename) {
     const a = document.createElement('a');
     a.href = url;
     a.download = filename;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
+    
+    console.log(`✅ Downloaded: ${filename}`);
 }

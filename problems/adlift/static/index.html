@@ -16,17 +16,33 @@
         <section class="upload-section">
             <div class="upload-card">
                 <h2>📁 Upload CSV File</h2>
-                <form id="uploadForm" enctype="multipart/form-data">
-                    <div class="file-input-container">
-                        <input type="file" id="csvFile" name="file" accept=".csv" required>
-                        <label for="csvFile" class="file-label">
-                            Choose CSV File
-                        </label>
+                
+                <!-- Drag & Drop Area -->
+                <div class="drag-drop-area" id="dragDropArea">
+                    <div class="drag-drop-content">
+                        <div class="upload-icon">📁</div>
+                        <h3>Drag & Drop CSV File</h3>
+                        <p>Or click to browse files</p>
+                        <input type="file" id="csvFile" name="file" accept=".csv" style="display: none;">
                     </div>
-                    <button type="submit" class="analyze-btn" id="analyzeBtn">
-                        🚀 Analyze Campaign Data
-                    </button>
-                </form>
+                </div>
+                
+                <!-- File Status Display -->
+                <div class="file-status" id="fileStatus" style="display: none;">
+                    <div class="file-info">
+                        <span class="file-icon">📄</span>
+                        <div class="file-details">
+                            <div class="file-name" id="fileName">No file selected</div>
+                            <div class="file-size" id="fileSize">0 KB</div>
+                        </div>
+                        <button class="remove-file-btn" id="removeFileBtn">✕</button>
+                    </div>
+                </div>
+                
+                <!-- Analyze Button -->
+                <button class="analyze-btn" id="analyzeBtn" disabled>
+                    🚀 Analyze Campaign Data
+                </button>
             </div>
         </section>
 
@@ -75,7 +91,7 @@
                     <div class="download-item">
                         <div class="download-info">
                             <h4>🤖 AI Variants</h4>
-                            <p>50+ fresh headlines, descriptions & keywords ready for ad platforms</p>
+                            <p>Fresh headlines, descriptions & keywords ready for ad platforms</p>
                         </div>
                         <button class="download-btn" onclick="downloadVariants()">
                             📊 Download CSV

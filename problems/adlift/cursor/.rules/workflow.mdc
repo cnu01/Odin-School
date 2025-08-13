@@ -65,7 +65,7 @@ SCORE_FORMULA = "z(QPI) - 0.7 × z(CPQL)"  # Within segment
   ]
   ```
 - [ ] **Qualification Gap Analysis**:
-  ```python
+```python
   # OK CTR but high CPQL (weak benefit/CTA clarity)
   qualification_issues = df[
       (df['CTR'] >= df.groupby('segment')['CTR'].transform('median')) &
@@ -84,7 +84,7 @@ SCORE_FORMULA = "z(QPI) - 0.7 × z(CPQL)"  # Within segment
 
 #### 2.1 LLM-Assisted Variant Generation
 - [ ] **Few-shot learning from top performers**:
-  ```python
+```python
   def generate_variants(top_performers, segment_context):
       """
       LLM prompt with winning examples for maximum relevance
@@ -152,7 +152,7 @@ SCORE_FORMULA = "z(QPI) - 0.7 × z(CPQL)"  # Within segment
 
 #### 3.2 Impact Projections & Justification
 - [ ] **Conservative estimates**:
-  ```python
+```python
   expected_impact = {
       "ctr_improvement": "15-25%",     # Based on segment analysis
       "cpql_reduction": "10-20%",      # Through better qualification

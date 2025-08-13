@@ -1,0 +1,43 @@
+date,campaign,ad_group,audience_segment,placement,headline,description,keywords,impressions,clicks,spend,leads,qualified_leads,CTR,CPC,CVR,qualified_rate
+2025-07-21,DSA-India,DSA-Advanced,Working Professionals,search,Upskill to Data Roles,Weekend live classes,"data analytics, upskill",10746,189,10996.64,30,13,0.017588,58.18,0.15873,0.433333
+2025-07-22,DSA-India,DSA-Advanced,Working Professionals,search,Upskill to Data Roles,Weekend live classes,"data analytics, upskill",10395,184,9382.83,31,14,0.017701,50.99,0.168478,0.451613
+2025-07-23,DSA-India,DSA-Advanced,Working Professionals,search,Upskill to Data Roles,Weekend live classes,"data analytics, upskill",9346,166,11655.1,19,11,0.017762,70.21,0.114458,0.578947
+2025-07-24,DSA-India,DSA-Advanced,Working Professionals,search,Upskill to Data Roles,Weekend live classes,"data analytics, upskill",9734,153,9169.16,29,15,0.015718,59.93,0.189542,0.517241
+2025-07-25,DSA-India,DSA-Advanced,Working Professionals,search,Upskill to Data Roles,Weekend live classes,"data analytics, upskill",11616,196,12187.59,21,9,0.016873,62.18,0.107143,0.428571
+2025-07-26,DSA-India,DSA-Advanced,Working Professionals,search,Upskill to Data Roles,Weekend live classes,"data analytics, upskill",10674,177,10390.3,20,14,0.016582,58.7,0.112994,0.7
+2025-07-27,DSA-India,DSA-Advanced,Working Professionals,search,Upskill to Data Roles,Weekend live classes,"data analytics, upskill",10013,123,7669.78,15,10,0.012284,62.36,0.121951,0.666667
+2025-07-28,DSA-India,DSA-Advanced,Working Professionals,search,Upskill to Data Roles,Weekend live classes,"data analytics, upskill",10860,185,7106.61,18,9,0.017035,38.41,0.097297,0.5
+2025-07-29,DSA-India,DSA-Advanced,Working Professionals,search,Upskill to Data Roles,Weekend live classes,"data analytics, upskill",10235,207,12753.88,19,6,0.020225,61.61,0.091787,0.315789
+2025-07-30,DSA-India,DSA-Advanced,Working Professionals,search,Upskill to Data Roles,Weekend live classes,"data analytics, upskill",8154,148,8804.95,20,10,0.018151,59.49,0.135135,0.5
+2025-07-31,DSA-India,DSA-Advanced,Working Professionals,search,Upskill to Data Roles,Weekend live classes,"data analytics, upskill",11261,235,12117.07,30,17,0.020868,51.56,0.12766,0.566667
+2025-08-01,DSA-India,DSA-Advanced,Working Professionals,search,Upskill to Data Roles,Weekend live classes,"data analytics, upskill",8876,169,10297.99,18,5,0.01904,60.93,0.106509,0.277778
+2025-08-02,DSA-India,DSA-Advanced,Working Professionals,search,Upskill to Data Roles,Weekend live classes,"data analytics, upskill",10277,190,11728.47,19,8,0.018488,61.73,0.1,0.421053
+2025-08-03,DSA-India,DSA-Advanced,Working Professionals,search,Upskill to Data Roles,Weekend live classes,"data analytics, upskill",7945,155,10426.58,24,8,0.019509,67.27,0.154839,0.333333
+2025-07-21,DSA-India,DSA-Advanced,Working Professionals,search,Analytics Career Switch,Project-heavy program,"analytics, switch",8051,161,5976.7,13,3,0.019998,37.12,0.080745,0.230769
+2025-07-22,DSA-India,DSA-Advanced,Working Professionals,search,Analytics Career Switch,Project-heavy program,"analytics, switch",10030,169,9756.49,15,5,0.016849,57.73,0.088757,0.333333
+2025-07-23,DSA-India,DSA-Advanced,Working Professionals,search,Analytics Career Switch,Project-heavy program,"analytics, switch",10419,196,9712.77,24,9,0.018812,49.55,0.122449,0.375
+2025-07-24,DSA-India,DSA-Advanced,Working Professionals,search,Analytics Career Switch,Project-heavy program,"analytics, switch",11195,183,6976.75,19,11,0.016347,38.12,0.103825,0.578947
+2025-07-25,DSA-India,DSA-Advanced,Working Professionals,search,Analytics Career Switch,Project-heavy program,"analytics, switch",8609,163,8210.26,21,13,0.018934,50.37,0.128834,0.619048
+2025-07-26,DSA-India,DSA-Advanced,Working Professionals,search,Analytics Career Switch,Project-heavy program,"analytics, switch",7805,144,7837.27,23,7,0.01845,54.43,0.159722,0.304348
+2025-07-27,DSA-India,DSA-Advanced,Working Professionals,search,Analytics Career Switch,Project-heavy program,"analytics, switch",10830,194,9782.82,20,13,0.017913,50.43,0.103093,0.65
+2025-07-28,DSA-India,DSA-Advanced,Working Professionals,search,Analytics Career Switch,Project-heavy program,"analytics, switch",9753,172,5845.02,17,5,0.017636,33.98,0.098837,0.294118
+2025-07-29,DSA-India,DSA-Advanced,Working Professionals,search,Analytics Career Switch,Project-heavy program,"analytics, switch",8469,152,6956.57,17,10,0.017948,45.77,0.111842,0.588235
+2025-07-30,DSA-India,DSA-Advanced,Working Professionals,search,Analytics Career Switch,Project-heavy program,"analytics, switch",9711,188,8245.04,17,4,0.019359,43.86,0.090426,0.235294
+2025-07-31,DSA-India,DSA-Advanced,Working Professionals,search,Analytics Career Switch,Project-heavy program,"analytics, switch",9979,142,6448.92,21,11,0.01423,45.41,0.147887,0.52381
+2025-08-01,DSA-India,DSA-Advanced,Working Professionals,search,Analytics Career Switch,Project-heavy program,"analytics, switch",9482,146,6276.04,22,11,0.015398,42.99,0.150685,0.5
+2025-08-02,DSA-India,DSA-Advanced,Working Professionals,search,Analytics Career Switch,Project-heavy program,"analytics, switch",9894,185,7091.76,22,8,0.018698,38.33,0.118919,0.363636
+2025-08-03,DSA-India,DSA-Advanced,Working Professionals,search,Analytics Career Switch,Project-heavy program,"analytics, switch",9073,137,7640.44,16,7,0.0151,55.77,0.116788,0.4375
+2025-07-21,DSA-India,DSA-Advanced,Working Professionals,youtube,Data Career Starter,Mentor-led capstone,"career switch, data",21541,210,6515.52,18,8,0.009749,31.03,0.085714,0.444444
+2025-07-22,DSA-India,DSA-Advanced,Working Professionals,youtube,Data Career Starter,Mentor-led capstone,"career switch, data",19959,181,5619.65,18,7,0.009069,31.05,0.099448,0.388889
+2025-07-23,DSA-India,DSA-Advanced,Working Professionals,youtube,Data Career Starter,Mentor-led capstone,"career switch, data",16947,146,4574.04,12,7,0.008615,31.33,0.082192,0.583333
+2025-07-24,DSA-India,DSA-Advanced,Working Professionals,youtube,Data Career Starter,Mentor-led capstone,"career switch, data",15877,162,4189.1,16,6,0.010203,25.86,0.098765,0.375
+2025-07-25,DSA-India,DSA-Advanced,Working Professionals,youtube,Data Career Starter,Mentor-led capstone,"career switch, data",9288,96,2293.8,7,4,0.010336,23.89,0.072917,0.571429
+2025-07-26,DSA-India,DSA-Advanced,Working Professionals,youtube,Data Career Starter,Mentor-led capstone,"career switch, data",10133,88,2839.62,6,2,0.008684,32.27,0.068182,0.333333
+2025-07-27,DSA-India,DSA-Advanced,Working Professionals,youtube,Data Career Starter,Mentor-led capstone,"career switch, data",16593,119,3486.47,7,4,0.007172,29.3,0.058824,0.571429
+2025-07-28,DSA-India,DSA-Advanced,Working Professionals,youtube,Data Career Starter,Mentor-led capstone,"career switch, data",22653,217,6092.5,14,3,0.009579,28.08,0.064516,0.214286
+2025-07-29,DSA-India,DSA-Advanced,Working Professionals,youtube,Data Career Starter,Mentor-led capstone,"career switch, data",14883,115,2730.43,12,8,0.007727,23.74,0.104348,0.666667
+2025-07-30,DSA-India,DSA-Advanced,Working Professionals,youtube,Data Career Starter,Mentor-led capstone,"career switch, data",21926,188,5731.43,11,3,0.008574,30.49,0.058511,0.272727
+2025-07-31,DSA-India,DSA-Advanced,Working Professionals,youtube,Data Career Starter,Mentor-led capstone,"career switch, data",18083,191,4287.88,14,2,0.010562,22.45,0.073298,0.142857
+2025-08-01,DSA-India,DSA-Advanced,Working Professionals,youtube,Data Career Starter,Mentor-led capstone,"career switch, data",17045,163,4286.24,23,8,0.009563,26.3,0.141104,0.347826
+2025-08-02,DSA-India,DSA-Advanced,Working Professionals,youtube,Data Career Starter,Mentor-led capstone,"career switch, data",16742,156,4380.05,15,10,0.009318,28.08,0.096154,0.666667
+2025-08-03,DSA-India,DSA-Advanced,Working Professionals,youtube,Data Career Starter,Mentor-led capstone,"career switch, data",25235,274,5947.53,21,9,0.010858,21.71,0.076642,0.428571
