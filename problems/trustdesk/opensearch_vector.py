@@ -51,7 +51,7 @@ class OpenSearchVectorService:
                 # Test connection
                 try:
                     self.client.cat.indices()
-                    print("✅ OpenSearch Serverless connection established")
+                    print("SUCCESS: OpenSearch Serverless connection established")
                     
                     # Test write permissions
                     test_index = "test-connection"
@@ -62,7 +62,7 @@ class OpenSearchVectorService:
                                 body={"mappings": {"properties": {"test": {"type": "text"}}}}
                             )
                             self.client.indices.delete(index=test_index)
-                            print("✅ Write permissions confirmed")
+                            print("SUCCESS: Write permissions confirmed")
                             self.has_write_access = True
                     except Exception as e:
                         if "authorization_exception" in str(e).lower():
@@ -77,11 +77,11 @@ class OpenSearchVectorService:
                             raise e
                         
                 except Exception as e:
-                    print(f"❌ OpenSearch connection test failed: {e}")
+                    print(f"ERROR: OpenSearch connection test failed: {e}")
                     self.client = None
                     
             except Exception as e:
-                print(f"❌ Failed to setup OpenSearch authentication: {e}")
+                print(f"ERROR: Failed to setup OpenSearch authentication: {e}")
                 self.client = None
         else:
             print("⚠️ OpenSearch endpoint not configured. Set OPENSEARCH_ENDPOINT in .env")
@@ -158,7 +158,7 @@ class OpenSearchVectorService:
             # Create knowledge index
             if not self.client.indices.exists(index=self.knowledge_index):
                 self.client.indices.create(index=self.knowledge_index, body=knowledge_mapping)
-                print(f"✅ Created OpenSearch index: {self.knowledge_index}")
+                print(f"SUCCESS: Created OpenSearch index: {self.knowledge_index}")
             else:
                 print(f"ℹ️ Index already exists: {self.knowledge_index}")
             
@@ -288,7 +288,7 @@ class OpenSearchVectorService:
             
             success = response.get('result') in ['created', 'updated']
             if success:
-                print(f"✅ Document indexed: {doc_id}")
+                print(f"SUCCESS: Document indexed: {doc_id}")
             
             return success
             

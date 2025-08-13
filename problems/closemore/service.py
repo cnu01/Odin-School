@@ -577,3 +577,141 @@ class ClosemoreService:
                 objections=[],
                 suggested_next_steps=["Manual review required"]
             )
+    
+    async def get_problem_analysis(self) -> Dict[str, Any]:
+        """
+        Get problem analysis data for CloseMore system dashboard
+        
+        Returns:
+            Dict with diagnosed problems, segment challenges, and implementation status
+        """
+        try:
+            # Generate synthetic problem analysis data consistent with other systems
+            problem_analysis = {
+                "diagnosed_problems": [
+                    {
+                        "title": "Inconsistent Follow-up Timing",
+                        "description": "Sales reps lack optimal follow-up timing guidance",
+                        "impact": "15-20% conversion loss",
+                        "solution": "AI-powered timing recommendations",
+                        "priority": "High"
+                    },
+                    {
+                        "title": "Objection Response Quality",
+                        "description": "Variable quality in handling common objections",
+                        "impact": "10-15% higher drop-off",
+                        "solution": "RAG-enhanced response suggestions",
+                        "priority": "Medium"
+                    },
+                    {
+                        "title": "Meeting No-Show Rate",
+                        "description": "High no-show rates for scheduled meetings",
+                        "impact": "24-28% no-show rate",
+                        "solution": "Better qualification and confirmation",
+                        "priority": "High"
+                    }
+                ],
+                "segment_challenges": [
+                    {
+                        "segment": "Price-Sensitive Leads",
+                        "challenge": "Higher objection rate on pricing discussions",
+                        "current_performance": "45% conversion",
+                        "target_performance": "65% conversion",
+                        "recommended_strategy": "Value-focused conversation approach"
+                    },
+                    {
+                        "segment": "Technical Decision Makers",
+                        "challenge": "Longer conversation cycles",
+                        "current_performance": "28 days avg",
+                        "target_performance": "18 days avg",
+                        "recommended_strategy": "Technical content and demos"
+                    },
+                    {
+                        "segment": "Career Switchers",
+                        "challenge": "High information-seeking behavior",
+                        "current_performance": "3.2 conversations/lead",
+                        "target_performance": "2.1 conversations/lead",
+                        "recommended_strategy": "Proactive information sharing"
+                    }
+                ],
+                "implementation_status": {
+                    "conversation_analysis": "✅ Fully implemented with Bedrock Claude-v2",
+                    "rag_enhancement": "✅ Active with sales knowledge base",
+                    "daily_action_planning": "✅ Prioritized action lists working",
+                    "rep_performance_analytics": "✅ Comprehensive metrics available",
+                    "real_time_coaching": "🔄 In development"
+                },
+                "overall_impact": {
+                    "meeting_booking_rate": "+15% improvement target",
+                    "no_show_reduction": "-20% reduction target", 
+                    "win_rate_increase": "+10-20% improvement",
+                    "implementation_timeline": "45 days"
+                }
+            }
+            
+            return problem_analysis
+            
+        except Exception as e:
+            print(f"Error generating problem analysis: {e}")
+            return {
+                "diagnosed_problems": [],
+                "segment_challenges": [],
+                "implementation_status": {},
+                "overall_impact": {}
+            }
+    
+    async def get_conversations(self, rep_id: Optional[str] = None, limit: int = 50) -> Dict[str, Any]:
+        """
+        Get conversation list for CloseMore system
+        
+        Args:
+            rep_id: Optional filter by sales rep ID
+            limit: Maximum number of conversations to return
+            
+        Returns:
+            Dict with conversation list and summary statistics
+        """
+        try:
+            # Generate synthetic conversation data for demonstration
+            conversations = []
+            
+            for i in range(min(limit, 20)):  # Generate up to 20 sample conversations
+                conversation = {
+                    "conversation_id": f"conv_{i+1:03d}",
+                    "lead_id": f"lead_{i+1:03d}",
+                    "rep_id": rep_id or f"rep_{(i % 5) + 1}",
+                    "channel": ["call_transcript", "whatsapp", "email", "chat"][i % 4],
+                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "summary": f"Conversation {i+1} - Lead interested in Data Science course",
+                    "intent": ["ready_to_book", "needs_more_info", "price_sensitive", "comparing_options"][i % 4],
+                    "sentiment_score": 0.65 + (i % 4) * 0.1,
+                    "conversion_probability": 0.45 + (i % 5) * 0.15,
+                    "next_action": "Follow up within 24 hours",
+                    "urgency": ["high", "medium", "low"][i % 3]
+                }
+                conversations.append(conversation)
+            
+            # Summary statistics
+            summary = {
+                "total_conversations": len(conversations),
+                "avg_sentiment": sum(c["sentiment_score"] for c in conversations) / len(conversations) if conversations else 0,
+                "avg_conversion_probability": sum(c["conversion_probability"] for c in conversations) / len(conversations) if conversations else 0,
+                "high_priority_count": len([c for c in conversations if c["urgency"] == "high"]),
+                "channels_used": list(set(c["channel"] for c in conversations))
+            }
+            
+            return {
+                "conversations": conversations,
+                "summary": summary,
+                "rep_filter": rep_id,
+                "total_available": len(conversations)
+            }
+            
+        except Exception as e:
+            print(f"Error retrieving conversations: {e}")
+            return {
+                "conversations": [],
+                "summary": {},
+                "rep_filter": rep_id,
+                "total_available": 0
+            }

@@ -474,3 +474,54 @@ async def get_lead_conversation_history(
             status_code=500,
             detail=f"Error retrieving lead history: {str(e)}"
         )
+
+# ADDITIONAL ENDPOINTS FOR DASHBOARD INTEGRATION
+
+@router.get("/problem-analysis")
+async def get_problem_analysis():
+    """
+    Get problem analysis data for CloseMore system dashboard
+    
+    Provides comprehensive analysis of current sales conversation challenges,
+    segment-specific issues, and implementation status for business insights.
+    
+    Returns:
+        Problem analysis with diagnosed problems, segment challenges, and implementation status
+    """
+    try:
+        problem_analysis = await closemore_service.get_problem_analysis()
+        return problem_analysis
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error retrieving problem analysis: {str(e)}"
+        )
+
+@router.get("/conversations")
+async def get_conversations(
+    rep_id: Optional[str] = Query(None, description="Filter by sales representative ID"),
+    limit: int = Query(50, description="Maximum number of conversations to return")
+):
+    """
+    Get conversation list with summary statistics
+    
+    Retrieves recent conversations with analysis results, filtering options,
+    and summary metrics for sales performance monitoring.
+    
+    Args:
+        rep_id: Optional filter by sales representative ID
+        limit: Maximum number of conversations to return (default: 50)
+        
+    Returns:
+        Conversation list with summary statistics and filtering metadata
+    """
+    try:
+        conversations_data = await closemore_service.get_conversations(rep_id, limit)
+        return conversations_data
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error retrieving conversations: {str(e)}"
+        )

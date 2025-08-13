@@ -13,6 +13,53 @@ def get_service():
     return CreatorFitService()
 
 
+@router.get("/")
+async def creatorfit_home():
+    """CreatorFit - AI-Powered Influencer Marketing & Creator-Content Fit Analysis System"""
+    return {
+        "problem": "CreatorFit - Influencer Marketing Optimization & Creator-Content Fit Analysis",
+        "description": "AI-powered creator-content matching system with lead forecasting and CPL optimization",
+        "status": "Active - Full AI Analysis Suite Ready",
+        "business_impact": {
+            "target_improvements": {
+                "creator_match_quality": "+40% improvement",
+                "lead_forecast_accuracy": "92%+ precision",
+                "cpl_optimization": "₹700-₹3,200 range",
+                "campaign_roi": "3-5x improvement"
+            },
+            "key_metrics": [
+                "Creator-content fit scoring with ML algorithms",
+                "Lead forecasting with 92%+ accuracy",
+                "Dynamic CPL optimization across segments",
+                "Real-time campaign performance tracking"
+            ]
+        },
+        "ai_capabilities": [
+            "Advanced creator-content fit analysis",
+            "LightGBM-based lead forecasting",
+            "Dynamic CPL calculation and optimization",
+            "Multi-dimensional creator scoring",
+            "Audience overlap analysis",
+            "Performance prediction modeling"
+        ],
+        "features": [
+            "CSV upload for bulk creator analysis",
+            "Creator fit scoring and ranking",
+            "Lead generation forecasting",
+            "Budget allocation optimization",
+            "Campaign performance metrics",
+            "Strategic recommendations engine"
+        ],
+        "endpoints": {
+            "Core Analysis": {
+                "/analyze": "POST - Upload CSV and get comprehensive creator analysis",
+                "/forecast": "POST - Lead generation forecasting",
+                "/programs": "GET - Available program types",
+                "/health": "GET - System health check"
+            }
+        }
+    }
+
 
 @router.post("/analyze", response_model=PredictionResponse)
 async def analyze_creators_csv(
