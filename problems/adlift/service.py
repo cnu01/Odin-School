@@ -64,17 +64,24 @@ class AdliftService:
             print("🎯 Running existing variant generation logic...")
             top_performers, winning_bigrams = self.variant_module['extract_patterns'](df_filtered)
             
-            # Generate variants using existing logic
+            # Get dynamic segments from actual data
+            available_segments = df_filtered['audience_segment'].unique().tolist()
+            available_placements = df_filtered['placement'].unique().tolist()
+            
+            # Generate variants using existing logic with DYNAMIC segments
             all_variants = []
-            for segment in ['Graduates', 'Working Professionals']:
-                for placement in ['search', 'youtube']:
+            for segment in available_segments:
+                for placement in available_placements:
                     headlines, descriptions = self.variant_module['generate_variants'](top_performers, segment)
+                    
+                    # Get dynamic fallback description from top performers
+                    fallback_description = self._get_dynamic_fallback_description(top_performers, segment)
                     
                     # Create variant combinations (simplified for API response)
                     for i, headline in enumerate(headlines[:5]):  # Limit for API
                         all_variants.append({
                             'headline': headline,
-                            'description': descriptions[min(i, len(descriptions)-1)] if descriptions else "Professional development program",
+                            'description': descriptions[min(i, len(descriptions)-1)] if descriptions else fallback_description,
                             'segment': segment,
                             'placement': placement,
                             'type': "winner-like" if i < 3 else "explorer"
@@ -88,67 +95,26 @@ class AdliftService:
                 os.remove(temp_csv_path)
             
             # Format results for API response
-            performance_variance = self._format_performance_variance(segment_stats)
             root_causes = self._format_root_causes(mismatch_evidence, qualification_issues)
             campaign_decisions = self._format_campaign_decisions(decisions_df)
-            fatigue_detection = self._format_fatigue_detection(fatigue_df)
             
             print("✅ Analysis complete using existing logic!")
             
             return {
-                "performance_variance": performance_variance,
                 "root_causes": root_causes,
-                "campaign_decisions": campaign_decisions,
-                "fatigue_detection": fatigue_detection,
                 "variants_data": {
                     "variants_count": len(all_variants),
-                    "variants": all_variants[:10],  # Limit for API response
-                    "segments": ["Graduates", "Working Professionals"],
-                    "placements": ["search", "youtube"]
+                    "variants": all_variants  # Include full variants for CSV download
                 },
-                "expected_impact": self._generate_expected_impact()
+                "campaign_decisions": campaign_decisions,
+                "expected_impact": self._generate_expected_impact(df_filtered, mismatch_evidence, qualification_issues, decisions_df)
             }
             
         except Exception as e:
             print(f"❌ Analysis failed: {str(e)}")
             raise Exception(f"Analysis failed: {str(e)}")
     
-    def _format_performance_variance(self, segment_stats) -> Dict:
-        """Format existing analysis results for API response using REAL DATA"""
-        try:
-            # Use the temp file to get real metrics
-            temp_csv_path = "temp_upload.csv"
-            if os.path.exists(temp_csv_path):
-                df = pd.read_csv(temp_csv_path)
-                df['QPI'] = df['CTR'] * df['CVR'] * df['qualified_rate']
-                df['CPQL'] = df['spend'] / df['qualified_leads'].clip(lower=1)
-                df_filtered = df[df['impressions'] >= 500].copy()
-                
-                ctr_stats = df_filtered['CTR'].describe()
-                cpql_stats = df_filtered['CPQL'].describe()
-                qpi_stats = df_filtered['QPI'].describe()
-                
-                return {
-                    "ctr_range": f"{ctr_stats['min']:.1%} to {ctr_stats['max']:.1%}",
-                    "ctr_variance": f"{ctr_stats['max']/ctr_stats['min']:.1f}x",
-                    "cpql_range": f"₹{cpql_stats['min']:.0f} to ₹{cpql_stats['max']:.0f}",
-                    "cpql_variance": f"{cpql_stats['max']/cpql_stats['min']:.1f}x",
-                    "qpi_range": f"{qpi_stats['min']:.4f} to {qpi_stats['max']:.4f}",
-                    "total_campaigns": len(df_filtered)
-                }
-        except Exception as e:
-            print(f"Warning: Could not calculate real metrics, using fallback: {e}")
-            pass
-        
-        # Fallback to hardcoded values if calculation fails
-        return {
-            "ctr_range": "",
-            "ctr_variance": "", 
-            "cpql_range": "",
-            "cpql_variance": "",
-            "qpi_range": "",
-            "total_campaigns": 0
-        }
+
     
     def _format_root_causes(self, mismatch_evidence, qualification_issues) -> List[Dict]:
         """Format existing root cause analysis for API response"""
@@ -186,27 +152,96 @@ class AdliftService:
             }
         except:
             return {
-                "pause_count": 45,
-                "keep_count": 35,
-                "monitor_count": 48
+                "pause_count": 0,
+                "keep_count": 0,
+                "monitor_count": 0
             }
     
-    def _format_fatigue_detection(self, fatigue_df) -> List[Dict]:
-        """Format existing fatigue detection for API response"""
+    def _get_dynamic_fallback_description(self, top_performers, segment) -> str:
+        """Get dynamic fallback description from top performing campaigns"""
         try:
-            if len(fatigue_df) > 0:
-                return fatigue_df[['headline', 'segment', 'fatigue_ratio', 'days_live']].head(5).to_dict('records')
+            # Filter top performers by segment
+            segment_performers = top_performers[top_performers['audience_segment'] == segment]
+            if len(segment_performers) > 0:
+                # Get most common description pattern
+                most_common_desc = segment_performers['description'].iloc[0] if 'description' in segment_performers.columns else None
+                if most_common_desc:
+                    return most_common_desc
+            
+            # Fallback to generic based on segment
+            if 'graduate' in segment.lower():
+                return "Advance your career with professional skills development"
+            elif 'professional' in segment.lower():
+                return "Enhance your expertise with industry-leading training"
             else:
-                return []
+                return "Transform your career with comprehensive skill building"
         except:
-            return []
+            return "Professional development program"
     
-    def _generate_expected_impact(self) -> Dict:
-        """Generate expected impact projections based on existing analysis"""
-        return {
-            "ctr_improvement": "15-25%",
-            "cpql_reduction": "10-20%",
-            "timeline": "30 days",
-            "qualified_leads_improvement": "20-30%",
-            "cac_reduction": "15-25%"
-        }
+
+    
+    def _generate_expected_impact(self, df_filtered, mismatch_evidence, qualification_issues, decisions_df) -> Dict:
+        """Generate expected impact projections based on ACTUAL analysis data"""
+        try:
+            # Calculate actual potential improvements from data
+            current_avg_ctr = df_filtered['CTR'].mean()
+            current_avg_cpql = df_filtered['CPQL'].mean()
+            current_qualified_rate = df_filtered['qualified_rate'].mean()
+            
+            # Calculate top performer benchmarks
+            top_quartile_ctr = df_filtered['CTR'].quantile(0.75)
+            top_quartile_cpql = df_filtered['CPQL'].quantile(0.25)  # Lower is better for CPQL
+            top_quartile_qualified_rate = df_filtered['qualified_rate'].quantile(0.75)
+            
+            # Calculate realistic improvement percentages
+            ctr_improvement_potential = ((top_quartile_ctr - current_avg_ctr) / current_avg_ctr) * 100
+            cpql_improvement_potential = ((current_avg_cpql - top_quartile_cpql) / current_avg_cpql) * 100
+            qualified_rate_improvement = ((top_quartile_qualified_rate - current_qualified_rate) / current_qualified_rate) * 100
+            
+            # Ensure realistic bounds (cap at reasonable maximums)
+            ctr_improvement = min(max(ctr_improvement_potential, 5), 40)  # 5-40% range
+            cpql_reduction = min(max(cpql_improvement_potential, 5), 35)  # 5-35% range
+            qualified_improvement = min(max(qualified_rate_improvement, 5), 50)  # 5-50% range
+            
+            # Calculate timeline based on decision urgency
+            pause_count = len(decisions_df[decisions_df['decision'] == 'PAUSE']) if 'decision' in decisions_df.columns else 0
+            total_campaigns = len(decisions_df)
+            urgency_ratio = pause_count / total_campaigns if total_campaigns > 0 else 0
+            
+            # Dynamic timeline based on urgency
+            if urgency_ratio > 0.4:  # High urgency - many campaigns to pause
+                main_timeline = "21-30 days"
+                variant_timeline = "5-7 days"
+            elif urgency_ratio > 0.2:  # Medium urgency
+                main_timeline = "30-45 days"
+                variant_timeline = "7-14 days"
+            else:  # Low urgency
+                main_timeline = "45-60 days"
+                variant_timeline = "14-21 days"
+            
+            return {
+                "ctr_improvement": f"{ctr_improvement:.0f}-{ctr_improvement + 5:.0f}%",
+                "cpql_reduction": f"{cpql_reduction:.0f}-{cpql_reduction + 5:.0f}%",
+                "timeline": main_timeline,
+                "variant_timeline": variant_timeline,
+                "rotation_timeline": "Immediate" if pause_count > 0 else "7 days",
+                "qualified_leads_improvement": f"{qualified_improvement:.0f}-{qualified_improvement + 10:.0f}%",
+                "cac_reduction": f"{min(ctr_improvement, cpql_reduction):.0f}-{max(ctr_improvement, cpql_reduction):.0f}%",
+                "confidence_level": "High" if urgency_ratio > 0.3 else "Medium",
+                "data_driven": True
+            }
+            
+        except Exception as e:
+            print(f"⚠️ Failed to calculate dynamic impact, using conservative estimates: {e}")
+            # Conservative fallback with data-driven flag
+            return {
+                "ctr_improvement": "",
+                "cpql_reduction": "",
+                "timeline": "",
+                "variant_timeline": "",
+                "rotation_timeline": "",
+                "qualified_leads_improvement": "",
+                "cac_reduction": "",
+                "confidence_level": "",
+                "data_driven": False
+            }
