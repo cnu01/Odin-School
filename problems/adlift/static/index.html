@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdLift Marketing Optimizer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 AdLift Marketing Optimizer</h1>
+            <p>AI-driven ad optimization and creative generation</p>
+        </header>
+
+        <!-- File Upload Section -->
+        <section class="upload-section">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-content">
+                    <div class="upload-icon">📁</div>
+                    <h3>Upload Your CSV File</h3>
+                    <p>Drag & drop your ad performance CSV or click to browse</p>
+                    <input type="file" id="csvFile" accept=".csv" style="display: none;">
+                    <button class="upload-btn" onclick="document.getElementById('csvFile').click()">
+                        Choose File
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Loading State -->
+        <section class="loading-section" id="loadingSection" style="display: none;">
+            <div class="loading-content">
+                <div class="spinner"></div>
+                <h3>Analyzing Your Data...</h3>
+                <p>This may take a few moments</p>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section class="results-section" id="resultsSection" style="display: none;">
+            <div class="results-header">
+                <h2>📊 Analysis Results</h2>
+                <button class="download-all-btn" onclick="downloadAllFiles()">
+                    📥 Download All Files
+                </button>
+            </div>
+
+            <!-- Performance Summary -->
+            <div class="result-card">
+                <h3>🎯 Performance Summary</h3>
+                <div class="metrics-grid" id="performanceMetrics">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Root Causes -->
+            <div class="result-card">
+                <h3>🔍 Root Cause Analysis</h3>
+                <div id="rootCauses">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Campaign Decisions -->
+            <div class="result-card">
+                <h3>⚖️ Campaign Decisions</h3>
+                <div class="decisions-grid" id="campaignDecisions">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Fatigue Detection -->
+            <div class="result-card" id="fatigueSection" style="display: none;">
+                <h3>⏰ Creative Fatigue Detection</h3>
+                <div id="fatigueDetection">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Expected Impact -->
+            <div class="result-card">
+                <h3>📈 Expected Impact (30 Days)</h3>
+                <div class="impact-grid" id="expectedImpact">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Download Section -->
+            <div class="result-card">
+                <h3>📥 Download Results</h3>
+                <div class="download-grid">
+                    <button class="download-btn" onclick="downloadVariants()">
+                        📊 AI Variants (CSV)
+                    </button>
+                    <button class="download-btn" onclick="downloadPrioritization()">
+                        ⚖️ Campaign Decisions (CSV)
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Error Section -->
+        <section class="error-section" id="errorSection" style="display: none;">
+            <div class="error-content">
+                <div class="error-icon">❌</div>
+                <h3>Analysis Failed</h3>
+                <p id="errorMessage"></p>
+                <button class="retry-btn" onclick="resetForm()">Try Again</button>
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

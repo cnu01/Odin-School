@@ -1,63 +1,52 @@
-# AdLift Marketing Optimization - Practical MVP TODO Plan
+# AdLift Marketing Optimization - Frontend + Backend MVP TODO Plan
 
 ## Problem Statement Alignment Check ✅
 **Original Ask**: Diagnose 1-2 reasons → Propose AI-driven way to generate fresh variants & rotate winners → Prioritize with metrics
-**This Plan**: One comprehensive solution (Copy Refresh + Rule-Based Rotation) with concrete, actionable outputs
+**This Plan**: One comprehensive solution (Copy Refresh + Rule-Based Rotation) with concrete, actionable outputs + Professional UI
 
 ---
 
-## Core Deliverables (2 Hours)
+## Core Deliverables (15 Minutes)
 
-### 📋 **Output Files**
-1. **diagnosis.md** — 1 page with 1-2 reasons + 2-3 evidence rows
-2. **variants.csv** — 8-10 headlines, 4-5 descriptions, 3 keyword sets (core/problem-aware/negatives)  
-3. **prioritization.csv** — per creative: QPI, CPQL, Score, decision {keep/pause/replace}, reason
+### 📋 **Backend + Frontend Integration**
+1. **FastAPI Backend** — 2 endpoints (health + analyze) with content generation
+2. **Single Page UI** — Upload CSV, display results, download files
+3. **Dynamic Content** — Programmatically generated diagnosis + executive summary
+4. **No LLM Required** — Template-based variants, rule-based decisions
 
 ---
 
-### Phase 1: Problem Diagnosis (25-30 min)
-- [ ] **Load ad data** (headline, description, keywords, segment, placement, impressions, CTR, CPC, CVR, qualified_rate)
-- [ ] **Compute business-native metrics** (per segment × placement):
-  - QPI = CTR × CVR × qualified_rate (quality per impression)
-  - CPQL = CPC / (CVR × qualified_rate)
-- [ ] **Fast sanity checks**:
-  - Filter: impressions ≥ 500
-  - Use segment medians & quartiles (no heavy significance tests)
-- [ ] **Identify 1-2 root causes with evidence rows**:
-  - Copy-intent mismatch → low QPI/CTR on specific keyword themes
-  - Qualification gap → OK CTR but high CPQL (weak benefit/CTA clarity)
-- [ ] **(Optional) Fatigue flag**: 7-day CTR ≤ 80% of first-3-day CTR
+### Phase 1: Backend Setup (5 min) ✅
+- [x] **Create models/schemas.py** — Pydantic models for request/response
+- [x] **Create services/analyzer.py** — Extract core logic from existing scripts
+- [x] **Create routes/api.py** — Health check + analyze endpoints
+- [x] **Test backend endpoints** — Verify FastAPI is working
 
-### Phase 2: Copy Refresh + Rule-Based Rotation (60 min)
-- [ ] **LLM-assisted variant generation**:
-  - Few-shot from top performers
-  - Output: 8-10 headlines, 4-5 descriptions, 3 keyword sets
-  - Filters: Jaccard < 0.8 vs losers, include ≥1 winning bigram, length/compliance, de-dupe
-  - Export: variants.csv
-- [ ] **Rule-based rotation** (per segment × placement):
-  - **KEEP**: QPI ≥ Q3 and CPQL ≤ median
-  - **PAUSE**: QPI ≤ Q1 or CPQL ≥ 1.2 × median
-  - **REPLACE**: All PAUSE (and fatigue-flagged) with 2 variants → winner-like + explorer
-  - **Score** (tie-break): Score = z(QPI) - 0.7 × z(CPQL) (within segment)
-  - Export: prioritization.csv (include decision + reason)
+### Phase 2: Frontend Development (7 min) 🚀
+- [ ] **Create static/index.html** — Single page with upload + results sections
+- [ ] **Create static/style.css** — Minimal, clean styling with loading states
+- [ ] **Create static/script.js** — File upload, API calls, results display
+- [ ] **Test frontend integration** — Verify file upload and display
 
-### Phase 3: Prioritize & Write-Up (30 min)
-- [ ] **Draft diagnosis.md** (≤1 page): reasons, evidence, rotation policy
-- [ ] **Add expected impact**: +15-25% CTR, -10-20% CPQL in 30 days (conservative)
-- [ ] **Quick QA**: no div/0, segment-wise quartiles, filters applied, CSV schemas correct
+### Phase 3: Integration & Polish (3 min)
+- [ ] **Connect frontend to backend** — Test complete flow
+- [ ] **Polish UI elements** — Ensure responsive design
+- [ ] **Final testing** — End-to-end validation
 
 ---
 
 ## Success Criteria
-- ✅ Clear 1-2 data-backed reasons
-- ✅ High-quality, filtered variants ready to launch
-- ✅ Keep/Pause/Replace decisions with QPI/CPQL and Score
-- ✅ Realistic targets stated; actions executable this week
+- ✅ Professional single-page UI with file upload
+- ✅ FastAPI backend with 2 working endpoints
+- ✅ Dynamic content generation (no static files)
+- ✅ All analysis results displayed beautifully
+- ✅ Download functionality for CSV files
+- ✅ Mobile-responsive design
 
 ## Why This Approach is Superior
-- **Business-native KPIs** (QPI, CPQL) with segment context → reliable decisions
-- **Explainable thresholds** beat fragile "quick ML" under time pressure  
-- **Produces exactly what stakeholders need** to act tomorrow
-- **One comprehensive solution** vs trying to build two separate systems
+- **No LLM dependency** — Template-based content generation
+- **Instant results** — No external API calls or costs
+- **Professional UI** — Marketing team can use immediately
+- **Self-contained** — Works offline, no external dependencies
 
 **Note**: Thompson Sampling/bandits = V2. Mention as future upgrade, not in MVP.
