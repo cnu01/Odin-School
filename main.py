@@ -1,11 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from database import connect_to_mongo, close_mongo_connection
-from contextlib import asynccontextmanager
-import os
 from dotenv import load_dotenv
 from database import connect_to_mongo, close_mongo_connection
+import os
 
 load_dotenv()
 
@@ -24,34 +22,38 @@ async def startup_event():
 async def shutdown_event():
     await close_mongo_connection()
 
-# CORS middleware
-# Read CORS origins from env: comma-separated list, e.g. "http://localhost:8000,http://localhost:8001"
-cors_origins_env = os.getenv("CORS_ORIGINS", "http://localhost:8000,http://localhost:8001")
+# ------------------------
+# ✅ CORS configuration
+# ------------------------
+cors_origins_env = os.getenv("CORS_ORIGINS", "")
 origins = [o.strip() for o in cors_origins_env.split(",") if o.strip()]
 
-# Browsers disallow credentials with wildcard origin. If '*' is present, disable credentials.
+# If wildcard is used, disable credentials (browser restriction)
 allow_credentials = True
-if any(o == "*" for o in origins):
+if "*" in origins:
     origins = ["*"]
     allow_credentials = False
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=origins or ["*"],  # default to * if empty
     allow_credentials=allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Mount static files for AdLift frontend
+# ------------------------
+# Static files
+# ------------------------
 app.mount("/adlift", StaticFiles(directory="problems/adlift/static"), name="adlift")
 
-# Include routers for each problem
+# ------------------------
+# Routers
+# ------------------------
 from problems.hotlead.routes import router as hotlead_router
 from problems.creatorfit.routes import router as creatorfit_router
 from problems.trustdesk.routes import router as trustdesk_router
 from problems.adlift.routes import router as adlift_router
-# Import ReferMore router via package to allow safe fallback
 from problems.refermore import router as refermore_router
 from problems.pricesense.routes import router as pricesense_router
 from problems.firsttouch.routes import router as firsttouch_router
@@ -68,6 +70,9 @@ app.include_router(firsttouch_router, prefix="/api/firsttouch", tags=["FirstTouc
 app.include_router(onetruth_router, prefix="/api/onetruth", tags=["OneTruth - Marketing Analytics"])
 app.include_router(closemore_router, prefix="/api/closemore", tags=["CloseMore - Sales"])
 
+# ------------------------
+# Routes
+# ------------------------
 @app.get("/")
 async def root():
     return {
