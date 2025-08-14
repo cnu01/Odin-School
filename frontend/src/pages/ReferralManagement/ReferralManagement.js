@@ -84,47 +84,45 @@ const ReferralManagement = () => {
     certificate_earned: false
   });
 
+  // Define loadInitialData function outside useEffect so it can be called by handleRefresh
+  const loadInitialData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Add delay to prevent rapid duplicate requests
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Load all required data in parallel
+      const [dashboardRes, candidatesRes, analyticsRes, problemRes] = await Promise.all([
+        refermoreService.getDashboardData(),
+        refermoreService.getCandidates(20, 0.6),
+        refermoreService.getAnalytics(500),
+        refermoreService.getProblemAnalysis()
+      ]);
+
+      setDashboardData(dashboardRes);
+      setCandidates(candidatesRes.items || []);
+      setAnalytics(analyticsRes);
+      setProblemAnalysis(problemRes);
+
+    } catch (err) {
+      setError(err.message || 'Failed to load referral data');
+      console.error('Error loading referral data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     const abortController = new AbortController();
     
-    const loadInitialData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        // Add delay to prevent rapid duplicate requests
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        if (abortController.signal.aborted) return;
-
-        // Load all required data in parallel
-        const [dashboardRes, candidatesRes, analyticsRes, problemRes] = await Promise.all([
-          refermoreService.getDashboardData(),
-          refermoreService.getCandidates(20, 0.6),
-          refermoreService.getAnalytics(500),
-          refermoreService.getProblemAnalysis()
-        ]);
-
-        if (!abortController.signal.aborted) {
-          setDashboardData(dashboardRes);
-          setCandidates(candidatesRes.items || []);
-          setAnalytics(analyticsRes);
-          setProblemAnalysis(problemRes);
-        }
-
-      } catch (err) {
-        if (!abortController.signal.aborted && err.name !== 'CanceledError') {
-          setError(err.message || 'Failed to load referral data');
-          console.error('Error loading referral data:', err);
-        }
-      } finally {
-        if (!abortController.signal.aborted) {
-          setLoading(false);
-        }
-      }
+    const loadWithAbortController = async () => {
+      if (abortController.signal.aborted) return;
+      await loadInitialData();
     };
 
-    loadInitialData();
+    loadWithAbortController();
     
     // Cleanup function to prevent race conditions
     return () => {

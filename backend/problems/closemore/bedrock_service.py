@@ -21,15 +21,31 @@ class ClosemoreBedrockService:
     def __init__(self):
         """Initialize Bedrock client and configuration"""
         try:
-            self.bedrock_client = boto3.client(
-                'bedrock-runtime',
-                region_name=os.getenv('AWS_REGION', 'us-east-1')
-            )
+            # Check if we should use fallback mode
+            use_fallback = os.getenv('USE_BEDROCK_FALLBACK', 'false').lower() == 'true'
+            if use_fallback:
+                print("Using Bedrock fallback mode - AI analysis will use local fallbacks")
+                self.bedrock_client = None
+            else:
+                # Try to initialize with timeout
+                self.bedrock_client = boto3.client(
+                    'bedrock-runtime',
+                    region_name=os.getenv('AWS_REGION', 'us-east-1'),
+                    # Add timeout configuration
+                    config=boto3.session.Config(
+                        connect_timeout=5,  # 5 second connection timeout
+                        read_timeout=10,    # 10 second read timeout
+                        retries={'max_attempts': 0}  # No retries for faster failure
+                    )
+                )
+                print("CloseMore Bedrock service initialized successfully")
+            
             self.model_id = "anthropic.claude-v2"
             self.max_tokens = 2000
-            print("CloseMore Bedrock service initialized successfully")
+            
         except Exception as e:
             print(f"Warning: Bedrock client initialization failed: {e}")
+            print("Falling back to local analysis mode")
             self.bedrock_client = None
     
     def _create_conversation_analysis_prompt(self, conversation: ConversationInput) -> str:
@@ -173,7 +189,8 @@ Return ONLY a JSON array of action objects, no additional text.
         """Analyze conversation using Amazon Bedrock Claude-v2"""
         
         if not self.bedrock_client:
-            raise Exception("Bedrock client not available")
+            print("Bedrock client not available, using fallback analysis")
+            return self._create_fallback_analysis(conversation)
         
         try:
             prompt = self._create_conversation_analysis_prompt(conversation)
@@ -216,7 +233,8 @@ Return ONLY a JSON array of action objects, no additional text.
         """Generate daily actions using Amazon Bedrock"""
         
         if not self.bedrock_client:
-            raise Exception("Bedrock client not available")
+            print("Bedrock client not available, using fallback daily actions")
+            return self._create_fallback_daily_actions(rep_id)
         
         try:
             prompt = self._create_daily_actions_prompt(rep_id, conversations_data, max_actions)

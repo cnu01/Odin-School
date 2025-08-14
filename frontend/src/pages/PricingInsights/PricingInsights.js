@@ -272,47 +272,45 @@ function PricingInsights() {
   const [messageDialog, setMessageDialog] = useState({ open: false, segment: null, message: '' });
   const [messageLoading, setMessageLoading] = useState(false);
 
+  // Define loadInitialData function outside useEffect so it can be called by handleRefresh
+  const loadInitialData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Add delay to prevent rapid duplicate requests
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Load all required data in parallel
+      const [dashboardRes, analyticsRes, problemRes, recommendationsRes] = await Promise.all([
+        pricesenseService.getDashboardData(),
+        pricesenseService.getAnalyticsSummary(500),
+        pricesenseService.getProblemAnalysis(),
+        pricesenseService.getRecommendations(10, 60.0)
+      ]);
+
+      setDashboardData(dashboardRes);
+      setAnalytics(analyticsRes);
+      setProblemAnalysis(problemRes);
+      setRecommendations(recommendationsRes.recommendations || []);
+
+    } catch (err) {
+      setError(err.message || 'Failed to load pricing data');
+      console.error('Error loading pricing data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     const abortController = new AbortController();
     
-    const loadInitialData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        // Add delay to prevent rapid duplicate requests
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        if (abortController.signal.aborted) return;
-
-        // Load all required data in parallel
-        const [dashboardRes, analyticsRes, problemRes, recommendationsRes] = await Promise.all([
-          pricesenseService.getDashboardData(),
-          pricesenseService.getAnalyticsSummary(500),
-          pricesenseService.getProblemAnalysis(),
-          pricesenseService.getRecommendations(10, 60.0)
-        ]);
-
-        if (!abortController.signal.aborted) {
-          setDashboardData(dashboardRes);
-          setAnalytics(analyticsRes);
-          setProblemAnalysis(problemRes);
-          setRecommendations(recommendationsRes.recommendations || []);
-        }
-
-      } catch (err) {
-        if (!abortController.signal.aborted && err.name !== 'CanceledError') {
-          setError(err.message || 'Failed to load pricing data');
-          console.error('Error loading pricing data:', err);
-        }
-      } finally {
-        if (!abortController.signal.aborted) {
-          setLoading(false);
-        }
-      }
+    const loadWithAbortController = async () => {
+      if (abortController.signal.aborted) return;
+      await loadInitialData();
     };
 
-    loadInitialData();
+    loadWithAbortController();
     
     // Cleanup function to prevent race conditions
     return () => {

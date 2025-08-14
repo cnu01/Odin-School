@@ -13,7 +13,14 @@ import boto3
 from botocore.exceptions import ClientError
 import fitz  # PyMuPDF for PDF processing
 from docx import Document as DocxDocument
-import magic  # For file type detection
+
+# Optional import for file type detection - fallback if not available
+try:
+    import magic  # For file type detection
+    HAS_MAGIC = True
+except ImportError:
+    HAS_MAGIC = False
+    print("⚠️  Warning: python-magic not available. File type detection will use extensions only.")
 
 from .embeddings import EmbeddingService
 from .opensearch_vector import OpenSearchVectorService
