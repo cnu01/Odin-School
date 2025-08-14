@@ -50,24 +50,9 @@ import {
   SmartToy,
   Psychology,
   TrendingUp,
-  TrendingDown,
-  Schedule,
-  Person,
-  LocationOn,
-  Language,
-  Speed,
-  Timer,
-  AttachMoney,
-  CallMade,
-  CallReceived,
-  RecordVoiceOver,
-  Settings,
-  PlayArrow,
-  Pause,
   AutoFixHigh,
   Refresh,
   ModelTraining,
-  Analytics,
   Science,
 } from '@mui/icons-material';
 import hotleadService from '../../services/hotleadService';
@@ -88,6 +73,8 @@ function HotLead() {
   const [leadExplanation, setLeadExplanation] = useState(null);
   const [outreachMessage, setOutreachMessage] = useState('');
   const [modelTraining, setModelTraining] = useState(false);
+  const [problemAnalysis, setProblemAnalysis] = useState(null);
+  const [analysisLoading, setAnalysisLoading] = useState(false);
 
   // Load data on component mount
   useEffect(() => {
@@ -220,7 +207,7 @@ function HotLead() {
       if (response.success) {
         setSnackbarMessage(`Database seeded with ${response.data.total_leads} leads. Conversion rate: ${response.data.conversion_rate}`);
         setSnackbarOpen(true);
-        loadData(); // Refresh all data
+        loadData(); // Refresh data
       } else {
         setSnackbarMessage('Failed to seed database');
         setSnackbarOpen(true);
@@ -231,6 +218,28 @@ function HotLead() {
       setSnackbarOpen(true);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAnalyzeProblems = async () => {
+    try {
+      setAnalysisLoading(true);
+      const response = await hotleadService.getProblemAnalysis();
+      
+      if (response.success) {
+        setProblemAnalysis(response.data);
+        setSnackbarMessage('Problem analysis completed successfully!');
+        setSnackbarOpen(true);
+      } else {
+        setSnackbarMessage('Failed to analyze problems');
+        setSnackbarOpen(true);
+      }
+    } catch (err) {
+      console.error('Error analyzing problems:', err);
+      setSnackbarMessage('Error analyzing problems');
+      setSnackbarOpen(true);
+    } finally {
+      setAnalysisLoading(false);
     }
   };
 
@@ -523,7 +532,7 @@ function HotLead() {
       )}
 
       {/* System Status */}
-      {systemStatus && (
+      {/* {systemStatus && (
         <Card sx={{ mb: 3 }}>
           <CardContent>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -541,19 +550,178 @@ function HotLead() {
             </Box>
           </CardContent>
         </Card>
-      )}
+      )} */}
 
       {/* Tabs */}
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
         <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)}>
+          <Tab label="Problem Diagnosis" />
           <Tab label="Priority Queue" />
           <Tab label="Analytics" />
           <Tab label="Model Info" />
         </Tabs>
       </Box>
 
-      {/* Priority Queue Tab */}
+      {/* Problem Diagnosis Tab */}
       {tabValue === 0 && (
+        <Box>
+          <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3, display: 'flex', alignItems: 'center' }}>
+            <SmartToy color="primary" sx={{ mr: 2 }} />
+            AI-Powered Problem Diagnosis
+          </Typography>
+          
+          <Alert severity="info" sx={{ mb: 3 }}>
+            <Typography variant="body2">
+              <strong>OdinSchool Business Context:</strong> EdTech platform with 600+ hiring partners. 
+              Challenge: Converting website traffic to paid enrollments efficiently with healthy traffic but uneven conversion patterns.
+            </Typography>
+          </Alert>
+
+          <Card sx={{ mb: 3 }}>
+            <CardContent>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                <Typography variant="h6">
+                  Real Lead Data Analysis
+                </Typography>
+                <Button
+                  variant="contained"
+                  startIcon={<Psychology />}
+                  onClick={handleAnalyzeProblems}
+                  disabled={analysisLoading}
+                  sx={{ minWidth: 160 }}
+                >
+                  {analysisLoading ? (
+                    <>
+                      <CircularProgress size={20} sx={{ mr: 1 }} />
+                      Analyzing...
+                    </>
+                  ) : (
+                    'Analyze Problems'
+                  )}
+                </Button>
+              </Box>
+
+              {analysisLoading && (
+                <Box sx={{ mb: 3 }}>
+                  <LinearProgress />
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                    Claude AI is analyzing 150 random leads from MongoDB database...
+                  </Typography>
+                </Box>
+              )}
+
+              {problemAnalysis && (
+                <Box>
+                  <Typography variant="h6" sx={{ mb: 3, color: 'success.main' }}>
+                    ✅ Analysis Complete - Problems Identified:
+                  </Typography>
+                  
+                  <Grid container spacing={3}>
+                    {problemAnalysis.diagnosed_problems?.map((problem, index) => (
+                      <Grid item xs={12} md={6} key={problem.problem_id}>
+                        <Card sx={{ 
+                          height: '100%',
+                          borderLeft: '4px solid',
+                          borderColor: index === 0 ? 'error.main' : 'warning.main',
+                          bgcolor: index === 0 ? 'error.50' : 'warning.50'
+                        }}>
+                          <CardContent>
+                            <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
+                              <Chip 
+                                label={`Problem ${index + 1}`}
+                                color={index === 0 ? 'error' : 'warning'}
+                                size="small"
+                                sx={{ mr: 2 }}
+                              />
+                              <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1rem' }}>
+                                {problem.title}
+                              </Typography>
+                            </Box>
+                            
+                            <Box sx={{ mb: 2 }}>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: 'primary.main' }}>
+                                🔍 Symptom (What we observe):
+                              </Typography>
+                              <Typography variant="body2" sx={{ mb: 2 }}>
+                                {problem.symptom}
+                              </Typography>
+                            </Box>
+
+                            <Box sx={{ mb: 2 }}>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: 'error.main' }}>
+                                🎯 Root Cause (Why it's happening):
+                              </Typography>
+                              <Typography variant="body2" sx={{ mb: 2 }}>
+                                {problem.root_cause}
+                              </Typography>
+                            </Box>
+
+                            <Box sx={{ mb: 2 }}>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: 'warning.main' }}>
+                                💰 Business Impact:
+                              </Typography>
+                              <Typography variant="body2" sx={{ mb: 2 }}>
+                                {problem.impact}
+                              </Typography>
+                            </Box>
+
+                            <Box>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: 'success.main' }}>
+                                📊 Evidence from Real Data:
+                              </Typography>
+                              <Typography variant="body2" sx={{ 
+                                bgcolor: 'white', 
+                                p: 2, 
+                                borderRadius: 1,
+                                border: '1px solid',
+                                borderColor: 'grey.300'
+                              }}>
+                                {problem.evidence}
+                              </Typography>
+                            </Box>
+                          </CardContent>
+                        </Card>
+                      </Grid>
+                    ))}
+                  </Grid>
+
+                  {/* Implementation Status */}
+                  {/* {problemAnalysis.implementation_status && (
+                    <Card sx={{ mt: 3, bgcolor: 'primary.50' }}>
+                      <CardContent>
+                        <Typography variant="h6" sx={{ mb: 2 }}>
+                          🛠️ Implementation Status
+                        </Typography>
+                        <Grid container spacing={2}>
+                          {Object.entries(problemAnalysis.implementation_status).map(([key, status]) => (
+                            <Grid item xs={12} md={6} key={key}>
+                              <Typography variant="body2">
+                                <strong>{key.replace(/_/g, ' ').toUpperCase()}:</strong> {status}
+                              </Typography>
+                            </Grid>
+                          ))}
+                        </Grid>
+                      </CardContent>
+                    </Card>
+                  )} */}
+                </Box>
+              )}
+
+              {!problemAnalysis && !analysisLoading && (
+                <Alert severity="info">
+                  <Typography variant="body2">
+                    Click "Analyze Problems" to get AI-powered insights from your real lead data in MongoDB.
+                    Claude will analyze patterns, identify issues, and provide evidence-based recommendations.
+                  </Typography>
+                </Alert>
+              )}
+            </CardContent>
+          </Card>
+        </Box>
+      )}
+
+      {/* Priority Queue Tab */}
+      {tabValue === 1 && (
         <>
           {/* Summary Cards */}
           {analytics && (
@@ -739,7 +907,7 @@ function HotLead() {
       )}
 
       {/* Analytics Tab */}
-      {tabValue === 1 && analytics && (
+      {tabValue === 2 && analytics && (
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
             <Card>
@@ -816,7 +984,7 @@ function HotLead() {
       )}
 
       {/* Model Info Tab */}
-      {tabValue === 2 && systemStatus && (
+      {tabValue === 3 && systemStatus && (
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
             <Card>
