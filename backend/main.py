@@ -55,7 +55,7 @@ from problems.creatorfit.routes import router as creatorfit_router
 from problems.trustdesk.routes import router as trustdesk_router
 from problems.adlift.routes import router as adlift_router
 from problems.refermore import router as refermore_router
-# from problems.pricesense.routes import router as pricesense_router  # TODO: Create pricesense module
+from problems.pricesense.routes import router as pricesense_router
 from problems.firsttouch.routes import router as firsttouch_router
 from problems.onetruth.routes import router as onetruth_router
 from problems.closemore.routes import router as closemore_router
@@ -65,7 +65,7 @@ app.include_router(creatorfit_router, prefix="/api/creatorfit", tags=["CreatorFi
 app.include_router(trustdesk_router, prefix="/api/trustdesk", tags=["TrustDesk - Branding"])
 app.include_router(adlift_router, prefix="/api/adlift", tags=["AdLift - Marketing"])
 app.include_router(refermore_router, prefix="/api/refermore", tags=["ReferMore - Sales"])
-# app.include_router(pricesense_router, prefix="/api/pricesense", tags=["PriceSense - Product"])  # TODO: Create pricesense module
+app.include_router(pricesense_router, prefix="/api/pricesense", tags=["PriceSense - Product"])
 app.include_router(firsttouch_router, prefix="/api/firsttouch", tags=["FirstTouch BOT - Sales"])
 app.include_router(onetruth_router, prefix="/api/onetruth", tags=["OneTruth - Marketing Analytics"])
 app.include_router(closemore_router, prefix="/api/closemore", tags=["CloseMore - Sales"])

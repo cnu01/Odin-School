@@ -99,6 +99,8 @@ class AnalyticsResponse(BaseModel):
 
 
 class EvaluationResponse(BaseModel):
+    model_config = {'protected_namespaces': ()}
+    
     accuracy: float
     test_samples: int
     trained: bool

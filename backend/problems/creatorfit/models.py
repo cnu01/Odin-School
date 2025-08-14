@@ -55,6 +55,8 @@ class DataQuality(BaseModel):
 
 class ModelInfo(BaseModel):
     """Model information"""
+    model_config = {'protected_namespaces': ()}
+    
     model_type: str
     accuracy_metrics: Dict[str, Any]
     features_used: int
@@ -68,6 +70,8 @@ class Recommendations(BaseModel):
 
 class PredictionResponse(BaseModel):
     """Complete prediction response"""
+    model_config = {'protected_namespaces': ()}
+    
     success: bool
     program_type: str
     results: List[PredictionResult]

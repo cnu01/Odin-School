@@ -388,7 +388,7 @@ async def predict_optimal_plan(segment_data: Dict[str, Any]) -> Dict[str, Any]:
     """
     try:
         # Make prediction
-        prediction_result = pricesense_model.predict(segment_data)
+        prediction_result = await pricesense_model.predict(segment_data)
         
         # Extract probability
         probability = prediction_result.get("probabilities", {}).get("True", 0.5)
