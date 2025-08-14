@@ -7,7 +7,7 @@ python-dotenv==1.0.1
 python-multipart==0.0.20
 
 # Core Scientific Libraries
-numpy==1.26.4
+numpy>=2.0.0,<2.2.0
 pandas==2.3.1
 scipy
 matplotlib
@@ -19,6 +19,7 @@ lightgbm==4.5.0
 scikit-learn==1.5.1
 xgboost==2.1.2
 tensorflow==2.19.0
+tf-keras==2.19.0
 transformers==4.47.0
 
 # AWS Services
