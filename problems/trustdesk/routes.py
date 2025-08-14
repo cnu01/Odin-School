@@ -457,7 +457,7 @@ async def bulk_upload_sample_documents():
         Bulk upload results
     """
     try:
-        sample_docs_path = "sample_documents"
+        sample_docs_path = os.path.join(os.path.dirname(__file__), "sample_documents")
         
         if not os.path.exists(sample_docs_path):
             raise HTTPException(status_code=404, detail="Sample documents directory not found")

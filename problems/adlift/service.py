@@ -49,7 +49,8 @@ class AdliftService:
                 raise ValueError("CSV content is empty")
             
             # Save CSV content to temporary file for existing scripts
-            temp_csv_path = "temp_upload.csv"
+            import tempfile
+            temp_csv_path = os.path.join(tempfile.gettempdir(), "temp_upload.csv")
             with open(temp_csv_path, 'w', encoding='utf-8') as f:
                 f.write(csv_content)
             

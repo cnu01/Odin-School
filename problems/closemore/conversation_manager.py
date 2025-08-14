@@ -28,8 +28,10 @@ class ConversationRecord:
 class ConversationManager:
     """Manages conversation storage and retrieval for CloseMore"""
     
-    def __init__(self, storage_path: str = "data/closemore"):
+    def __init__(self, storage_path: str = None):
         """Initialize conversation manager with storage configuration"""
+        if storage_path is None:
+            storage_path = os.path.join(os.path.dirname(__file__), "data")
         self.storage_path = storage_path
         self.conversations_file = os.path.join(storage_path, "conversations.json")
         self.analytics_file = os.path.join(storage_path, "analytics.json")

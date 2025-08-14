@@ -223,7 +223,7 @@ class DocumentManager:
             self.vector_db_type = "fallback"
         
         # Document storage path
-        self.storage_path = Path("knowledge_base_storage")
+        self.storage_path = Path(os.path.dirname(__file__)) / "knowledge_base_storage"
         self.storage_path.mkdir(exist_ok=True)
     
     async def upload_document(self, file_path: str, metadata: Dict = None) -> Dict[str, Any]:

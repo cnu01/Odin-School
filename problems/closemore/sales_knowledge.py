@@ -35,8 +35,10 @@ class RetrievalResult:
 class SalesKnowledgeManager:
     """Manages sales knowledge documents and retrieval for CloseMore"""
     
-    def __init__(self, storage_path: str = "data/closemore"):
+    def __init__(self, storage_path: str = None):
         """Initialize sales knowledge manager"""
+        if storage_path is None:
+            storage_path = os.path.join(os.path.dirname(__file__), "data")
         self.storage_path = storage_path
         self.knowledge_file = os.path.join(storage_path, "sales_knowledge.json")
         self.embedding_service = ClosemoreEmbeddingService()

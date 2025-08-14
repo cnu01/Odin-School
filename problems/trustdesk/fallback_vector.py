@@ -15,7 +15,7 @@ class FallbackVectorService:
     
     def __init__(self):
         self.documents = {}  # doc_id -> {content, embedding, metadata}
-        self.storage_path = Path("fallback_vector_storage.json")
+        self.storage_path = Path(os.path.dirname(__file__)) / "fallback_vector_storage.json"
         self.load_storage()
     
     def load_storage(self):

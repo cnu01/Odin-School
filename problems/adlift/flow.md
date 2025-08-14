@@ -4,7 +4,7 @@
 
 ```bash
 # Navigate to project root
-cd C:\Users\Amol Barkale\Desktop\Odin-School
+cd /path/to/your/Odin-School
 
 # Run FastAPI server
 python -m uvicorn main:app --reload --port 8000
