@@ -13,7 +13,7 @@ Enterprise-grade pipeline for high-accuracy lead predictions with:
 Usage:
     python prediction_pipeline.py input.csv data_science
 """
-
+import os
 import sys
 import json
 import warnings
@@ -49,8 +49,11 @@ except ImportError as e:
 class CreatorFitPredictionPipeline:
     """Production-ready prediction pipeline with ensemble models and business intelligence."""
     
-    def __init__(self, model_dir: str = "../../../models"):
-        self.model_dir = Path(model_dir)
+    def __init__(self, model_dir: str = "../../ml"):
+        default_ml_dir = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", "..", "ml")
+        )
+        self.model_dir = Path(model_dir or os.environ.get("MODEL_DIR", default_ml_dir))
         self.models = {}
         self.preprocessor = None
         self.metadata = None

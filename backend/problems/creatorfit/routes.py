@@ -1,3 +1,4 @@
+import os
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from fastapi.responses import JSONResponse
 from typing import Dict, Any, Optional
@@ -172,9 +173,11 @@ async def health_check():
     try:
         # Check if ML pipeline is available
         try:
-            from pathlib import Path
-            # Use absolute path to models directory
-            models_dir = Path(__file__).parent.parent.parent / "models"
+            # Use absolute path to models directory            
+            default_ml_dir = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", "..", "ml")
+            )
+            models_dir = os.environ.get("MODEL_DIR", default_ml_dir)
             model_files = [
                 "creatorfit_lgb_model.pkl",
                 "creatorfit_preprocessor.pkl", 
