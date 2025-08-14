@@ -86,26 +86,50 @@ function CloseMore() {
       : 0,
   };
 
-  // Load data from API on component mount
+  // Load data from API on component mount - simplified approach
   useEffect(() => {
+    let isMounted = true;
+    
     const loadData = async () => {
+      if (!isMounted) return;
+      
       try {
         setLoading(true);
+        setError(null);
+        
+        // Simple delay to prevent rapid duplicate requests
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        if (!isMounted) return;
+        
         const [conversationsData, actionsData] = await Promise.all([
           closemoreService.getConversations(),
           closemoreService.getDailyActions()
         ]);
-        setConversations(conversationsData);
-        setDailyActions(actionsData);
+        
+        if (isMounted) {
+          setConversations(conversationsData);
+          setDailyActions(actionsData);
+        }
       } catch (err) {
-        setError('Failed to load data');
-        console.error('Error loading CloseMore data:', err);
+        if (isMounted) {
+          setError('Failed to load data');
+          console.error('Error loading CloseMore data:', err);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
-    loadData();
+    // Debounce the load to prevent React 18 Strict Mode double calls
+    const timeoutId = setTimeout(loadData, 50);
+    
+    return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   const getPriorityColor = (priority) => {

@@ -56,20 +56,45 @@ const OneTruth = () => {
 
   // Dashboard Functions
   const loadDashboard = useCallback(async () => {
+    const abortController = new AbortController();
+    
     try {
       setLoading(true);
+      
+      // Add delay to prevent rapid duplicate requests
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      if (abortController.signal.aborted) return;
+      
       const data = await onetruthService.getDashboard(timeRange, includeAnomalies);
-      setDashboardData(data);
+      
+      if (!abortController.signal.aborted) {
+        setDashboardData(data);
+      }
     } catch (error) {
-      showError(error.message);
+      if (!abortController.signal.aborted && error.name !== 'CanceledError') {
+        showError(error.message);
+      }
     } finally {
-      setLoading(false);
+      if (!abortController.signal.aborted) {
+        setLoading(false);
+      }
     }
+    
+    return () => {
+      abortController.abort();
+    };
   }, [timeRange, includeAnomalies]);
 
-  // Load dashboard data on component mount
+  // Load dashboard data on component mount with debounce
   useEffect(() => {
-    loadDashboard();
+    const timeoutId = setTimeout(() => {
+      loadDashboard();
+    }, 200); // Debounce filter changes
+    
+    return () => {
+      clearTimeout(timeoutId);
+    };
   }, [loadDashboard]);
 
   const getHealthColor = (score) => {

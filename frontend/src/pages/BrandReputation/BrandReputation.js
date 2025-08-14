@@ -94,32 +94,51 @@ function BrandReputation() {
 
   // Load comments on component mount and when filters change
   useEffect(() => {
-    loadComments();
-  }, [filterPlatform, filterPriority]);
-
-  const loadComments = async () => {
-    setLoading(true);
-    try {
-      const filters = {
-        platform: filterPlatform,
-        priority: filterPriority
-      };
-      
-      const result = await trustdeskService.getComments(filters);
-      
-      if (result.success) {
-        setCommentsData(result.data);
-        updateStats(result.data);
-      } else {
-        showSnackbar('Error loading comments: ' + result.error, 'error');
+    const abortController = new AbortController();
+    
+    const loadComments = async () => {
+      try {
+        setLoading(true);
+        
+        // Add delay to prevent rapid duplicate requests from filter changes
+        await new Promise(resolve => setTimeout(resolve, 150));
+        
+        if (abortController.signal.aborted) return;
+        
+        const filters = {
+          platform: filterPlatform,
+          priority: filterPriority
+        };
+        
+        const result = await trustdeskService.getComments(filters);
+        
+        if (!abortController.signal.aborted) {
+          if (result.success) {
+            setCommentsData(result.data);
+            updateStats(result.data);
+          } else {
+            showSnackbar('Error loading comments: ' + result.error, 'error');
+          }
+        }
+      } catch (error) {
+        if (!abortController.signal.aborted && error.name !== 'CanceledError') {
+          console.error('Error loading comments:', error);
+          showSnackbar('Failed to load comments', 'error');
+        }
+      } finally {
+        if (!abortController.signal.aborted) {
+          setLoading(false);
+        }
       }
-    } catch (error) {
-      console.error('Error loading comments:', error);
-      showSnackbar('Failed to load comments', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    loadComments();
+    
+    // Cleanup function to prevent race conditions
+    return () => {
+      abortController.abort();
+    };
+  }, [filterPlatform, filterPriority]);
 
   const updateStats = (comments) => {
     const urgent = comments.filter(c => c.category === 'urgent' && c.status === 'new').length;
