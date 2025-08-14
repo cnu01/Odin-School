@@ -273,34 +273,52 @@ function PricingInsights() {
   const [messageLoading, setMessageLoading] = useState(false);
 
   useEffect(() => {
+    const abortController = new AbortController();
+    
+    const loadInitialData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Add delay to prevent rapid duplicate requests
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        if (abortController.signal.aborted) return;
+
+        // Load all required data in parallel
+        const [dashboardRes, analyticsRes, problemRes, recommendationsRes] = await Promise.all([
+          pricesenseService.getDashboardData(),
+          pricesenseService.getAnalyticsSummary(500),
+          pricesenseService.getProblemAnalysis(),
+          pricesenseService.getRecommendations(10, 60.0)
+        ]);
+
+        if (!abortController.signal.aborted) {
+          setDashboardData(dashboardRes);
+          setAnalytics(analyticsRes);
+          setProblemAnalysis(problemRes);
+          setRecommendations(recommendationsRes.recommendations || []);
+        }
+
+      } catch (err) {
+        if (!abortController.signal.aborted && err.name !== 'CanceledError') {
+          setError(err.message || 'Failed to load pricing data');
+          console.error('Error loading pricing data:', err);
+        }
+      } finally {
+        if (!abortController.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    };
+
     loadInitialData();
+    
+    // Cleanup function to prevent race conditions
+    return () => {
+      abortController.abort();
+    };
   }, []);
-
-  const loadInitialData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      // Load all required data in parallel
-      const [dashboardRes, analyticsRes, problemRes, recommendationsRes] = await Promise.all([
-        pricesenseService.getDashboardData(),
-        pricesenseService.getAnalyticsSummary(500),
-        pricesenseService.getProblemAnalysis(),
-        pricesenseService.getRecommendations(10, 60.0)
-      ]);
-
-      setDashboardData(dashboardRes);
-      setAnalytics(analyticsRes);
-      setProblemAnalysis(problemRes);
-      setRecommendations(recommendationsRes.recommendations || []);
-
-    } catch (err) {
-      setError(err.message || 'Failed to load pricing data');
-      console.error('Error loading pricing data:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleRefresh = () => {
     loadInitialData();

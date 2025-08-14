@@ -89,14 +89,12 @@ function HotLead() {
   const [outreachMessage, setOutreachMessage] = useState('');
   const [modelTraining, setModelTraining] = useState(false);
 
-  // Load data on component mount
-  useEffect(() => {
-    loadData();
-  }, []);
-
+  // Define loadData function that can be used throughout the component
   const loadData = async () => {
     try {
       setLoading(true);
+      setError(null);
+      
       const [priorityResponse, analyticsResponse, statusResponse] = await Promise.all([
         hotleadService.getPriorityQueue({ limit: 20, min_score: 0 }),
         hotleadService.getAnalytics(),
@@ -122,6 +120,27 @@ function HotLead() {
       setLoading(false);
     }
   };
+
+  // Load data on component mount with race condition protection
+  useEffect(() => {
+    const abortController = new AbortController();
+    
+    const loadInitialData = async () => {
+      // Add delay to prevent rapid duplicate requests
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      if (!abortController.signal.aborted) {
+        await loadData();
+      }
+    };
+
+    loadInitialData();
+    
+    // Cleanup function to prevent race conditions
+    return () => {
+      abortController.abort();
+    };
+  }, []);
 
   const handleLeadClick = async (lead) => {
     setSelectedLead(lead);

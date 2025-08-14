@@ -164,7 +164,10 @@ class CloseMoreService {
       
       return conversations;
     } catch (error) {
-      console.error('Error fetching conversations:', error);
+      // Don't log errors for cancelled requests (race conditions)
+      if (error.name !== 'CanceledError' && !error.message?.includes('canceled')) {
+        console.error('Error fetching conversations:', error);
+      }
       // Return fallback mock data
       return this.getMockConversations();
     }
@@ -187,6 +190,8 @@ class CloseMoreService {
       
       // Transform the API response to match frontend expectations
       const data = response.data;
+      console.log('Daily actions API response:', data); // Debug log
+      
       const dailyActions = [{
         rep: repId,
         avatar: repId.split('_').map(n => n[0]).join('').toUpperCase(),
@@ -198,9 +203,18 @@ class CloseMoreService {
         actions: data.actions || []
       }];
       
+      console.log('Transformed daily actions:', dailyActions); // Debug log
       return dailyActions;
     } catch (error) {
-      console.error('Error fetching daily actions:', error);
+      // Don't log errors for cancelled requests (race conditions)
+      if (error.name !== 'CanceledError' && !error.message?.includes('canceled')) {
+        console.error('Error fetching daily actions:', error);
+        console.error('Error details:', {
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data
+        });
+      }
       // Return mock data as fallback
       return this.getMockDailyActions();
     }
