@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Query
 from typing import Optional, Dict, Any
 from datetime import datetime
 from .models import (
-    LeadInput, ScoredLead, LeadIngestRequest, LeadResponse,
+    LeadIngestRequest, LeadResponse,
     PriorityQueueRequest, PriorityQueueResponse, LeadAnalyticsResponse,
     ContactUpdate, OutreachRequest, WhyLeadRequest, ProblemAnalysisResponse
 )
@@ -34,9 +34,9 @@ async def hotlead_home():
             "/priority-queue": "GET - Get prioritized leads for sales",
             "/train": "POST - Train ML model with synthetic data",
             "/analytics": "GET - Get lead scoring analytics",
-            "/score": "POST - Score individual lead (legacy)",
             "/status": "GET - System status and model info",
-            "/seed": "POST - Seed database with training data"
+            "/seed": "POST - Seed database with training data",
+            "/problem-analysis": "GET - AI-powered problem diagnosis"
         },
         "ml_capabilities": [
             "Random Forest lead conversion prediction",
@@ -84,22 +84,6 @@ async def get_priority_queue(
             source_filter=source_filter
         )
         return await hotlead_service.get_priority_queue(request)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@router.post("/score", response_model=ScoredLead)
-async def score_lead(lead_input: LeadInput):
-    """
-    Score a lead using AI analysis for priority and routing (legacy endpoint)
-    
-    Args:
-        lead_input: LeadInput containing lead data (source, pageviews, device, geography, form_fields)
-        
-    Returns:
-        ScoredLead with AI-generated score, reason, and priority routing action
-    """
-    try:
-        return await hotlead_service.score_lead(lead_input)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -153,8 +137,8 @@ async def hotlead_status():
                 "GET /api/hotlead/priority-queue - Get prioritized leads",
                 "POST /api/hotlead/train - Train ML model",
                 "GET /api/hotlead/analytics - Get performance analytics",
-                "POST /api/hotlead/score - Score individual lead",
-                "GET /api/hotlead/status - System status"
+                "GET /api/hotlead/status - System status",
+                "GET /api/hotlead/problem-analysis - AI problem diagnosis"
             ],
             "capabilities": [
                 "Lead conversion prediction",
