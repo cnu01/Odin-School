@@ -129,7 +129,6 @@ ipython_config.py
 
 # Machine Learning Models (IMPORTANT for Odin-School)
 # Ignore large model files but keep metadata
-*.pkl
 *.joblib
 *.h5
 *.hdf5
