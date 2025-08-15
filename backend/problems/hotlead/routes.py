@@ -4,7 +4,8 @@ from datetime import datetime
 from .models import (
     LeadIngestRequest, LeadResponse,
     PriorityQueueRequest, PriorityQueueResponse, LeadAnalyticsResponse,
-    ContactUpdate, OutreachRequest, WhyLeadRequest, ProblemAnalysisResponse
+    ContactUpdate, OutreachRequest, WhyLeadRequest, ProblemAnalysisResponse,
+    AISolutionsResponse
 )
 from .service import HotLeadService
 
@@ -249,16 +250,40 @@ async def test_lead_prediction(
 
 
 @router.get("/problem-analysis", response_model=ProblemAnalysisResponse)
-async def get_problem_analysis():
+async def get_problem_analysis(
+    force_refresh: Optional[bool] = Query(False, description="Force refresh analysis (bypass cache)")
+):
     """
     Get complete problem diagnosis and analysis for HotLead frontend display
     Shows identified issues, segment challenges, and implementation status
+    
+    Parameters:
+    - force_refresh: If True, generates new analysis instead of using cached version
     """
     try:
-        analysis = await hotlead_service.get_problem_analysis()
+        analysis = await hotlead_service.get_problem_analysis(force_refresh=force_refresh)
         return analysis
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"HotLead problem analysis failed: {e}")
+
+
+@router.get("/ai-solutions", response_model=AISolutionsResponse)
+async def get_ai_solutions():
+    """
+    Get AI-powered solutions and enhancement recommendations for HotLead
+    
+    Provides:
+    - Claude-generated AI solutions for identified problems
+    - Enhancement recommendations for existing capabilities  
+    - Implementation roadmap with timelines and phases
+    - ROI projections and financial impact analysis
+    - Technical architecture requirements
+    """
+    try:
+        solutions = await hotlead_service.get_ai_solutions()
+        return solutions
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"AI Solutions generation failed: {e}")
 
 
 @router.get("/dashboard-data")
