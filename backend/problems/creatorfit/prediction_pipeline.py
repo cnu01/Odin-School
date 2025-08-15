@@ -192,39 +192,7 @@ class CreatorFitPredictionPipeline:
         confidence = np.ones(len(primary_pred)) * 0.85  # High confidence for trained model
         return primary_pred, confidence
     
-    def calculate_business_metrics(self, df: pd.DataFrame, predictions: np.ndarray, 
-                                 confidence: np.ndarray, campaign_budget: float = 100000) -> Dict[str, Any]:
-        """Calculate business intelligence metrics."""
-        
-        # Estimated CPL (Cost Per Lead)
-        total_predicted_leads = predictions.sum()
-        estimated_cpl = campaign_budget / total_predicted_leads if total_predicted_leads > 0 else 0
-        
-        # ROI estimation (assuming 10% conversion to enrollment, ₹50k revenue per enrollment)
-        estimated_enrollments = total_predicted_leads * 0.1
-        estimated_revenue = estimated_enrollments * 50000
-        estimated_roi = (estimated_revenue - campaign_budget) / campaign_budget * 100
-        
-        # Creator performance tiers
-        high_performers = (predictions >= np.percentile(predictions, 80)).sum()
-        medium_performers = ((predictions >= np.percentile(predictions, 40)) & 
-                           (predictions < np.percentile(predictions, 80))).sum()
-        low_performers = (predictions < np.percentile(predictions, 40)).sum()
-        
-        return {
-            'total_predicted_leads': int(total_predicted_leads),
-            'estimated_cpl': float(round(estimated_cpl, 2)),
-            'estimated_enrollments': int(estimated_enrollments),
-            'estimated_revenue': int(estimated_revenue),
-            'estimated_roi_percent': float(round(estimated_roi, 1)),
-            'creator_distribution': {
-                'high_performers': int(high_performers),
-                'medium_performers': int(medium_performers),
-                'low_performers': int(low_performers)
-            },
-            'avg_confidence': float(round(confidence.mean(), 3)),
-            'campaign_budget': float(campaign_budget)
-        }
+
     
     def process_csv_file(self, csv_path: str, program_type: str = "data_science") -> Dict[str, Any]:
         """Production CSV processing with maximum accuracy pipeline."""
@@ -265,10 +233,7 @@ class CreatorFitPredictionPipeline:
             # 5. Make production predictions with confidence
             predictions, confidence = self.predict_with_confidence(X_processed)
             
-            # 6. Calculate business metrics
-            business_metrics = self.calculate_business_metrics(df_clean, predictions, confidence)
-            
-            # 7. Prepare detailed results
+            # 6. Prepare detailed results
             results = []
             for i in range(len(df_clean)):
                 result = {
@@ -298,7 +263,6 @@ class CreatorFitPredictionPipeline:
                 'success': True,
                 'program_type': program_type,
                 'results': results,
-                'summary': business_metrics,
                 'data_quality': quality_report,
                 'model_info': {
                     'model_type': 'Production LightGBM Ensemble',
@@ -354,10 +318,6 @@ def main():
         print(f"Program: {result['program_type'].title()}")
         print(f"Creators Analyzed: {len(result['results'])}")
         print(f"Data Quality Score: {result['data_quality']['quality_score']:.1%}")
-        print(f"Total Predicted Leads: {result['summary']['total_predicted_leads']:,}")
-        print(f"Estimated CPL: ₹{result['summary']['estimated_cpl']:,.0f}")
-        print(f"Estimated ROI: {result['summary']['estimated_roi_percent']:+.1f}%")
-        print(f"Average Confidence: {result['summary']['avg_confidence']:.1%}")
         
         print(f"\n📊 TOP 5 CREATORS:")
         for creator in result['results'][:5]:

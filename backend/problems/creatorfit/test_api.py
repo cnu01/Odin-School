@@ -51,8 +51,6 @@ def test_csv_analysis():
         result = response.json()
         print(f"✅ Analysis successful!")
         print(f"Total creators analyzed: {len(result.get('results', []))}")
-        print(f"Total predicted leads: {result.get('summary', {}).get('total_predicted_leads', 0)}")
-        print(f"Estimated CPL: ₹{result.get('summary', {}).get('estimated_cpl', 0):,.0f}")
         print(f"Data quality score: {result.get('data_quality', {}).get('quality_score', 0):.2%}")
         
         # Show top 3 creators

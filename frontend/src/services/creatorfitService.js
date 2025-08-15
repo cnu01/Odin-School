@@ -103,22 +103,6 @@ class CreatorFitService {
     };
   }
 
-  // Format business metrics for display
-  formatBusinessMetrics(summary) {
-    if (!summary) return null;
-
-    return {
-      totalLeads: summary.total_predicted_leads?.toLocaleString() || '0',
-      estimatedCPL: `₹${summary.estimated_cpl?.toLocaleString() || '0'}`,
-      estimatedEnrollments: summary.estimated_enrollments?.toLocaleString() || '0',
-      estimatedRevenue: `₹${(summary.estimated_revenue || 0).toLocaleString()}`,
-      estimatedROI: `${summary.estimated_roi_percent?.toFixed(1) || '0'}%`,
-      avgConfidence: `${((summary.avg_confidence || 0) * 100).toFixed(1)}%`,
-      campaignBudget: `₹${summary.campaign_budget?.toLocaleString() || '0'}`,
-      distribution: summary.creator_distribution || {}
-    };
-  }
-
   // Format creator results for display
   formatCreatorResults(results) {
     if (!Array.isArray(results)) return [];

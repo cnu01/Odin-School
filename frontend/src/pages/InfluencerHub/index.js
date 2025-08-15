@@ -63,7 +63,6 @@ const InfluencerHub = () => {
   // Results state
   const [analysisResults, setAnalysisResults] = useState(null);
   const [creators, setCreators] = useState([]);
-  const [businessMetrics, setBusinessMetrics] = useState(null);
   
   // Table pagination
   const [page, setPage] = useState(0);
@@ -149,7 +148,6 @@ const InfluencerHub = () => {
       if (result.success) {
         setAnalysisResults(result);
         setCreators(creatorfitService.formatCreatorResults(result.results || []));
-        setBusinessMetrics(creatorfitService.formatBusinessMetrics(result.summary));
         
         const analysisTypeLabel = analysisType === 'analyze' ? 'Analysis' : 'Forecasting';
         showSuccess(`${analysisTypeLabel} completed successfully! Found ${result.results?.length || 0} creators.`);
@@ -372,88 +370,6 @@ const InfluencerHub = () => {
             Running AI analysis on creators... This may take up to 60 seconds.
           </Typography>
         </Box>
-      )}
-
-      {/* Business Metrics Summary */}
-      {businessMetrics && (
-        <Card sx={{ mb: 3 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              📈 Business Intelligence Summary
-            </Typography>
-            
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6} md={3}>
-                <Paper sx={{ p: 2, textAlign: 'center' }}>
-                  <TrendingUpIcon color="primary" sx={{ fontSize: 32, mb: 1 }} />
-                  <Typography variant="h5" color="primary">
-                    {businessMetrics.totalLeads}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    Predicted Leads
-                  </Typography>
-                </Paper>
-              </Grid>
-              
-              <Grid item xs={12} sm={6} md={3}>
-                <Paper sx={{ p: 2, textAlign: 'center' }}>
-                  <PersonIcon color="success" sx={{ fontSize: 32, mb: 1 }} />
-                  <Typography variant="h5" color="success.main">
-                    {businessMetrics.estimatedEnrollments}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    Est. Enrollments
-                  </Typography>
-                </Paper>
-              </Grid>
-              
-              <Grid item xs={12} sm={6} md={3}>
-                <Paper sx={{ p: 2, textAlign: 'center' }}>
-                  <AnalyticsIcon color="info" sx={{ fontSize: 32, mb: 1 }} />
-                  <Typography variant="h5" color="info.main">
-                    {businessMetrics.estimatedCPL}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    Est. CPL
-                  </Typography>
-                </Paper>
-              </Grid>
-              
-              <Grid item xs={12} sm={6} md={3}>
-                <Paper sx={{ p: 2, textAlign: 'center' }}>
-                  <AssessmentIcon color="warning" sx={{ fontSize: 32, mb: 1 }} />
-                  <Typography variant="h5" color="warning.main">
-                    {businessMetrics.estimatedROI}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    Est. ROI
-                  </Typography>
-                </Paper>
-              </Grid>
-            </Grid>
-
-            <Divider sx={{ my: 2 }} />
-            
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
-                <Typography variant="body2" color="textSecondary">
-                  Campaign Budget: <strong>{businessMetrics.campaignBudget}</strong>
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Average Confidence: <strong>{businessMetrics.avgConfidence}</strong>
-                </Typography>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <Typography variant="body2" color="textSecondary">
-                  High Performers: <strong>{businessMetrics.distribution.high_performers || 0}</strong>
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Medium Performers: <strong>{businessMetrics.distribution.medium_performers || 0}</strong>
-                </Typography>
-              </Grid>
-            </Grid>
-          </CardContent>
-        </Card>
       )}
 
       {/* Creator Results Table */}
