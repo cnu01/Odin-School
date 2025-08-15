@@ -35,11 +35,11 @@ sys.path.append(str(Path(__file__).parent.parent.parent.parent))
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
 try:
-    from problems.creatorfit.data_preprocessing import (
+    from backend.problems.creatorfit.flows.data_preprocessing import (
         _apply_schema_adapter, _coerce_and_normalize, _impute_missing, 
         _apply_business_guards, _fold_rare_categories
     )
-    from problems.creatorfit.features import build_features, ODIN_SCHOOL_PROGRAMS
+    from backend.problems.creatorfit.flows.features import build_features, ODIN_SCHOOL_PROGRAMS
     from problems.creatorfit.modeling import build_preprocessor
     FULL_PIPELINE_AVAILABLE = True
 except ImportError as e:
@@ -112,7 +112,7 @@ class CreatorFitPredictionPipeline:
             quality_report['quality_score'] *= 0.85
         
         # Check for topic relevance
-        from problems.creatorfit.data_preprocessing import EDTECH_TOPICS
+        from backend.problems.creatorfit.flows.data_preprocessing import EDTECH_TOPICS
         irrelevant_topics = ~df['topic'].str.contains('|'.join(EDTECH_TOPICS), case=False, na=False)
         if irrelevant_topics.any():
             quality_report['issues_found'].append(f"{irrelevant_topics.sum()} creators with non-EdTech topics")

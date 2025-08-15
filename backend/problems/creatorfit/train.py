@@ -9,8 +9,8 @@ from lightgbm import LGBMRegressor, early_stopping, log_evaluation, reset_parame
 from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error
 
 # Local modules
-from .data_preprocessing import load_and_clean_data
-from .features import build_features
+from .flows.data_preprocessing import load_and_clean_data
+from .flows.features import build_features
 from .modeling import build_preprocessor, group_train_val_split
 
 # -----------------------------

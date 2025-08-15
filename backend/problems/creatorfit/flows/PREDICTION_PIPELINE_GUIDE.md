@@ -117,7 +117,6 @@ your_data_enhanced_results.json
 ├── success: true/false
 ├── program_type: "data_science"
 ├── results: [creator rankings with predictions]
-├── summary: {business intelligence metrics}
 ├── data_quality: {validation report}
 ├── model_info: {performance metrics}
 └── recommendations: {strategic guidance}
