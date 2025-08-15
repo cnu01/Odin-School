@@ -12,12 +12,11 @@ class CreatorFitService:
         # No database needed - everything runs from trained models
         pass
     
-    async def analyze_csv(self, csv_content: bytes, program_type: str = "data_science", 
-                         campaign_budget: float = 100000) -> Dict[str, Any]:
+    async def analyze_csv(self, csv_content: bytes, program_type: str = "data_science") -> Dict[str, Any]:
         """
-        Comprehensive creator analysis with business intelligence and CPL calculations
+        Comprehensive creator analysis with lead forecasting
         This integrates with the prediction_pipeline.py we built yesterday
-        Includes: fit scoring, lead prediction, ROI analysis, budget allocation
+        Includes: fit scoring, lead prediction, recommendations
         """
         try:
             # Save uploaded CSV to temporary file
@@ -27,12 +26,12 @@ class CreatorFitService:
             
             # Use lightweight prediction pipeline
             try:
-                result = self._lightweight_analysis(temp_csv_path, program_type, campaign_budget)
+                result = self._lightweight_analysis(temp_csv_path, program_type)
                 
                 # Enhance result with analysis-specific information
                 if result.get('success'):
                     result['endpoint_type'] = 'analyze'
-                    result['focus'] = 'comprehensive_business_analysis'
+                    result['focus'] = 'comprehensive_creator_analysis'
                 
                 # No database saving needed
                 
@@ -122,7 +121,7 @@ class CreatorFitService:
                 'details': 'Check CSV format and try again'
             }
     
-    def _lightweight_analysis(self, csv_path: str, program_type: str, campaign_budget: float = 100000):
+    def _lightweight_analysis(self, csv_path: str, program_type: str):
         """Fast analysis using simple algorithms without heavy ML dependencies"""
         try:
             import pandas as pd
@@ -186,7 +185,6 @@ class CreatorFitService:
                 },
                 'recommendations': {
                     'top_performers': [r for r in results[:5] if r['recommendation'] == 'BOOK'],
-                    'budget_allocation': f"Allocate 60% budget to top {min(5, len([r for r in results if r['recommendation'] == 'BOOK']))} creators",
                     'risk_mitigation': f"Monitor {len([r for r in results if r['confidence_score'] < 0.8])} creators with low confidence scores"
                 }
             }

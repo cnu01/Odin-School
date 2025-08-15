@@ -40,8 +40,7 @@ def test_csv_analysis():
     with open(sample_csv, 'rb') as f:
         files = {'file': ('sample_creators.csv', f, 'text/csv')}
         data = {
-            'program_type': 'data_science',
-            'campaign_budget': 100000
+            'program_type': 'data_science'
         }
         
         response = requests.post(f"{BASE_URL}/analyze", files=files, data=data)

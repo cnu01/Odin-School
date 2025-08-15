@@ -19,26 +19,22 @@ async def creatorfit_home():
     """CreatorFit - AI-Powered Influencer Marketing & Creator-Content Fit Analysis System"""
     return {
         "problem": "CreatorFit - Influencer Marketing Optimization & Creator-Content Fit Analysis",
-        "description": "AI-powered creator-content matching system with lead forecasting and CPL optimization",
+        "description": "AI-powered creator-content matching system with lead forecasting",
         "status": "Active - Full AI Analysis Suite Ready",
         "business_impact": {
             "target_improvements": {
                 "creator_match_quality": "+40% improvement",
-                "lead_forecast_accuracy": "92%+ precision",
-                "cpl_optimization": "₹700-₹3,200 range",
-                "campaign_roi": "3-5x improvement"
+                "lead_forecast_accuracy": "92%+ precision"
             },
             "key_metrics": [
                 "Creator-content fit scoring with ML algorithms",
                 "Lead forecasting with 92%+ accuracy",
-                "Dynamic CPL optimization across segments",
-                "Real-time campaign performance tracking"
+                "Real-time performance tracking"
             ]
         },
         "ai_capabilities": [
             "Advanced creator-content fit analysis",
             "LightGBM-based lead forecasting",
-            "Dynamic CPL calculation and optimization",
             "Multi-dimensional creator scoring",
             "Audience overlap analysis",
             "Performance prediction modeling"
@@ -47,8 +43,7 @@ async def creatorfit_home():
             "CSV upload for bulk creator analysis",
             "Creator fit scoring and ranking",
             "Lead generation forecasting",
-            "Budget allocation optimization",
-            "Campaign performance metrics",
+            "Performance metrics",
             "Strategic recommendations engine"
         ],
         "endpoints": {
@@ -65,19 +60,17 @@ async def creatorfit_home():
 @router.post("/analyze", response_model=PredictionResponse)
 async def analyze_creators_csv(
     file: UploadFile = File(..., description="CSV file with creator data"),
-    program_type: ProgramType = Form(default=ProgramType.DATA_SCIENCE, description="Program type for analysis"),
-    campaign_budget: float = Form(default=100000, ge=0, description="Campaign budget for CPL calculation")
+    program_type: ProgramType = Form(default=ProgramType.DATA_SCIENCE, description="Program type for analysis")
 ):
     """
-    COMPREHENSIVE CREATOR ANALYSIS - Upload CSV and get full business intelligence
+    COMPREHENSIVE CREATOR ANALYSIS - Upload CSV and get creator analysis
     
     This endpoint provides:
     1. Creator fit scores and rankings
     2. Lead predictions with confidence levels  
-    3. Business metrics (CPL, ROI, budget allocation)
-    4. Strategic recommendations for campaign optimization
+    3. Strategic recommendations for creator selection
     
-    Perfect for: Campaign planning, budget allocation, strategic decision making
+    Perfect for: Creator evaluation, lead forecasting, strategic decision making
     """
     try:
         # Validate file
@@ -91,8 +84,7 @@ async def analyze_creators_csv(
         service = get_service()
         result = await service.analyze_csv(
             csv_content=csv_content,
-            program_type=program_type.value,
-            campaign_budget=campaign_budget
+            program_type=program_type.value
         )
         
         if result.get('success'):

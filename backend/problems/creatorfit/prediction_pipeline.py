@@ -272,7 +272,6 @@ class CreatorFitPredictionPipeline:
                 },
                 'recommendations': {
                     'top_performers': [r for r in results[:5] if r['recommendation'] == 'BOOK'],
-                    'budget_allocation': f"Allocate 60% budget to top {min(5, len([r for r in results if r['recommendation'] == 'BOOK']))} creators",
                     'risk_mitigation': f"Monitor {len([r for r in results if r['confidence_score'] < 0.8])} creators with low confidence scores"
                 }
             }
