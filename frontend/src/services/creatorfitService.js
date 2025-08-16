@@ -6,12 +6,11 @@ class CreatorFitService {
   }
 
   // Comprehensive creator analysis with business intelligence
-  async analyzeCreators(file, programType = 'data_science', campaignBudget = 100000) {
+  async analyzeCreators(file, programType = 'data_science') {
     try {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('program_type', programType);
-      formData.append('campaign_budget', campaignBudget);
 
       const response = await api.post(`${this.baseURL}/analyze`, formData, {
         headers: {

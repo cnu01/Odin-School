@@ -18,7 +18,6 @@ Then open: http://localhost:8001 (or next available port)
 ### 3. Upload & Analyze
 - Select CSV file with creator data
 - Choose program type (Data Science, Web Development, etc.)
-- Set campaign budget
 - Click "Run Production Analysis"
 
 ## 📊 Expected CSV Format

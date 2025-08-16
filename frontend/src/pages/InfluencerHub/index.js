@@ -21,8 +21,6 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  TextField,
-  Divider,
   LinearProgress,
   Badge,
   Tooltip,
@@ -57,7 +55,6 @@ const InfluencerHub = () => {
   
   // Analysis configuration
   const [programType, setProgramType] = useState('data_science');
-  const [campaignBudget, setCampaignBudget] = useState(100000);
   const [analysisType, setAnalysisType] = useState('analyze'); // 'analyze' or 'forecast'
   
   // Results state
@@ -136,7 +133,6 @@ const InfluencerHub = () => {
         result = await creatorfitService.analyzeCreators(
           selectedFile, 
           programType, 
-          campaignBudget
         );
       } else {
         result = await creatorfitService.forecastLeads(
@@ -329,21 +325,6 @@ const InfluencerHub = () => {
                     </Select>
                   </FormControl>
                 </Grid>
-                
-                {analysisType === 'analyze' && (
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Campaign Budget (₹)"
-                      type="number"
-                      value={campaignBudget}
-                      onChange={(e) => setCampaignBudget(Number(e.target.value))}
-                      InputProps={{
-                        inputProps: { min: 1000, step: 1000 }
-                      }}
-                    />
-                  </Grid>
-                )}
               </Grid>
             </Grid>
           </Grid>

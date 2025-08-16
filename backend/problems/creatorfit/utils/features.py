@@ -19,7 +19,7 @@ except ImportError as e:
 # EDTECH FEATURE ENGINEERING CONFIG
 # --------------------------------------------------------------------------------------
 # Reusable default model (good quality + fast). You can override from train.py if needed.
-DEFAULT_EMB_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+DEFAULT_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
 # Simple in-process cache so repeated calls don't re-load the model from disk/network.
 # This avoids slowdowns when you run train.py multiple times.
@@ -125,7 +125,7 @@ def _encode_texts(
 def compute_fit_scores(
     df: pd.DataFrame,
     program_text: str,
-    emb_model_name: str = DEFAULT_EMB_MODEL,
+    emb_model_name: str = DEFAULT_EMBEDDING_MODEL,
     model = None,
     batch_size: int = 256,
     to_unit_interval: bool = True,
@@ -180,7 +180,7 @@ def compute_fit_scores(
 def build_features(
     df_clean: pd.DataFrame,
     program_type: str = "data_science",
-    emb_model_name: str = DEFAULT_EMB_MODEL,
+    emb_model_name: str = DEFAULT_EMBEDDING_MODEL,
     model = None,
 ) -> Tuple[pd.DataFrame, pd.Series, Dict[str, List[str]]]:
     """
