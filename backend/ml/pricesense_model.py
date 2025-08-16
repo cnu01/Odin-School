@@ -58,6 +58,15 @@ class PriceSenseModel(BaseMLModel):
     def __init__(self, model_name: str = "pricesense_optimization"):
         super().__init__(model_name=model_name, model_type="classification")
         self.feature_columns = FEATURES
+        
+        # Try to load existing trained model on initialization
+        try:
+            self.load_model()
+            if self.is_trained:
+                logger.info(f"Successfully loaded pre-trained {model_name} model")
+        except Exception as e:
+            logger.info(f"No pre-trained {model_name} model found or failed to load: {e}")
+            # Continue with untrained model - this is normal for first time
 
     def _create_model(self):
         # XGBoost optimized for pricing optimization

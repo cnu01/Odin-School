@@ -312,7 +312,112 @@ async def predict_lead_conversion(lead_data: Dict[str, Any]) -> Dict[str, Any]:
             "error": str(e)
         }
 
-def generate_synthetic_training_data(num_samples: int = 2000) -> List[Dict[str, Any]]:
+def generate_synthetic_training_data(num_samples: int = 5000) -> List[Dict[str, Any]]:
+    """
+    Load enhanced training data from CSV or generate fallback data
+    Uses the realistic 5000-lead dataset created by enhanced generator
+    """
+    import pandas as pd
+    import os
+    
+    # Try to load the enhanced dataset first
+    backend_dir = os.path.dirname(os.path.dirname(__file__))  # Go up two levels from ml/ to backend/
+    enhanced_data_path = os.path.join(backend_dir, "data", "enhanced_leads_5000.csv")
+    
+    try:
+        if os.path.exists(enhanced_data_path):
+            logger.info(f"Loading enhanced 5000-lead dataset from {enhanced_data_path}")
+            df = pd.read_csv(enhanced_data_path)
+            
+            # Convert DataFrame to list of dictionaries
+            training_data = []
+            for _, row in df.iterrows():
+                lead_data = {
+                    "lead_id": row["lead_id"],
+                    "source": row["source"],
+                    "utm_source": row["utm_source"],
+                    "utm_medium": row["utm_medium"],
+                    "utm_campaign": row["utm_campaign"],
+                    "page_views": int(row["page_views"]),
+                    "time_on_site": int(row["time_on_site"]),
+                    "course_pages_viewed": int(row["course_pages_viewed"]),
+                    "demo_requests": int(row["demo_requests"]),
+                    "device": row["device"],
+                    "location": row["geography"],
+                    "geography": row["geography"],
+                    "hour": int(row["contact_hour"]),
+                    "day_of_week": int(row["contact_day"]),
+                    "is_business_hours": 9 <= int(row["contact_hour"]) <= 17 and 1 <= int(row["contact_day"]) <= 5,
+                    "session_count": int(row["session_count"]),
+                    "days_since_first_visit": int(row["days_since_first_visit"]),
+                    "form_submissions": int(row["form_submissions"]),
+                    "is_return_visitor": row["session_count"] > 1,
+                    "downloads_count": 0,  # Will derive from other features
+                    "previous_visits": int(row["session_count"]),
+                    "contacted": row["contacted"],
+                    "meeting_booked": row["meeting_scheduled"],
+                    "enrolled": row["enrolled"],
+                    "converted": row["enrolled"],  # Primary target
+                    "revenue": int(row["revenue"]) if row["revenue"] > 0 else 0,
+                    "rep_assigned": row["rep_assigned"],
+                    "rep_experience_level": row["rep_experience_level"],
+                    "response_time_hours": float(row["response_time_hours"]),
+                    "contact_attempts": int(row["contact_attempts"]),
+                    "lost_reason": row["lost_reason"] if row["lost_reason"] else "",
+                    "objection_type": row["objection_type"] if row["objection_type"] else "",
+                    
+                    # Derived features for ML model
+                    "avg_response_time_hours": float(row["response_time_hours"]),
+                    "source_quality_score": 0.8,  # Will calculate dynamically
+                    "location_quality_score": 0.7,  # Will calculate dynamically
+                    "intent_score": min(1.0, (int(row["demo_requests"]) * 0.5 + int(row["course_pages_viewed"]) * 0.1)),
+                    "behavior_score": min(1.0, int(row["page_views"]) / 10.0),
+                    "lead_score": 75,  # Will calculate from ML model
+                    "priority": "MEDIUM"  # Will calculate from conversion probability
+                }
+                training_data.append(lead_data)
+            
+            logger.info(f"✅ Loaded {len(training_data)} enhanced leads from CSV")
+            
+            # Print dataset statistics
+            converted_count = len([d for d in training_data if d["converted"]])
+            contacted_count = len([d for d in training_data if d["contacted"]])
+            meeting_count = len([d for d in training_data if d["meeting_booked"]])
+            total_revenue = sum(d["revenue"] for d in training_data)
+            
+            logger.info(f"Enhanced Dataset Statistics:")
+            logger.info(f"  - Total leads: {len(training_data)}")
+            logger.info(f"  - Converted: {converted_count} ({converted_count/len(training_data)*100:.1f}%)")
+            logger.info(f"  - Contacted: {contacted_count} ({contacted_count/len(training_data)*100:.1f}%)")
+            logger.info(f"  - Meetings: {meeting_count} ({meeting_count/len(training_data)*100:.1f}%)")
+            logger.info(f"  - Total Revenue: ₹{total_revenue:,}")
+            
+            # Show source distribution
+            source_counts = {}
+            for lead in training_data:
+                source = lead["source"]
+                source_counts[source] = source_counts.get(source, 0) + 1
+            
+            logger.info("Source distribution:")
+            for source, count in sorted(source_counts.items(), key=lambda x: x[1], reverse=True):
+                pct = count / len(training_data) * 100
+                logger.info(f"  - {source}: {count} ({pct:.1f}%)")
+            
+            return training_data
+            
+        else:
+            logger.warning(f"Enhanced dataset not found at {enhanced_data_path}")
+            logger.info("Falling back to synthetic data generation...")
+            
+    except Exception as e:
+        logger.error(f"Error loading enhanced dataset: {e}")
+        logger.info("Falling back to synthetic data generation...")
+    
+    # Fallback to original synthetic data generation
+    return generate_original_synthetic_data(num_samples)
+
+
+def generate_original_synthetic_data(num_samples: int = 2000) -> List[Dict[str, Any]]:
     """
     Generate comprehensive synthetic training data for the HotLead model
     Following PRD requirements with 1500-2000 samples covering all lead scenarios

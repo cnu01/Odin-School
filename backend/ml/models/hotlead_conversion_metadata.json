@@ -1,0 +1,63 @@
+{
+  "model_name": "hotlead_conversion",
+  "model_type": "classification",
+  "trained_at": "2025-08-14T19:55:23.406311",
+  "training_data_size": 5000,
+  "feature_columns": [
+    "page_views",
+    "time_on_site",
+    "session_duration",
+    "course_pages_viewed",
+    "downloads_count",
+    "form_submissions",
+    "demo_requests",
+    "previous_visits",
+    "source_score",
+    "utm_campaign_score",
+    "utm_medium_score",
+    "geo_score",
+    "device_score",
+    "location_quality_score",
+    "time_score",
+    "day_score",
+    "is_business_hours_score",
+    "return_visitor_score",
+    "intent_score",
+    "behavior_score",
+    "response_time_score",
+    "source_quality_score"
+  ],
+  "metrics": {
+    "accuracy": 0.725,
+    "classification_report": {
+      "False": {
+        "precision": 0.7845468053491828,
+        "recall": 0.8024316109422492,
+        "f1-score": 0.7933884297520661,
+        "support": 658.0
+      },
+      "True": {
+        "precision": 0.6024464831804281,
+        "recall": 0.5760233918128655,
+        "f1-score": 0.5889387144992526,
+        "support": 342.0
+      },
+      "accuracy": 0.725,
+      "macro avg": {
+        "precision": 0.6934966442648054,
+        "recall": 0.6892275013775574,
+        "f1-score": 0.6911635721256594,
+        "support": 1000.0
+      },
+      "weighted avg": {
+        "precision": 0.7222684951674687,
+        "recall": 0.725,
+        "f1-score": 0.723466627135604,
+        "support": 1000.0
+      }
+    },
+    "training_samples": 4000,
+    "test_samples": 1000,
+    "features_count": 22
+  }
+}

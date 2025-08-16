@@ -2,9 +2,10 @@ from fastapi import APIRouter, HTTPException, Query
 from typing import Optional, Dict, Any
 from datetime import datetime
 from .models import (
-    LeadInput, ScoredLead, LeadIngestRequest, LeadResponse,
+    LeadIngestRequest, LeadResponse,
     PriorityQueueRequest, PriorityQueueResponse, LeadAnalyticsResponse,
-    ContactUpdate, OutreachRequest, WhyLeadRequest, ProblemAnalysisResponse
+    ContactUpdate, OutreachRequest, WhyLeadRequest, ProblemAnalysisResponse,
+    AISolutionsResponse
 )
 from .service import HotLeadService
 
@@ -34,9 +35,9 @@ async def hotlead_home():
             "/priority-queue": "GET - Get prioritized leads for sales",
             "/train": "POST - Train ML model with synthetic data",
             "/analytics": "GET - Get lead scoring analytics",
-            "/score": "POST - Score individual lead (legacy)",
             "/status": "GET - System status and model info",
-            "/seed": "POST - Seed database with training data"
+            "/seed": "POST - Seed database with training data",
+            "/problem-analysis": "GET - AI-powered problem diagnosis"
         },
         "ml_capabilities": [
             "Random Forest lead conversion prediction",
@@ -84,22 +85,6 @@ async def get_priority_queue(
             source_filter=source_filter
         )
         return await hotlead_service.get_priority_queue(request)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@router.post("/score", response_model=ScoredLead)
-async def score_lead(lead_input: LeadInput):
-    """
-    Score a lead using AI analysis for priority and routing (legacy endpoint)
-    
-    Args:
-        lead_input: LeadInput containing lead data (source, pageviews, device, geography, form_fields)
-        
-    Returns:
-        ScoredLead with AI-generated score, reason, and priority routing action
-    """
-    try:
-        return await hotlead_service.score_lead(lead_input)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -153,8 +138,8 @@ async def hotlead_status():
                 "GET /api/hotlead/priority-queue - Get prioritized leads",
                 "POST /api/hotlead/train - Train ML model",
                 "GET /api/hotlead/analytics - Get performance analytics",
-                "POST /api/hotlead/score - Score individual lead",
-                "GET /api/hotlead/status - System status"
+                "GET /api/hotlead/status - System status",
+                "GET /api/hotlead/problem-analysis - AI problem diagnosis"
             ],
             "capabilities": [
                 "Lead conversion prediction",
@@ -265,16 +250,40 @@ async def test_lead_prediction(
 
 
 @router.get("/problem-analysis", response_model=ProblemAnalysisResponse)
-async def get_problem_analysis():
+async def get_problem_analysis(
+    force_refresh: Optional[bool] = Query(False, description="Force refresh analysis (bypass cache)")
+):
     """
     Get complete problem diagnosis and analysis for HotLead frontend display
     Shows identified issues, segment challenges, and implementation status
+    
+    Parameters:
+    - force_refresh: If True, generates new analysis instead of using cached version
     """
     try:
-        analysis = await hotlead_service.get_problem_analysis()
+        analysis = await hotlead_service.get_problem_analysis(force_refresh=force_refresh)
         return analysis
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"HotLead problem analysis failed: {e}")
+
+
+@router.get("/ai-solutions", response_model=AISolutionsResponse)
+async def get_ai_solutions():
+    """
+    Get AI-powered solutions and enhancement recommendations for HotLead
+    
+    Provides:
+    - Claude-generated AI solutions for identified problems
+    - Enhancement recommendations for existing capabilities  
+    - Implementation roadmap with timelines and phases
+    - ROI projections and financial impact analysis
+    - Technical architecture requirements
+    """
+    try:
+        solutions = await hotlead_service.get_ai_solutions()
+        return solutions
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"AI Solutions generation failed: {e}")
 
 
 @router.get("/dashboard-data")
