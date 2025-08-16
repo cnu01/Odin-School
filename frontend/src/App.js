@@ -10,7 +10,7 @@ import HotLead from './pages/HotLead/HotLead';
 import InfluencerHub from './pages/InfluencerHub';
 import BrandReputation from './pages/BrandReputation/BrandReputation';
 
-import PricingInsights from './pages/PricingInsights/PricingInsights';
+import PriceSense from './pages/PriceSense';
 import CloseMore from './pages/CloseMore/CloseMore';
 import OneTruth from './pages/OneTruth/OneTruth';
 import ReferralManagement from './pages/ReferralManagement/ReferralManagement';
@@ -86,7 +86,7 @@ function App() {
             <Route path="/reputation" element={<BrandReputation />} />
             <Route path="/adlift" element={<AdLift />} />
             <Route path="/referrals" element={<ReferralManagement />} />
-            <Route path="/pricing" element={<PricingInsights />} />
+            <Route path="/pricing" element={<PriceSense />} />
             <Route path="/firsttouch" element={<FirstTouch />} />
             <Route path="/onetruth" element={<OneTruth />} />
             <Route path="/closemore" element={<CloseMore />} />

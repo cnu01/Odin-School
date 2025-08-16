@@ -26,15 +26,16 @@ async def pricesense_home():
         "description": "AI-driven pricing and payment plan optimization using ML",
         "status": "Ready",
         "endpoints": [
-            "GET /api/pricesense/status",
-            "GET /api/pricesense/problem-analysis - Problem diagnosis for frontend",
-            "GET /api/pricesense/dashboard-data - Complete dashboard data",
-            "POST /api/pricesense/train?size=2000",
-            "POST /api/pricesense/optimize",
-            "GET /api/pricesense/recommendations",
-            "POST /api/pricesense/message",
-            "GET /api/pricesense/analytics",
-            "GET /api/pricesense/evaluate",
+            "GET /api/pricesense/status - System status and model info",
+            "GET /api/pricesense/problem-analysis - Systematic problem diagnosis",
+            "GET /api/pricesense/solutions - AI-first solutions for pricing optimization",
+            "GET /api/pricesense/dashboard-data - Live demo dashboard data",
+            "POST /api/pricesense/train?size=2000 - Train ML model",
+            "POST /api/pricesense/optimize - Optimize plan selection",
+            "GET /api/pricesense/recommendations - Get plan recommendations",
+            "POST /api/pricesense/message - Generate pricing messages",
+            "GET /api/pricesense/analytics - Performance analytics",
+            "GET /api/pricesense/evaluate - Model evaluation",
         ],
     }
 
@@ -45,6 +46,42 @@ async def pricesense_status():
         return await get_service().get_status()
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Status check failed: {e}")
+
+
+@router.get("/problem-analysis", response_model=ProblemAnalysisResponse)
+async def get_problem_analysis(force_refresh: bool = False):
+    """
+    Get systematic problem diagnosis for PriceSense
+    Tab 1: Diagnose Problems - Plan selection optimization issues by segment
+    """
+    try:
+        return await get_service().get_problem_analysis(force_refresh)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Problem analysis failed: {e}")
+
+
+@router.get("/solutions")
+async def get_proposed_solutions():
+    """
+    Get AI-first solutions for pricing optimization
+    Tab 2: Propose Solutions - AI plan recommendation + messaging solutions
+    """
+    try:
+        return await get_service().get_proposed_solutions()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Solutions retrieval failed: {e}")
+
+
+@router.get("/dashboard-data")
+async def get_dashboard_data(time_range: str = "7d", include_anomalies: bool = True):
+    """
+    Get comprehensive dashboard data for Live Demo
+    Tab 4: Live Demo - Real-time pricing optimization dashboard
+    """
+    try:
+        return await get_service().get_dashboard_data(time_range, include_anomalies)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Dashboard data retrieval failed: {e}")
 
 
 @router.post("/train")
