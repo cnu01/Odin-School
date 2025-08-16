@@ -1,3 +1,4 @@
+import os
 from __future__ import annotations
 from pathlib import Path
 import pandas as pd
@@ -153,7 +154,9 @@ def main():
     # -----------------------------
     import joblib
     
-    model_dir = repo_root() / "models"
+    default_ml_dir = Path(__file__).resolve().parent.parent / "ml"
+    model_dir = Path(os.environ.get("MODEL_DIR", default_ml_dir))
+
     model_dir.mkdir(exist_ok=True)
     
     # Save the trained model

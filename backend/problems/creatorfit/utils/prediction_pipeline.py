@@ -1,8 +1,4 @@
-#!/usr/bin/env python3
 """
-CreatorFit Production Prediction Pipeline
-========================================
-
 Enterprise-grade pipeline for high-accuracy lead predictions with:
 - Advanced data validation and quality scoring
 - Production-ready feature engineering with business intelligence
@@ -13,7 +9,7 @@ Enterprise-grade pipeline for high-accuracy lead predictions with:
 Usage:
     python prediction_pipeline.py input.csv data_science
 """
-
+import os
 import sys
 import json
 import warnings
@@ -35,12 +31,12 @@ sys.path.append(str(Path(__file__).parent.parent.parent.parent))
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
 try:
-    from problems.creatorfit.data_preprocessing import (
+    from backend.problems.creatorfit.utils.data_preprocessing import (
         _apply_schema_adapter, _coerce_and_normalize, _impute_missing, 
         _apply_business_guards, _fold_rare_categories
     )
-    from problems.creatorfit.features import build_features, ODIN_SCHOOL_PROGRAMS
-    from problems.creatorfit.modeling import build_preprocessor
+    from features import build_features, ODIN_SCHOOL_PROGRAMS
+    from modeling import build_preprocessor
     FULL_PIPELINE_AVAILABLE = True
 except ImportError as e:
     print(f"[WARNING] Full pipeline not available: {e}")
@@ -49,8 +45,11 @@ except ImportError as e:
 class CreatorFitPredictionPipeline:
     """Production-ready prediction pipeline with ensemble models and business intelligence."""
     
-    def __init__(self, model_dir: str = "../../../models"):
-        self.model_dir = Path(model_dir)
+    def __init__(self, model_dir: str = "../../ml"):
+        default_ml_dir = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", "..", "ml")
+        )
+        self.model_dir = Path(model_dir or os.environ.get("MODEL_DIR", default_ml_dir))
         self.models = {}
         self.preprocessor = None
         self.metadata = None
@@ -109,7 +108,7 @@ class CreatorFitPredictionPipeline:
             quality_report['quality_score'] *= 0.85
         
         # Check for topic relevance
-        from problems.creatorfit.data_preprocessing import EDTECH_TOPICS
+        from data_preprocessing import EDTECH_TOPICS
         irrelevant_topics = ~df['topic'].str.contains('|'.join(EDTECH_TOPICS), case=False, na=False)
         if irrelevant_topics.any():
             quality_report['issues_found'].append(f"{irrelevant_topics.sum()} creators with non-EdTech topics")
@@ -189,39 +188,7 @@ class CreatorFitPredictionPipeline:
         confidence = np.ones(len(primary_pred)) * 0.85  # High confidence for trained model
         return primary_pred, confidence
     
-    def calculate_business_metrics(self, df: pd.DataFrame, predictions: np.ndarray, 
-                                 confidence: np.ndarray, campaign_budget: float = 100000) -> Dict[str, Any]:
-        """Calculate business intelligence metrics."""
-        
-        # Estimated CPL (Cost Per Lead)
-        total_predicted_leads = predictions.sum()
-        estimated_cpl = campaign_budget / total_predicted_leads if total_predicted_leads > 0 else 0
-        
-        # ROI estimation (assuming 10% conversion to enrollment, ₹50k revenue per enrollment)
-        estimated_enrollments = total_predicted_leads * 0.1
-        estimated_revenue = estimated_enrollments * 50000
-        estimated_roi = (estimated_revenue - campaign_budget) / campaign_budget * 100
-        
-        # Creator performance tiers
-        high_performers = (predictions >= np.percentile(predictions, 80)).sum()
-        medium_performers = ((predictions >= np.percentile(predictions, 40)) & 
-                           (predictions < np.percentile(predictions, 80))).sum()
-        low_performers = (predictions < np.percentile(predictions, 40)).sum()
-        
-        return {
-            'total_predicted_leads': int(total_predicted_leads),
-            'estimated_cpl': float(round(estimated_cpl, 2)),
-            'estimated_enrollments': int(estimated_enrollments),
-            'estimated_revenue': int(estimated_revenue),
-            'estimated_roi_percent': float(round(estimated_roi, 1)),
-            'creator_distribution': {
-                'high_performers': int(high_performers),
-                'medium_performers': int(medium_performers),
-                'low_performers': int(low_performers)
-            },
-            'avg_confidence': float(round(confidence.mean(), 3)),
-            'campaign_budget': float(campaign_budget)
-        }
+
     
     def process_csv_file(self, csv_path: str, program_type: str = "data_science") -> Dict[str, Any]:
         """Production CSV processing with maximum accuracy pipeline."""
@@ -262,10 +229,7 @@ class CreatorFitPredictionPipeline:
             # 5. Make production predictions with confidence
             predictions, confidence = self.predict_with_confidence(X_processed)
             
-            # 6. Calculate business metrics
-            business_metrics = self.calculate_business_metrics(df_clean, predictions, confidence)
-            
-            # 7. Prepare detailed results
+            # 6. Prepare detailed results
             results = []
             for i in range(len(df_clean)):
                 result = {
@@ -295,7 +259,6 @@ class CreatorFitPredictionPipeline:
                 'success': True,
                 'program_type': program_type,
                 'results': results,
-                'summary': business_metrics,
                 'data_quality': quality_report,
                 'model_info': {
                     'model_type': 'Production LightGBM Ensemble',
@@ -305,7 +268,6 @@ class CreatorFitPredictionPipeline:
                 },
                 'recommendations': {
                     'top_performers': [r for r in results[:5] if r['recommendation'] == 'BOOK'],
-                    'budget_allocation': f"Allocate 60% budget to top {min(5, len([r for r in results if r['recommendation'] == 'BOOK']))} creators",
                     'risk_mitigation': f"Monitor {len([r for r in results if r['confidence_score'] < 0.8])} creators with low confidence scores"
                 }
             }
@@ -351,10 +313,6 @@ def main():
         print(f"Program: {result['program_type'].title()}")
         print(f"Creators Analyzed: {len(result['results'])}")
         print(f"Data Quality Score: {result['data_quality']['quality_score']:.1%}")
-        print(f"Total Predicted Leads: {result['summary']['total_predicted_leads']:,}")
-        print(f"Estimated CPL: ₹{result['summary']['estimated_cpl']:,.0f}")
-        print(f"Estimated ROI: {result['summary']['estimated_roi_percent']:+.1f}%")
-        print(f"Average Confidence: {result['summary']['avg_confidence']:.1%}")
         
         print(f"\n📊 TOP 5 CREATORS:")
         for creator in result['results'][:5]:

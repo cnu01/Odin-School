@@ -21,12 +21,15 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  TextField,
-  Divider,
   LinearProgress,
   Badge,
   Tooltip,
-  IconButton
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField
 } from '@mui/material';
 
 import {
@@ -57,13 +60,15 @@ const InfluencerHub = () => {
   
   // Analysis configuration
   const [programType, setProgramType] = useState('data_science');
-  const [campaignBudget, setCampaignBudget] = useState(100000);
   const [analysisType, setAnalysisType] = useState('analyze'); // 'analyze' or 'forecast'
   
   // Results state
   const [analysisResults, setAnalysisResults] = useState(null);
   const [creators, setCreators] = useState([]);
-  const [businessMetrics, setBusinessMetrics] = useState(null);
+  
+  // Modal state for View Input
+  const [inputModalOpen, setInputModalOpen] = useState(false);
+  const [selectedCreatorInput, setSelectedCreatorInput] = useState(null);
   
   // Table pagination
   const [page, setPage] = useState(0);
@@ -137,7 +142,6 @@ const InfluencerHub = () => {
         result = await creatorfitService.analyzeCreators(
           selectedFile, 
           programType, 
-          campaignBudget
         );
       } else {
         result = await creatorfitService.forecastLeads(
@@ -149,7 +153,6 @@ const InfluencerHub = () => {
       if (result.success) {
         setAnalysisResults(result);
         setCreators(creatorfitService.formatCreatorResults(result.results || []));
-        setBusinessMetrics(creatorfitService.formatBusinessMetrics(result.summary));
         
         const analysisTypeLabel = analysisType === 'analyze' ? 'Analysis' : 'Forecasting';
         showSuccess(`${analysisTypeLabel} completed successfully! Found ${result.results?.length || 0} creators.`);
@@ -200,28 +203,56 @@ const InfluencerHub = () => {
     URL.revokeObjectURL(url);
   };
 
+  const handleViewInput = ({input_data}) => {
+
+    const inputData = {
+      creator_id: input_data?.creator_id ?? "Unknown Creator",
+      topic: input_data?.topic ?? "Unknown Topic",
+      recent_video_transcript: input_data?.recent_video_transcript || "Sample transcript data",
+      posting_cadence_days: input_data?.posting_cadence_days ?? 0,
+      views_90d: input_data?.views_90d ?? 0,
+      clicks: input_data?.clicks ?? 0,
+      leads: input_data?.leads ?? 0,
+      qualified_leads: input_data?.qualified_leads ?? 0,
+      enrollments: input_data?.enrollments ?? 0,
+      refunds: input_data?.refunds ?? 0,
+      geography: input_data?.geography ?? "Unknown",
+      language: input_data?.language ?? "Unknown",
+    };
+    
+    setSelectedCreatorInput(inputData);
+    setInputModalOpen(true);
+  };
+
   return (
     <Box p={3}>
       {/* Header */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Box>
-          <Typography variant="h4" gutterBottom>
-            🎯 Influencer Hub - CreatorFit AI
+        <Box sx={{ width: '100%' }}>
+          <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
+            Influencer Hub - CreatorFit AI
           </Typography>
           <Typography variant="subtitle1" color="textSecondary">
             AI-powered influencer analysis and lead forecasting for EdTech campaigns
           </Typography>
+        <Alert severity="info" sx={{ mb: 3, mt: 3, borderRadius: '4px', width: '100%' }}>
+            <Typography variant="body2" component="div">
+              <strong>What this analysis delivers</strong>
+              <Box component="ul" sx={{ pl: 3, my: 0, mt: 1, '& > li': { mb: 1.25 } }}>
+                <li>
+                  <strong>Diagnosis</strong>: Reasons why some creators underperform
+                </li>
+                <li>
+                  <strong>Solutions</strong>: AI-driven ways to score fit between creator content and programs
+                </li>
+                <li>
+                  <strong>Forecast qualified leads</strong>: Forecast qualified leads before booking creators
+                </li>
+                
+              </Box>
+            </Typography>
+        </Alert>
         </Box>
-        
-        {analysisResults && (
-          <Button
-            variant="outlined"
-            startIcon={<DownloadIcon />}
-            onClick={exportResults}
-          >
-            Export Results
-          </Button>
-        )}
       </Box>
 
       {/* Alerts */}
@@ -331,21 +362,6 @@ const InfluencerHub = () => {
                     </Select>
                   </FormControl>
                 </Grid>
-                
-                {analysisType === 'analyze' && (
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Campaign Budget (₹)"
-                      type="number"
-                      value={campaignBudget}
-                      onChange={(e) => setCampaignBudget(Number(e.target.value))}
-                      InputProps={{
-                        inputProps: { min: 1000, step: 1000 }
-                      }}
-                    />
-                  </Grid>
-                )}
               </Grid>
             </Grid>
           </Grid>
@@ -374,86 +390,17 @@ const InfluencerHub = () => {
         </Box>
       )}
 
-      {/* Business Metrics Summary */}
-      {businessMetrics && (
-        <Card sx={{ mb: 3 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              📈 Business Intelligence Summary
-            </Typography>
-            
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6} md={3}>
-                <Paper sx={{ p: 2, textAlign: 'center' }}>
-                  <TrendingUpIcon color="primary" sx={{ fontSize: 32, mb: 1 }} />
-                  <Typography variant="h5" color="primary">
-                    {businessMetrics.totalLeads}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    Predicted Leads
-                  </Typography>
-                </Paper>
-              </Grid>
-              
-              <Grid item xs={12} sm={6} md={3}>
-                <Paper sx={{ p: 2, textAlign: 'center' }}>
-                  <PersonIcon color="success" sx={{ fontSize: 32, mb: 1 }} />
-                  <Typography variant="h5" color="success.main">
-                    {businessMetrics.estimatedEnrollments}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    Est. Enrollments
-                  </Typography>
-                </Paper>
-              </Grid>
-              
-              <Grid item xs={12} sm={6} md={3}>
-                <Paper sx={{ p: 2, textAlign: 'center' }}>
-                  <AnalyticsIcon color="info" sx={{ fontSize: 32, mb: 1 }} />
-                  <Typography variant="h5" color="info.main">
-                    {businessMetrics.estimatedCPL}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    Est. CPL
-                  </Typography>
-                </Paper>
-              </Grid>
-              
-              <Grid item xs={12} sm={6} md={3}>
-                <Paper sx={{ p: 2, textAlign: 'center' }}>
-                  <AssessmentIcon color="warning" sx={{ fontSize: 32, mb: 1 }} />
-                  <Typography variant="h5" color="warning.main">
-                    {businessMetrics.estimatedROI}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    Est. ROI
-                  </Typography>
-                </Paper>
-              </Grid>
-            </Grid>
-
-            <Divider sx={{ my: 2 }} />
-            
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
-                <Typography variant="body2" color="textSecondary">
-                  Campaign Budget: <strong>{businessMetrics.campaignBudget}</strong>
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Average Confidence: <strong>{businessMetrics.avgConfidence}</strong>
-                </Typography>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <Typography variant="body2" color="textSecondary">
-                  High Performers: <strong>{businessMetrics.distribution.high_performers || 0}</strong>
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Medium Performers: <strong>{businessMetrics.distribution.medium_performers || 0}</strong>
-                </Typography>
-              </Grid>
-            </Grid>
-          </CardContent>
-        </Card>
+      {/* Export Results */}
+      {analysisResults && (
+        <Box display="flex" justifyContent="flex-end" my={2}>
+          <Button
+            variant="outlined"
+            startIcon={<DownloadIcon />}
+            onClick={exportResults}
+          >
+            Export Results
+          </Button>
+        </Box>
       )}
 
       {/* Creator Results Table */}
@@ -484,6 +431,8 @@ const InfluencerHub = () => {
                     <TableCell>Views (90d)</TableCell>
                     <TableCell>Tier</TableCell>
                     <TableCell>Recommendation</TableCell>
+                    <TableCell>Insights</TableCell>
+
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -539,6 +488,17 @@ const InfluencerHub = () => {
                             />
                           </Tooltip>
                         </TableCell>
+                        <TableCell>
+                        <Box display="flex" justifyContent="flex-end" my={2}>
+                        <Button
+                          variant="outlined"
+                          onClick={() => handleViewInput(creator)}
+                          size="small"
+                        >
+                          View more
+                        </Button>
+                      </Box>
+                        </TableCell>
                       </TableRow>
                     ))}
                 </TableBody>
@@ -570,6 +530,117 @@ const InfluencerHub = () => {
           </Typography>
         </Paper>
       )}
+
+      {/* Input Data Modal */}
+      <Dialog 
+        open={inputModalOpen} 
+        onClose={() => setInputModalOpen(false)} 
+        maxWidth="md" 
+        fullWidth
+      >
+        <DialogTitle>
+          <Box display="flex" alignItems="center" gap={2}>
+            <InfoIcon color="primary" />
+            <Typography variant="h6">
+              Input CSV Data for Creator: {selectedCreatorInput?.creator_id}
+            </Typography>
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
+            This shows the original CSV input values that were used to generate the AI analysis for this creator.
+          </Typography>
+          
+          {selectedCreatorInput ? (
+            <TableContainer component={Paper} sx={{ mt: 2 }}>
+              <Table>
+                <TableHead>
+                  <TableRow sx={{ backgroundColor: 'grey.100' }}>
+                    <TableCell sx={{ fontWeight: 600, fontSize: '0.875rem' }}>CSV Column</TableCell>
+                    <TableCell sx={{ fontWeight: 600, fontSize: '0.875rem' }}>Input Value</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {Object.entries(selectedCreatorInput).map(([key, value]) => (
+                    <TableRow key={key}>
+                      <TableCell sx={{ 
+                        fontWeight: 500, 
+                        backgroundColor: 'grey.50', 
+                        fontFamily: 'monospace',
+                        fontSize: '0.875rem'
+                      }}>
+                        {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      </TableCell>
+                      <TableCell>
+                        <TextField 
+                          fullWidth 
+                          size="small" 
+                          value={value || ''} 
+                          InputProps={{ readOnly: true }}
+                          variant="outlined"
+                          sx={{ 
+                            '& .MuiInputBase-input': { 
+                              backgroundColor: 'grey.50',
+                              cursor: 'default',
+                              fontFamily: 'monospace',
+                              fontSize: '0.875rem'
+                            }
+                          }}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          ) : (
+            <Box sx={{ textAlign: 'center', py: 4 }}>
+              <Typography variant="body1" color="textSecondary">
+                No input data available for this creator.
+              </Typography>
+            </Box>
+          )}
+
+          <Box sx={{ mt: 3, p: 2, backgroundColor: 'grey.50', borderRadius: 1 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+              📊 Output Values:
+            </Typography>
+            <Box component="ul" sx={{ pl: 3, my: 0, '& > li': { mb: 1.5 } }}>
+              <li>
+              <Typography variant="h10">
+              1. Predicted Leads:
+                </Typography>
+                <Typography variant="body2" color="textSecondary" component="span" sx={{ ml: 1 }}>
+                  qualified_leads × fit_score × random_factor(0.9-1.1)
+                </Typography>
+              </li>
+              <li>
+                <Typography variant="h10">2. Confidence:</Typography> 
+                <Typography variant="body2" color="textSecondary" component="span" sx={{ ml: 1 }}>
+                  placeholder
+                </Typography>
+              </li>
+              <li>
+                <Typography variant="h10">3. Tier:</Typography> 
+                <Typography variant="body2" color="textSecondary" component="span" sx={{ ml: 1 }}>
+                  Maps category_tag → Growing/Established/Emerging
+                </Typography>
+              </li>
+              <li>
+                <Typography variant="h10">4. Recommendation:</Typography> 
+                <Typography variant="body2" color="textSecondary" component="span" sx={{ ml: 1 }}>
+                  BOOK if leads &gt; 100 & confidence &gt; 0.8, else REVIEW if leads &gt; 50, else SKIP
+                </Typography>
+              </li>
+            </Box>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setInputModalOpen(false)} variant="contained">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

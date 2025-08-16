@@ -6,12 +6,11 @@ class CreatorFitService {
   }
 
   // Comprehensive creator analysis with business intelligence
-  async analyzeCreators(file, programType = 'data_science', campaignBudget = 100000) {
+  async analyzeCreators(file, programType = 'data_science') {
     try {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('program_type', programType);
-      formData.append('campaign_budget', campaignBudget);
 
       const response = await api.post(`${this.baseURL}/analyze`, formData, {
         headers: {
@@ -100,22 +99,6 @@ class CreatorFitService {
     return {
       isValid: errors.length === 0,
       errors
-    };
-  }
-
-  // Format business metrics for display
-  formatBusinessMetrics(summary) {
-    if (!summary) return null;
-
-    return {
-      totalLeads: summary.total_predicted_leads?.toLocaleString() || '0',
-      estimatedCPL: `₹${summary.estimated_cpl?.toLocaleString() || '0'}`,
-      estimatedEnrollments: summary.estimated_enrollments?.toLocaleString() || '0',
-      estimatedRevenue: `₹${(summary.estimated_revenue || 0).toLocaleString()}`,
-      estimatedROI: `${summary.estimated_roi_percent?.toFixed(1) || '0'}%`,
-      avgConfidence: `${((summary.avg_confidence || 0) * 100).toFixed(1)}%`,
-      campaignBudget: `₹${summary.campaign_budget?.toLocaleString() || '0'}`,
-      distribution: summary.creator_distribution || {}
     };
   }
 

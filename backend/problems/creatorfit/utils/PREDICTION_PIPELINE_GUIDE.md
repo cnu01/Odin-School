@@ -64,7 +64,6 @@ python prediction_pipeline.py creators.csv career_guidance
 ### Web Interface
 1. **Open** `index.html` in browser
 2. **Scroll to** "Enhanced Lead Forecasting Pipeline" section
-3. **Select** program type and campaign budget
 4. **Upload** your CSV file
 5. **Click** "🚀 Run Enhanced Analysis"
 6. **Run backend** command shown if results not found
@@ -117,7 +116,6 @@ your_data_enhanced_results.json
 ├── success: true/false
 ├── program_type: "data_science"
 ├── results: [creator rankings with predictions]
-├── summary: {business intelligence metrics}
 ├── data_quality: {validation report}
 ├── model_info: {performance metrics}
 └── recommendations: {strategic guidance}

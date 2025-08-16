@@ -227,10 +227,10 @@ python -m http.server 8000
 #### 5. Low accuracy predictions
 ```bash
 # Check data quality
-python problems/creatorfit/data_preprocessing.py
+python problems/creatorfit/utils/data_preprocessing.py
 
 # Verify feature engineering
-python problems/creatorfit/features.py
+python problems/creatorfit/utils/features.py
 
 # Retrain with better data
 python -m problems.creatorfit.train

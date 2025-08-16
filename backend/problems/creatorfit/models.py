@@ -19,7 +19,6 @@ class Recommendation(str, Enum):
 class AnalysisRequest(BaseModel):
     """Request model for CSV analysis"""
     program_type: ProgramType = Field(default=ProgramType.DATA_SCIENCE, description="Program type for analysis")
-    campaign_budget: float = Field(default=100000, ge=0, description="Campaign budget for CPL calculation")
 
 class PredictionResult(BaseModel):
     """Individual creator prediction result"""
@@ -34,17 +33,6 @@ class PredictionResult(BaseModel):
     creator_tier: str
     posting_cadence_days: int
     recommendation: Recommendation
-
-class BusinessMetrics(BaseModel):
-    """Business intelligence metrics"""
-    total_predicted_leads: int
-    estimated_cpl: float
-    estimated_enrollments: int
-    estimated_revenue: int
-    estimated_roi_percent: float
-    creator_distribution: Dict[str, int]
-    avg_confidence: float
-    campaign_budget: float
 
 class DataQuality(BaseModel):
     """Data quality report"""
@@ -65,7 +53,6 @@ class ModelInfo(BaseModel):
 class Recommendations(BaseModel):
     """Strategic recommendations"""
     top_performers: List[PredictionResult]
-    budget_allocation: str
     risk_mitigation: str
 
 class PredictionResponse(BaseModel):
@@ -75,7 +62,6 @@ class PredictionResponse(BaseModel):
     success: bool
     program_type: str
     results: List[PredictionResult]
-    summary: BusinessMetrics
     data_quality: DataQuality
     model_info: ModelInfo
     recommendations: Recommendations
