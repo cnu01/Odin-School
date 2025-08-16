@@ -686,7 +686,7 @@ const ReferralManagement = () => {
                       </Box>
                     </Grid>
                     <Grid item xs={12} md={4}>
-                      <Box>
+                      {/* <Box>
                         <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: 'warning.main' }}>
                           ⚡ Implementation Time
                         </Typography>
@@ -694,7 +694,7 @@ const ReferralManagement = () => {
                         <Typography variant="body2" color="text.secondary">
                           ML model deployment + testing
                         </Typography>
-                      </Box>
+                      </Box> */}
                     </Grid>
                   </Grid>
 
@@ -764,7 +764,7 @@ const ReferralManagement = () => {
                       </Box>
                     </Grid>
                     <Grid item xs={12} md={4}>
-                      <Box>
+                      {/* <Box>
                         <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: 'warning.main' }}>
                           ⚡ Implementation Time
                         </Typography>
@@ -772,7 +772,7 @@ const ReferralManagement = () => {
                         <Typography variant="body2" color="text.secondary">
                           Claude AI integration + templates
                         </Typography>
-                      </Box>
+                      </Box> */}
                     </Grid>
                   </Grid>
 
@@ -1560,12 +1560,12 @@ const AnalyticsDashboard = ({ analytics }) => {
                 <Typography variant="body2" color="text.secondary">Revenue per Conversion</Typography>
                 <Typography variant="h6">₹{analytics.roi?.revenue_per_conversion || 0}</Typography>
               </Grid>
-              <Grid item xs={12} md={3}>
+              {/* <Grid item xs={12} md={3}>
                 <Typography variant="body2" color="text.secondary">Net ROI</Typography>
                 <Typography variant="h6" color={analytics.roi?.roi_net >= 0 ? "success.main" : "error.main"}>
                   ₹{analytics.roi?.roi_net || 0}
                 </Typography>
-              </Grid>
+              </Grid> */}
             </Grid>
           </CardContent>
         </Card>
