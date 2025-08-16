@@ -1380,10 +1380,10 @@ const AnalyticsDashboard = ({ analytics }) => {
         <Card>
           <CardContent sx={{ textAlign: 'center' }}>
             <Typography variant="h4" color="primary.main" sx={{ fontWeight: 'bold' }}>
-              {analytics.total_students || 0}
+              {analytics.distribution?.sample_size || 0}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Total Students
+              Sample Size
             </Typography>
           </CardContent>
         </Card>
@@ -1393,10 +1393,10 @@ const AnalyticsDashboard = ({ analytics }) => {
         <Card>
           <CardContent sx={{ textAlign: 'center' }}>
             <Typography variant="h4" color="success.main" sx={{ fontWeight: 'bold' }}>
-              {analytics.referral_rate ? `${(analytics.referral_rate * 100).toFixed(1)}%` : '0%'}
+              {analytics.distribution?.avg_propensity ? `${analytics.distribution.avg_propensity.toFixed(1)}%` : '0%'}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Current Referral Rate
+              Avg Propensity Score
             </Typography>
           </CardContent>
         </Card>
@@ -1406,10 +1406,10 @@ const AnalyticsDashboard = ({ analytics }) => {
         <Card>
           <CardContent sx={{ textAlign: 'center' }}>
             <Typography variant="h4" color="info.main" sx={{ fontWeight: 'bold' }}>
-              {analytics.avg_satisfaction ? analytics.avg_satisfaction.toFixed(1) : '0.0'}
+              {analytics.distribution?.high_share ? `${analytics.distribution.high_share.toFixed(1)}%` : '0%'}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Avg Satisfaction
+              High Likelihood
             </Typography>
           </CardContent>
         </Card>
@@ -1419,11 +1419,154 @@ const AnalyticsDashboard = ({ analytics }) => {
         <Card>
           <CardContent sx={{ textAlign: 'center' }}>
             <Typography variant="h4" color="warning.main" sx={{ fontWeight: 'bold' }}>
-              {analytics.model_accuracy ? `${(analytics.model_accuracy * 100).toFixed(1)}%` : '0%'}
+              ₹{analytics.roi?.roi_multiple ? analytics.roi.roi_multiple.toFixed(1) : '1.0'}x
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              ML Model Accuracy
+              ROI Multiple
             </Typography>
+          </CardContent>
+        </Card>
+      </Grid>
+
+      {/* Additional ROI metrics */}
+      <Grid item xs={12} md={6} lg={3}>
+        <Card>
+          <CardContent sx={{ textAlign: 'center' }}>
+            <Typography variant="h4" color="secondary.main" sx={{ fontWeight: 'bold' }}>
+              {analytics.distribution?.medium_share ? `${analytics.distribution.medium_share.toFixed(1)}%` : '0%'}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Medium Likelihood
+            </Typography>
+          </CardContent>
+        </Card>
+      </Grid>
+
+      <Grid item xs={12} md={6} lg={3}>
+        <Card>
+          <CardContent sx={{ textAlign: 'center' }}>
+            <Typography variant="h4" color="text.secondary" sx={{ fontWeight: 'bold' }}>
+              {analytics.distribution?.low_share ? `${analytics.distribution.low_share.toFixed(1)}%` : '0%'}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Low Likelihood
+            </Typography>
+          </CardContent>
+        </Card>
+      </Grid>
+
+      <Grid item xs={12} md={6} lg={3}>
+        <Card>
+          <CardContent sx={{ textAlign: 'center' }}>
+            <Typography variant="h4" color="success.main" sx={{ fontWeight: 'bold' }}>
+              ₹{analytics.roi?.est_revenue ? analytics.roi.est_revenue.toLocaleString() : '0'}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Est. Revenue
+            </Typography>
+          </CardContent>
+        </Card>
+      </Grid>
+
+      <Grid item xs={12} md={6} lg={3}>
+        <Card>
+          <CardContent sx={{ textAlign: 'center' }}>
+            <Typography variant="h4" color="error.main" sx={{ fontWeight: 'bold' }}>
+              ₹{analytics.roi?.payouts_total ? analytics.roi.payouts_total.toLocaleString() : '0'}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Total Payouts
+            </Typography>
+          </CardContent>
+        </Card>
+      </Grid>
+
+      {/* Distribution Breakdown Chart */}
+      <Grid item xs={12}>
+        <Card>
+          <CardContent>
+            <Typography variant="h6" gutterBottom>
+              Referral Propensity Distribution
+            </Typography>
+            <Box sx={{ mt: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                <Typography variant="body2" sx={{ minWidth: 120 }}>
+                  High (≥70%)
+                </Typography>
+                <LinearProgress
+                  variant="determinate"
+                  value={analytics.distribution?.high_share || 0}
+                  color="success"
+                  sx={{ flexGrow: 1, mx: 2, height: 8, borderRadius: 4 }}
+                />
+                <Typography variant="body2" sx={{ minWidth: 50 }}>
+                  {analytics.distribution?.high_share ? `${analytics.distribution.high_share.toFixed(1)}%` : '0%'}
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                <Typography variant="body2" sx={{ minWidth: 120 }}>
+                  Medium (40-69%)
+                </Typography>
+                <LinearProgress
+                  variant="determinate"
+                  value={analytics.distribution?.medium_share || 0}
+                  color="warning"
+                  sx={{ flexGrow: 1, mx: 2, height: 8, borderRadius: 4 }}
+                />
+                <Typography variant="body2" sx={{ minWidth: 50 }}>
+                  {analytics.distribution?.medium_share ? `${analytics.distribution.medium_share.toFixed(1)}%` : '0%'}
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                <Typography variant="body2" sx={{ minWidth: 120 }}>
+                  Low (&lt;40%)
+                </Typography>
+                <LinearProgress
+                  variant="determinate"
+                  value={analytics.distribution?.low_share || 0}
+                  color="inherit"
+                  sx={{ flexGrow: 1, mx: 2, height: 8, borderRadius: 4 }}
+                />
+                <Typography variant="body2" sx={{ minWidth: 50 }}>
+                  {analytics.distribution?.low_share ? `${analytics.distribution.low_share.toFixed(1)}%` : '0%'}
+                </Typography>
+              </Box>
+            </Box>
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
+              Sample of {analytics.distribution?.sample_size || 0} students analyzed by ML model. 
+              Last updated: {analytics.last_updated ? new Date(analytics.last_updated).toLocaleString() : 'N/A'}
+            </Typography>
+          </CardContent>
+        </Card>
+      </Grid>
+
+      {/* ROI Summary */}
+      <Grid item xs={12}>
+        <Card>
+          <CardContent>
+            <Typography variant="h6" gutterBottom>
+              ROI Analysis Summary
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={3}>
+                <Typography variant="body2" color="text.secondary">Tracked Referrers</Typography>
+                <Typography variant="h6">{analytics.roi?.referrers_tracked || 0}</Typography>
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <Typography variant="body2" color="text.secondary">Total Conversions</Typography>
+                <Typography variant="h6">{analytics.roi?.totals?.conversions || 0}</Typography>
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <Typography variant="body2" color="text.secondary">Revenue per Conversion</Typography>
+                <Typography variant="h6">₹{analytics.roi?.revenue_per_conversion || 0}</Typography>
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <Typography variant="body2" color="text.secondary">Net ROI</Typography>
+                <Typography variant="h6" color={analytics.roi?.roi_net >= 0 ? "success.main" : "error.main"}>
+                  ₹{analytics.roi?.roi_net || 0}
+                </Typography>
+              </Grid>
+            </Grid>
           </CardContent>
         </Card>
       </Grid>
