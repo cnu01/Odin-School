@@ -48,6 +48,9 @@ import {
   Edit,
   Flag,
   Refresh,
+  AutoFixHigh,
+  Analytics,
+  Casino,
 } from '@mui/icons-material';
 import trustdeskService from '../../services/trustdeskService';
 
@@ -83,6 +86,10 @@ function BrandReputation() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
+  const [inputComment, setInputComment] = useState('');
+  const [analyzingComment, setAnalyzingComment] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState(null);
+  const [generatingComment, setGeneratingComment] = useState(false);
   const [stats, setStats] = useState({
     totalComments: 0,
     urgentIssues: 0,
@@ -286,6 +293,82 @@ function BrandReputation() {
     } catch (error) {
       console.error('Error analyzing comment:', error);
       showSnackbar('Failed to analyze comment', 'error');
+    }
+  };
+
+  // Random comment generator
+  const generateRandomComment = async () => {
+    setGeneratingComment(true);
+    try {
+      const sampleComments = [
+        // Positive comments
+        "Absolutely love this course! The instructors are amazing and the content is so relevant to current industry needs.",
+        "Best investment I've made in my career. Got a job within 2 months of completing the course!",
+        "The hands-on projects really helped me understand the concepts. Highly recommend!",
+        "Great support from the team throughout the course. Very professional and helpful.",
+        
+        // Negative comments
+        "The course content seems outdated. Expected more modern frameworks and tools.",
+        "Very disappointed with the lack of real-time support. Felt like I was learning alone.",
+        "Overpriced for what they offer. Found better courses elsewhere for half the price.",
+        "The instructor was not engaging at all. Just reading from slides most of the time.",
+        
+        // Neutral comments
+        "Decent course overall. Some modules were good, others could be improved.",
+        "The course covered the basics well but lacked advanced topics I was hoping for.",
+        "Good value for money, though the pace was a bit slow for my liking.",
+        "Content was okay but the platform interface could be more user-friendly.",
+        
+        // Questions
+        "Does this course include placement assistance? I'm looking for job support after completion.",
+        "What are the prerequisites for this course? I'm a complete beginner.",
+        "Can I get a refund if I'm not satisfied with the course content?",
+        "Are there any live sessions or is it all pre-recorded content?",
+        
+        // Urgent/Complaints
+        "I've been trying to access my course for 3 days but the platform keeps crashing!",
+        "My payment went through but I still don't have access to the course materials.",
+        "The live session link is not working and the session starts in 10 minutes!",
+        "Need immediate help with my assignment submission. The deadline is today!"
+      ];
+      
+      const randomComment = sampleComments[Math.floor(Math.random() * sampleComments.length)];
+      setInputComment(randomComment);
+      showSnackbar('Random comment generated!', 'success');
+    } catch (error) {
+      console.error('Error generating comment:', error);
+      showSnackbar('Failed to generate comment', 'error');
+    } finally {
+      setGeneratingComment(false);
+    }
+  };
+
+  // Analyze the input comment
+  const analyzeInputComment = async () => {
+    if (!inputComment.trim()) {
+      showSnackbar('Please enter a comment to analyze', 'warning');
+      return;
+    }
+
+    setAnalyzingComment(true);
+    try {
+      const result = await trustdeskService.analyzeComment({
+        content: inputComment.trim(),
+        platform: 'manual_input',
+        author: 'Test User'
+      });
+
+      if (result.success) {
+        setAnalysisResult(result.data);
+        showSnackbar('Comment analyzed successfully!', 'success');
+      } else {
+        showSnackbar('Analysis failed: ' + result.error, 'error');
+      }
+    } catch (error) {
+      console.error('Error analyzing comment:', error);
+      showSnackbar('Failed to analyze comment', 'error');
+    } finally {
+      setAnalyzingComment(false);
     }
   };
 
@@ -588,6 +671,128 @@ function BrandReputation() {
           </Button>
         </Box>
       </Box>
+
+      {/* Comment Analysis Section */}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Analytics color="primary" />
+            Comment Analysis Tool
+          </Typography>
+          
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                multiline
+                rows={3}
+                placeholder="Enter a comment to analyze its sentiment, category, and priority..."
+                value={inputComment}
+                onChange={(e) => setInputComment(e.target.value)}
+                variant="outlined"
+                sx={{ mb: 2 }}
+              />
+            </Grid>
+            
+            <Grid item xs={12}>
+              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                <Button
+                  variant="outlined"
+                  startIcon={generatingComment ? <CircularProgress size={20} /> : <Casino />}
+                  onClick={generateRandomComment}
+                  disabled={generatingComment}
+                >
+                  {generatingComment ? 'Generating...' : 'Generate Random Comment'}
+                </Button>
+                
+                <Button
+                  variant="contained"
+                  startIcon={analyzingComment ? <CircularProgress size={20} /> : <AutoFixHigh />}
+                  onClick={analyzeInputComment}
+                  disabled={analyzingComment || !inputComment.trim()}
+                >
+                  {analyzingComment ? 'Analyzing...' : 'Start Analyzing'}
+                </Button>
+              </Box>
+            </Grid>
+            
+            {/* Analysis Results */}
+            {analysisResult && (
+              <Grid item xs={12}>
+                <Paper sx={{ p: 2, mt: 2, bgcolor: 'background.default' }}>
+                  <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 'bold' }}>
+                    Analysis Results:
+                  </Typography>
+                  
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} md={3}>
+                      <Box sx={{ textAlign: 'center' }}>
+                        <Chip 
+                          label={`Sentiment: ${analysisResult.sentiment || 'Unknown'}`}
+                          color={
+                            analysisResult.sentiment === 'positive' ? 'success' :
+                            analysisResult.sentiment === 'negative' ? 'error' : 'default'
+                          }
+                          sx={{ mb: 1 }}
+                        />
+                      </Box>
+                    </Grid>
+                    
+                    <Grid item xs={12} md={3}>
+                      <Box sx={{ textAlign: 'center' }}>
+                        <Chip 
+                          label={`Category: ${analysisResult.category || 'Unknown'}`}
+                          color="primary"
+                          sx={{ mb: 1 }}
+                        />
+                      </Box>
+                    </Grid>
+                    
+                    <Grid item xs={12} md={3}>
+                      <Box sx={{ textAlign: 'center' }}>
+                        <Chip 
+                          label={`Priority: ${analysisResult.priority || 'Unknown'}`}
+                          color={
+                            analysisResult.priority === 'urgent' ? 'error' :
+                            analysisResult.priority === 'medium' ? 'warning' : 'success'
+                          }
+                          sx={{ mb: 1 }}
+                        />
+                      </Box>
+                    </Grid>
+                    
+                    <Grid item xs={12} md={3}>
+                      <Box sx={{ textAlign: 'center' }}>
+                        <Chip 
+                          label={`Confidence: ${analysisResult.confidence ? (analysisResult.confidence * 100).toFixed(1) + '%' : 'Unknown'}`}
+                          color="info"
+                          sx={{ mb: 1 }}
+                        />
+                      </Box>
+                    </Grid>
+                    
+                    {analysisResult.summary && (
+                      <Grid item xs={12}>
+                        <Typography variant="body2" sx={{ mt: 1 }}>
+                          <strong>Summary:</strong> {analysisResult.summary}
+                        </Typography>
+                      </Grid>
+                    )}
+                    
+                    {analysisResult.suggested_response && (
+                      <Grid item xs={12}>
+                        <Typography variant="body2" sx={{ mt: 1 }}>
+                          <strong>Suggested Response:</strong> {analysisResult.suggested_response}
+                        </Typography>
+                      </Grid>
+                    )}
+                  </Grid>
+                </Paper>
+              </Grid>
+            )}
+          </Grid>
+        </CardContent>
+      </Card>
 
       {/* Summary Cards */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
