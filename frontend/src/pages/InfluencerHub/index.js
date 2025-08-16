@@ -617,7 +617,7 @@ const InfluencerHub = () => {
               <li>
                 <Typography variant="h10">2. Confidence:</Typography> 
                 <Typography variant="body2" color="textSecondary" component="span" sx={{ ml: 1 }}>
-                  placeholder
+                  Calculates relation between user engagement (clicks), posting stability and semantic fit
                 </Typography>
               </li>
               <li>
