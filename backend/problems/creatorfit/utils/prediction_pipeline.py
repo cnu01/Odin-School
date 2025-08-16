@@ -1,14 +1,4 @@
-"""
-Enterprise-grade pipeline for high-accuracy lead predictions with:
-- Advanced data validation and quality scoring
-- Production-ready feature engineering with business intelligence
-- Model ensemble for maximum accuracy
-- Confidence scoring and uncertainty estimation
-- CPL analysis and ROI recommendations
 
-Usage:
-    python prediction_pipeline.py input.csv data_science
-"""
 import os
 import sys
 import json
@@ -21,6 +11,7 @@ import joblib
 from sklearn.ensemble import VotingRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import logging
+import math
 
 # Suppress warnings for cleaner output
 warnings.filterwarnings('ignore')
@@ -43,19 +34,61 @@ except ImportError as e:
     FULL_PIPELINE_AVAILABLE = False
 
 class CreatorFitPredictionPipeline:
-    """Production-ready prediction pipeline with ensemble models and business intelligence."""
+    """Prediction pipeline with ensemble models and business intelligence."""
     
     def __init__(self, model_dir: str = "../../ml"):
         default_ml_dir = os.path.abspath(
             os.path.join(os.path.dirname(__file__), "..", "..", "ml")
         )
         self.model_dir = Path(model_dir or os.environ.get("MODEL_DIR", default_ml_dir))
+        # self.model_dir = model_dir or Path(__file__).parent.parent / "ml"
         self.models = {}
         self.preprocessor = None
-        self.metadata = None
-        self.load_models()
+        self.metadata = {}
+        self._load_models()
     
-    def load_models(self):
+    def calculate_confidence_score(
+        self,
+        total_clicks: int,
+        posting_cadence_days: int,
+        content_fit_score: float,
+        smoothing_clicks: int = 500,
+        smoothing_posts: int = 20,
+        min_confidence_pct: float = 50.0,
+        max_confidence_pct: float = 97.0
+    ) -> float:
+        """Calculate a stable confidence score for creator performance."""
+
+        # Normalize inputs
+        clicks = max(0, int(total_clicks or 0))
+        cadence_days = max(1, min(14, int(posting_cadence_days or 14)))
+        fit_score = max(0.0, min(1.0, float(content_fit_score or 0.0)))
+
+        # Approximate number of posts in 90 days
+        posts_last_90d = max(1, 90 // cadence_days)
+
+        # Evidence from engagement volume (saturates with sqrt)
+        engagement_evidence = math.sqrt(clicks / (clicks + smoothing_clicks)) if clicks > 0 else 0.0
+
+        # Stability from regular posting
+        posting_stability = math.sqrt(posts_last_90d / (posts_last_90d + smoothing_posts))
+
+        # Direct semantic/content fit
+        semantic_fit = fit_score
+
+        # Weighted blend
+        blended_score = (
+            0.5 * engagement_evidence +
+            0.3 * posting_stability +
+            0.2 * semantic_fit
+        )
+        blended_score = max(0.0, min(1.0, blended_score))
+
+        # Scale to UI-friendly %
+        confidence_pct = min_confidence_pct + (max_confidence_pct - min_confidence_pct) * blended_score
+        return round(confidence_pct, 2)
+    
+    def _load_models(self):
         """Load trained models and preprocessor."""
         try:
             # Load primary LightGBM model
@@ -185,7 +218,15 @@ class CreatorFitPredictionPipeline:
                 return ensemble_pred, confidence
         
         # Single model prediction with synthetic confidence
-        confidence = np.ones(len(primary_pred)) * 0.85  # High confidence for trained model
+        # Calculate confidence using business logic instead of fake value
+        confidence = np.array([
+            self.calculate_confidence_score(
+                total_clicks=0,  # We don't have clicks in this context, use 0
+                posting_cadence_days=14,  # Default value
+                content_fit_score=0.7  # Default value
+            ) / 100.0  # Convert percentage to 0-1 range
+            for _ in range(len(primary_pred))
+        ])
         return primary_pred, confidence
     
 
@@ -227,7 +268,17 @@ class CreatorFitPredictionPipeline:
             X_processed = self.preprocessor.transform(X_pred)
             
             # 5. Make production predictions with confidence
-            predictions, confidence = self.predict_with_confidence(X_processed)
+            predictions, _ = self.predict_with_confidence(X_processed)
+            
+            # Calculate confidence using actual creator data
+            confidence = np.array([
+                self.calculate_confidence_score(
+                    total_clicks=df_clean.iloc[i].get('clicks', 0),
+                    posting_cadence_days=df_clean.iloc[i].get('posting_cadence_days', 14),
+                    content_fit_score=X.iloc[i]['fit_score']
+                ) / 100.0  # Convert percentage to 0-1 range
+                for i in range(len(df_clean))
+            ])
             
             # 6. Prepare detailed results
             results = []

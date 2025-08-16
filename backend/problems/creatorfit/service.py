@@ -1,7 +1,10 @@
+import math
 import os
 import tempfile
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, List
+import pandas as pd
+import numpy as np
 
 from .models import PredictionResponse, AnalysisRequest, ErrorResponse
 
@@ -9,8 +12,46 @@ class CreatorFitService:
     """Simple service for CreatorFit CSV analysis and lead forecasting"""
     
     def __init__(self):
-        # No database needed - everything runs from trained models
+        """Initialize CreatorFit service."""
         pass
+    
+    def calculate_confidence_score(
+        self,
+        total_clicks: int,
+        posting_cadence_days: int,
+        content_fit_score: float,
+        smoothing_clicks: int = 500,
+        smoothing_posts: int = 20,
+        min_confidence_pct: float = 50.0,
+        max_confidence_pct: float = 97.0
+    ) -> float:
+        """Calculate a stable confidence score for creator performance."""
+
+        clicks = max(0, int(total_clicks or 0))
+        cadence_days = max(1, min(14, int(posting_cadence_days or 14)))
+        fit_score = max(0.0, min(1.0, float(content_fit_score or 0.0)))
+
+        # Approximate number of posts in 90 days
+        posts_last_90d = max(1, 90 // cadence_days)
+
+        # Evidence from engagement volume (saturates with sqrt)
+        engagement_evidence = math.sqrt(clicks / (clicks + smoothing_clicks)) if clicks > 0 else 0.0
+
+        # Stability from regular posting
+        posting_stability = math.sqrt(posts_last_90d / (posts_last_90d + smoothing_posts))
+
+        semantic_fit = fit_score
+
+        blended_score = (
+            0.5 * engagement_evidence +
+            0.3 * posting_stability +
+            0.2 * semantic_fit
+        )
+        blended_score = max(0.0, min(1.0, blended_score))
+
+        # Scale to UI-friendly %
+        confidence_pct = min_confidence_pct + (max_confidence_pct - min_confidence_pct) * blended_score
+        return round(confidence_pct, 2)
     
     async def analyze_csv(self, csv_content: bytes, program_type: str = "data_science") -> Dict[str, Any]:
         """
@@ -136,7 +177,15 @@ class CreatorFitService:
             
             # Simple feature engineering
             df['fit_score'] = np.random.uniform(0.3, 0.9, len(df))  # Realistic fit scores
-            df['confidence_score'] = np.random.uniform(0.6, 0.95, len(df))  # High confidence
+            
+            df['confidence_score'] = df.apply(
+                lambda row: self.calculate_confidence_score(
+                    total_clicks=row.get('clicks', 0),
+                    posting_cadence_days=row.get('posting_cadence_days', 14),
+                    content_fit_score=row.get('fit_score', 0.5)
+                ) / 100.0,  # Convert percentage to 0-1 range
+                axis=1
+            )
             
             # Use actual qualified_leads from CSV, enhanced with fit score
             df['predicted_qualified_leads'] = (
@@ -146,7 +195,6 @@ class CreatorFitService:
             # Sort by predicted leads
             df = df.sort_values('predicted_qualified_leads', ascending=False).reset_index(drop=True)
             
-            # Create results
             results = []
             for i, row in df.iterrows():
                 leads = int(row['predicted_qualified_leads'])
