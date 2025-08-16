@@ -1,4 +1,3 @@
-# problems/creatorfit/features.py
 from __future__ import annotations
 
 from typing import Tuple, Dict, List, Optional, Iterable
@@ -6,7 +5,6 @@ from typing import Tuple, Dict, List, Optional, Iterable
 import numpy as np
 import pandas as pd
 
-# Handle sentence transformers import gracefully
 try:
     from sentence_transformers import SentenceTransformer
     SENTENCE_TRANSFORMERS_AVAILABLE = True
@@ -15,17 +13,11 @@ except ImportError as e:
     SentenceTransformer = None
     SENTENCE_TRANSFORMERS_AVAILABLE = False
 
-# --------------------------------------------------------------------------------------
-# EDTECH FEATURE ENGINEERING CONFIG
-# --------------------------------------------------------------------------------------
-# Reusable default model (good quality + fast). You can override from train.py if needed.
+
 DEFAULT_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
-# Simple in-process cache so repeated calls don't re-load the model from disk/network.
-# This avoids slowdowns when you run train.py multiple times.
 _MODEL_CACHE: Dict[str, any] = {}
 
-# EdTech-specific topics for content validation (imported from data_preprocessing)
 EDTECH_TOPICS = [
     "Python", "Data Science", "Machine Learning", "JavaScript", "React",
     "Node.js", "SQL", "Frontend Development", "Backend Development", 
@@ -34,7 +26,6 @@ EDTECH_TOPICS = [
     "Career Guidance", "Interview Preparation", "System Design"
 ]
 
-# Odin School program descriptions for fit scoring
 ODIN_SCHOOL_PROGRAMS = {
     "data_science": "Learn Python programming, statistics, machine learning, deep learning, data analysis, visualization with pandas, numpy, scikit-learn, tensorflow for data science career",
     "web_development": "Master HTML, CSS, JavaScript, React, Node.js, databases, APIs, full-stack web development for frontend backend programming career",
@@ -51,21 +42,13 @@ def _get_emb_model(name: str):
         _MODEL_CACHE[name] = SentenceTransformer(name)
     return _MODEL_CACHE[name]
 
-
-# --------------------------------------------------------------------------------------
-# TEXT NORMALIZATION
-# --------------------------------------------------------------------------------------
 def _normalize_text_series(s: pd.Series) -> pd.Series:
     """
-    Basic, idempotent cleanup for transcript text.
-    Keep it intentionally light — MiniLM handles raw text well.
+    Basic cleanup for transcript text.
     """
     return s.fillna("").astype(str).str.strip()
 
 
-# --------------------------------------------------------------------------------------
-# AUDIENCE & EXPOSURE FEATURES
-# --------------------------------------------------------------------------------------
 def add_audience_and_exposure(df: pd.DataFrame) -> pd.DataFrame:
     """
     Add EdTech-specific audience and exposure features:
@@ -73,25 +56,21 @@ def add_audience_and_exposure(df: pd.DataFrame) -> pd.DataFrame:
       - language_diversity: Multi-language creators (English+Hindi+Telugu)
       - india_focused: All creators are INDIA-focused (always 1)
       - log_views_90d: stabilized exposure (log1p of views_90d)
-    NOTE: assumes df is already cleaned in preprocessing with INDIA-only data.
     """
     df = df.copy()
 
-    # EdTech creator tier classification (based on realistic view ranges)
     def classify_creator_tier(views):
-        if views >= 100000:  # 1L+ views
+        if views >= 100000:
             return "Established"
-        elif views >= 25000:  # 25K-1L views  
+        elif views >= 25000:
             return "Growing"
-        else:  # <25K views
+        else:
             return "Emerging"
     
     df["creator_tier"] = df["views_90d"].apply(classify_creator_tier)
     
-    # Geographic focus: All creators are INDIA-focused (always 1 for our EdTech dataset)
     df["india_focused"] = 1
     
-    # Language diversity scoring (English is premium, Hindi/Telugu are regional)
     language_scores = {"English": 1.0, "Hindi": 0.8, "Telugu": 0.7}
     df["language_score"] = df["language"].map(language_scores).fillna(0.5)
     
@@ -100,10 +79,6 @@ def add_audience_and_exposure(df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
-
-# --------------------------------------------------------------------------------------
-# EMBEDDING HELPERS
-# --------------------------------------------------------------------------------------
 def _encode_texts(
     texts: Iterable[str],
     model: SentenceTransformer,
@@ -174,9 +149,6 @@ def compute_fit_scores(
     return pd.Series(cos, index=df.index, name="fit_score")
 
 
-# --------------------------------------------------------------------------------------
-# MAIN FEATURE BUILDER
-# --------------------------------------------------------------------------------------
 def build_features(
     df_clean: pd.DataFrame,
     program_type: str = "data_science",
@@ -195,15 +167,12 @@ def build_features(
 
     Returns pre-booking features only (no data leakage).
     """
-    # 1) Add EdTech-specific audience & exposure features
     df = add_audience_and_exposure(df_clean)
 
-    # 2) Get Odin School program description for fit scoring
     if program_type not in ODIN_SCHOOL_PROGRAMS:
         program_type = "data_science"  # Default fallback
     program_text = ODIN_SCHOOL_PROGRAMS[program_type]
 
-    # 3) Semantic content fit score with Odin School programs
     df["fit_score"] = compute_fit_scores(
         df=df,
         program_text=program_text,
@@ -212,7 +181,7 @@ def build_features(
         to_unit_interval=True,
     )
     
-    # 4) EdTech-specific features for CPL optimization
+    # EdTech-specific features for CPL optimization
     # Educational content validation (using our specific topics)
     edtech_pattern = "|".join(EDTECH_TOPICS)
     df["is_educational"] = df["topic"].str.contains(
@@ -224,51 +193,46 @@ def build_features(
     df["topic_count"] = df["topic"].str.count(";") + 1  # Multi-topic expertise
     df["category_count"] = df["category_tag"].str.count(";") + 1
     
-    # Creator consistency and activity scoring
-    df["posting_frequency_score"] = 1.0 / (df["posting_cadence_days"] + 0.1)  # Higher freq = higher score
+    df["posting_frequency_score"] = 1.0 / (df["posting_cadence_days"] + 0.1)
     
-    # Topic expertise depth (bonus for multiple EdTech topics)
     df["edtech_topic_depth"] = df["topic"].apply(
         lambda x: sum(1 for topic in EDTECH_TOPICS if topic.lower() in x.lower())
     )
 
-    # 5) Define EdTech feature contract (pre-booking signals only)
+    # Define EdTech feature contract (pre-booking signals only)
     numeric = [
-        "fit_score",               # Content-program alignment (CORE)
-        "posting_cadence_days",    # Creator consistency  
-        "views_90d",              # Audience reach
-        "log_views_90d",          # Stabilized reach
-        "india_focused",          # Geographic focus (always 1)
-        "language_score",         # Language premium scoring
-        "is_educational",         # EdTech content validation
-        "transcript_length",      # Content depth
-        "topic_count",            # Content diversity
-        "category_count",         # Category breadth
-        "posting_frequency_score", # Activity level
+        "fit_score",          
+        "posting_cadence_days",  
+        "views_90d",             
+        "log_views_90d",         
+        "india_focused",         
+        "language_score",        
+        "is_educational",         
+        "transcript_length",      
+        "topic_count",            
+        "category_count",         
+        "posting_frequency_score",
         "edtech_topic_depth"      # Topic expertise depth
     ]
     categorical = ["topic", "category_tag", "creator_tier", "language"]
     target = "qualified_leads"
 
-    # 6) Prevent data leakage - exclude post-campaign outcomes
     leakage_cols = {"clicks", "leads", "qualified_leads", "enrollments", "refunds", 
                    "click_rate", "lead_rate", "qualification_rate", "enrollment_rate"}
     feature_cols = set(numeric + categorical)
     if feature_cols & leakage_cols:
         raise ValueError(f"Data leakage detected! Features overlap with outcomes: {feature_cols & leakage_cols}")
 
-    # 7) Build final feature matrix
+    # Build final feature matrix
     X = df[numeric + categorical].copy()
     y = df[target].astype(float).copy()
 
-    # 8) Quality checks
+    # Quality checks
     if X.isna().any().any():
         nan_cols = X.columns[X.isna().any()].tolist()
         raise ValueError(f"Missing values in features: {nan_cols}")
 
     # 9) EdTech-specific reporting
-    established_creators = (df["creator_tier"] == "Established").sum()
-    english_creators = (df["language"] == "English").sum()
     educational_creators = df["is_educational"].sum()
     
     print(f"[EDTECH] Built {len(numeric)} numeric + {len(categorical)} categorical features")
