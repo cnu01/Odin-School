@@ -1308,7 +1308,7 @@ function HotLead() {
                       <TableCell align="center">AI Score</TableCell>
                       <TableCell>Source</TableCell>
                       <TableCell>Status</TableCell>
-                      <TableCell>Temperature</TableCell>
+                      {/* <TableCell>Temperature</TableCell> */}
                       <TableCell>Created</TableCell>
                       <TableCell align="center">Actions</TableCell>
                     </TableRow>
@@ -1359,11 +1359,11 @@ function HotLead() {
                             size="small"
                           />
                         </TableCell>
-                        <TableCell>
+                        {/* <TableCell>
                           <Typography variant="body2">
                             {lead.lead_temperature}
                           </Typography>
-                        </TableCell>
+                        </TableCell> */}
                         <TableCell>
                           <Typography variant="body2">
                             {formatTimeAgo(lead.created_at)}

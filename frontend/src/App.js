@@ -12,7 +12,7 @@ import BrandReputation from './pages/BrandReputation/BrandReputation';
 
 import PricingInsights from './pages/PricingInsights/PricingInsights';
 import CloseMore from './pages/CloseMore/CloseMore';
-import OneTruth from './pages/OneTruth';
+import OneTruth from './pages/OneTruth/OneTruth';
 import ReferralManagement from './pages/ReferralManagement/ReferralManagement';
 import FirstTouch from './pages/FirstTouch/FirstTouch';
 import AdLift from './pages/AdLift/AdLift';
