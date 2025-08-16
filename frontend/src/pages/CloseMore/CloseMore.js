@@ -263,12 +263,12 @@ function CloseMore() {
     // Load data immediately
     loadData();
     
-    // Set up automatic refresh every 30 seconds
-    refreshInterval = setInterval(() => {
-      if (isMounted) {
-        refreshTeamData(true); // Auto-refresh with indicator
-      }
-    }, 30000);
+    // Auto-refresh disabled per user request
+    // refreshInterval = setInterval(() => {
+    //   if (isMounted) {
+    //     refreshTeamData(true); // Auto-refresh with indicator
+    //   }
+    // }, 30000);
     
     return () => {
       isMounted = false;
