@@ -488,12 +488,13 @@ const InfluencerHub = () => {
                             />
                           </Tooltip>
                         </TableCell>
-                        <TableCell>
-                        <Box display="flex" justifyContent="flex-end" my={2}>
+                        <TableCell padding="none">
+                        <Box display="flex" justifyContent="flex-end" my={2} >
                         <Button
                           variant="outlined"
                           onClick={() => handleViewInput(creator)}
                           size="small"
+                          sx={{ padding: "2px 6px" }}
                         >
                           View more
                         </Button>
