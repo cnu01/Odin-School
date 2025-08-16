@@ -1,8 +1,4 @@
-#!/usr/bin/env python3
 """
-CreatorFit Production Prediction Pipeline
-========================================
-
 Enterprise-grade pipeline for high-accuracy lead predictions with:
 - Advanced data validation and quality scoring
 - Production-ready feature engineering with business intelligence
@@ -39,8 +35,8 @@ try:
         _apply_schema_adapter, _coerce_and_normalize, _impute_missing, 
         _apply_business_guards, _fold_rare_categories
     )
-    from backend.problems.creatorfit.utils.features import build_features, ODIN_SCHOOL_PROGRAMS
-    from problems.creatorfit.modeling import build_preprocessor
+    from features import build_features, ODIN_SCHOOL_PROGRAMS
+    from modeling import build_preprocessor
     FULL_PIPELINE_AVAILABLE = True
 except ImportError as e:
     print(f"[WARNING] Full pipeline not available: {e}")
@@ -112,7 +108,7 @@ class CreatorFitPredictionPipeline:
             quality_report['quality_score'] *= 0.85
         
         # Check for topic relevance
-        from backend.problems.creatorfit.utils.data_preprocessing import EDTECH_TOPICS
+        from data_preprocessing import EDTECH_TOPICS
         irrelevant_topics = ~df['topic'].str.contains('|'.join(EDTECH_TOPICS), case=False, na=False)
         if irrelevant_topics.any():
             quality_report['issues_found'].append(f"{irrelevant_topics.sum()} creators with non-EdTech topics")
