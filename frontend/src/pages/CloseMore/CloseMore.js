@@ -1013,14 +1013,12 @@ Rep: That's a common concern. Can you tell me about your current background and 
                           />
                         </TableCell>
                         <TableCell>
-                          <Badge badgeContent={conversation.priority === 'high' ? '!' : null} color="error">
-                            <Chip
-                              label={conversation.priority}
-                              color={getPriorityColor(conversation.priority)}
-                              variant="filled"
-                              size="small"
-                            />
-                          </Badge>
+                          <Chip
+                            label={conversation.priority}
+                            color={getPriorityColor(conversation.priority)}
+                            variant="filled"
+                            size="small"
+                          />
                         </TableCell>
                         <TableCell>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
