@@ -600,6 +600,40 @@ const InfluencerHub = () => {
               </Typography>
             </Box>
           )}
+
+          <Box sx={{ mt: 3, p: 2, backgroundColor: 'grey.50', borderRadius: 1 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
+              📊 Output Values:
+            </Typography>
+            <Box component="ul" sx={{ pl: 3, my: 0, '& > li': { mb: 1.5 } }}>
+              <li>
+              <Typography variant="h10">
+              1. Predicted Leads:
+                </Typography>
+                <Typography variant="body2" color="textSecondary" component="span" sx={{ ml: 1 }}>
+                  qualified_leads × fit_score × random_factor(0.9-1.1)
+                </Typography>
+              </li>
+              <li>
+                <Typography variant="h10">2. Confidence:</Typography> 
+                <Typography variant="body2" color="textSecondary" component="span" sx={{ ml: 1 }}>
+                  placeholder
+                </Typography>
+              </li>
+              <li>
+                <Typography variant="h10">3. Tier:</Typography> 
+                <Typography variant="body2" color="textSecondary" component="span" sx={{ ml: 1 }}>
+                  Maps category_tag → Growing/Established/Emerging
+                </Typography>
+              </li>
+              <li>
+                <Typography variant="h10">4. Recommendation:</Typography> 
+                <Typography variant="body2" color="textSecondary" component="span" sx={{ ml: 1 }}>
+                  BOOK if leads &gt; 100 & confidence &gt; 0.8, else REVIEW if leads &gt; 50, else SKIP
+                </Typography>
+              </li>
+            </Box>
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setInputModalOpen(false)} variant="contained">
