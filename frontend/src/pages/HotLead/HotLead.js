@@ -976,7 +976,7 @@ function HotLead() {
                   </Typography>
                   
                   <Grid container spacing={3} sx={{ mb: 4 }}>
-                    {aiSolutions.solutions?.filter(sol => sol.current_status.includes('✅')).map((solution, index) => (
+                    {aiSolutions.solutions?.filter(sol => sol.current_status && sol.current_status.includes('✅')).map((solution, index) => (
                       <Grid item xs={12} md={6} lg={4} key={solution.solution_id}>
                         <Card sx={{ 
                           height: '100%',
@@ -986,12 +986,14 @@ function HotLead() {
                         }}>
                           <CardContent>
                             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                              <Chip 
-                                label={solution.current_status}
-                                color="success"
-                                size="small"
-                                sx={{ mr: 1 }}
-                              />
+                              {solution.current_status && (
+                                <Chip 
+                                  label={solution.current_status}
+                                  color="success"
+                                  size="small"
+                                  sx={{ mr: 1 }}
+                                />
+                              )}
                               <Chip 
                                 label={`${solution.confidence_score * 100}% accuracy`}
                                 variant="outlined"
@@ -1066,12 +1068,14 @@ function HotLead() {
                         }}>
                           <CardContent>
                             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                              <Chip 
-                                label={solution.current_status}
-                                color="primary"
-                                size="small"
-                                sx={{ mr: 1 }}
-                              />
+                              {solution.current_status && (
+                                <Chip 
+                                  label={solution.current_status}
+                                  color="primary"
+                                  size="small"
+                                  sx={{ mr: 1 }}
+                                />
+                              )}
                               <Chip 
                                 label={`${solution.timeline_weeks} weeks`}
                                 variant="outlined"
@@ -1698,12 +1702,14 @@ function HotLead() {
                                 <Typography variant="body2" sx={{ fontWeight: 600 }}>
                                   {solution.title}
                                 </Typography>
-                                <Chip 
-                                  label={solution.current_status}
-                                  color={solution.current_status.includes('✅') ? 'success' : 'warning'}
-                                  size="small"
-                                  sx={{ mt: 0.5 }}
-                                />
+                                {solution.current_status && (
+                                  <Chip 
+                                    label={solution.current_status}
+                                    color={solution.current_status.includes('✅') ? 'success' : 'warning'}
+                                    size="small"
+                                    sx={{ mt: 0.5 }}
+                                  />
+                                )}
                               </Box>
                             </TableCell>
                             <TableCell align="center">
