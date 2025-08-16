@@ -10,6 +10,7 @@ import random
 from datetime import datetime, timedelta
 from typing import List, Dict, Any
 import json
+import os
 
 # Set random seeds for reproducibility
 np.random.seed(42)
@@ -331,7 +332,8 @@ def main():
     df = generator.generate_dataset(5000)
     
     # Save to CSV
-    output_file = "/Users/batman/Movies/odinschool/Odin-School/backend/data/enhanced_leads_5000.csv"
+    backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    output_file = os.path.join(backend_dir, "data", "enhanced_leads_5000.csv")
     df.to_csv(output_file, index=False)
     print(f"\n✅ Dataset saved to: {output_file}")
     
@@ -347,7 +349,7 @@ def main():
         "description": "Enhanced realistic lead dataset for HotLead AI solutions training"
     }
     
-    metadata_file = "/Users/batman/Movies/odinschool/Odin-School/backend/data/enhanced_leads_metadata.json"
+    metadata_file = os.path.join(backend_dir, "data", "enhanced_leads_metadata.json")
     with open(metadata_file, 'w') as f:
         json.dump(metadata, f, indent=2)
     
