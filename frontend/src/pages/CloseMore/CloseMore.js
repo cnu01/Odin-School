@@ -77,15 +77,37 @@ function CloseMore() {
   const [transcriptionAnalyzing, setTranscriptionAnalyzing] = useState(false);
   const [transcriptionResult, setTranscriptionResult] = useState(null);
   const [generatingTranscription, setGeneratingTranscription] = useState(false);
+  const [autoRefreshing, setAutoRefreshing] = useState(false);
   
   // Daily Actions Dialog state
   const [actionsDialogOpen, setActionsDialogOpen] = useState(false);
   const [selectedRepActions, setSelectedRepActions] = useState(null);
   const [actionManagementMode, setActionManagementMode] = useState(false);
 
+  // Function to refresh team data
+  const refreshTeamData = async (isAutoRefresh = false) => {
+    try {
+      if (isAutoRefresh) {
+        setAutoRefreshing(true);
+      }
+      const actionsData = await closemoreService.getDailyActions();
+      setDailyActions(actionsData);
+    } catch (error) {
+      console.error('Error refreshing team data:', error);
+    } finally {
+      if (isAutoRefresh) {
+        setAutoRefreshing(false);
+      }
+    }
+  };
+
   // Action management functions
   const handleMarkActionComplete = (actionIndex) => {
     if (selectedRepActions && selectedRepActions.actions) {
+      console.log('Marking action complete for rep:', selectedRepActions.repId);
+      console.log('Current dailyActions:', dailyActions);
+      console.log('selectedRepActions:', selectedRepActions);
+      
       const updatedActions = [...selectedRepActions.actions];
       updatedActions[actionIndex] = {
         ...updatedActions[actionIndex],
@@ -93,12 +115,29 @@ function CloseMore() {
         completed_at: new Date().toISOString()
       };
       
-      setSelectedRepActions({
+      const updatedRepActions = {
         ...selectedRepActions,
         actions: updatedActions,
         completedToday: selectedRepActions.completedToday + 1,
         pendingActions: selectedRepActions.pendingActions - 1
+      };
+      
+      setSelectedRepActions(updatedRepActions);
+      
+      // Update the team overview data as well
+      const updatedDailyActions = dailyActions.map(rep => {
+        console.log('Comparing rep.repId:', rep.repId, 'with selectedRepActions.repId:', selectedRepActions.repId);
+        return rep.repId === selectedRepActions.repId 
+          ? {
+              ...rep,
+              completedToday: rep.completedToday + 1,
+              pendingActions: rep.pendingActions - 1
+            }
+          : rep;
       });
+      
+      console.log('Updated dailyActions:', updatedDailyActions);
+      setDailyActions(updatedDailyActions);
       
       setSnackbarMessage('Action marked as completed!');
       setSnackbarOpen(true);
@@ -127,16 +166,36 @@ function CloseMore() {
   const handleUpdateActionPriority = (actionIndex, newPriority) => {
     if (selectedRepActions && selectedRepActions.actions) {
       const updatedActions = [...selectedRepActions.actions];
+      const currentAction = selectedRepActions.actions[actionIndex];
+      const wasHighPriority = currentAction.priority_score >= 80;
+      const isNowHighPriority = newPriority >= 80;
+      
       updatedActions[actionIndex] = {
         ...updatedActions[actionIndex],
         priority_score: newPriority,
         urgency_level: newPriority >= 80 ? 'high' : newPriority >= 60 ? 'medium' : 'low'
       };
       
-      setSelectedRepActions({
+      const updatedRepActions = {
         ...selectedRepActions,
         actions: updatedActions
-      });
+      };
+      
+      setSelectedRepActions(updatedRepActions);
+      
+      // Update high priority count in team overview if priority threshold crossed
+      if (wasHighPriority !== isNowHighPriority) {
+        const highPriorityDelta = isNowHighPriority ? 1 : -1;
+        const updatedDailyActions = dailyActions.map(rep => 
+          rep.repId === selectedRepActions.repId 
+            ? {
+                ...rep,
+                highPriority: rep.highPriority + highPriorityDelta
+              }
+            : rep
+        );
+        setDailyActions(updatedDailyActions);
+      }
       
       setSnackbarMessage('Action priority updated!');
       setSnackbarOpen(true);
@@ -157,10 +216,11 @@ function CloseMore() {
       : 0,
   };
 
-  // Load data from API on component mount - simplified approach
+  // Load data from API on component mount with periodic refresh
   useEffect(() => {
     let isMounted = true;
     let loadingTimeout = null;
+    let refreshInterval = null;
     
     const loadData = async () => {
       if (!isMounted) return;
@@ -203,10 +263,20 @@ function CloseMore() {
     // Load data immediately
     loadData();
     
+    // Set up automatic refresh every 30 seconds
+    refreshInterval = setInterval(() => {
+      if (isMounted) {
+        refreshTeamData(true); // Auto-refresh with indicator
+      }
+    }, 30000);
+    
     return () => {
       isMounted = false;
       if (loadingTimeout) {
         clearTimeout(loadingTimeout);
+      }
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
       }
     };
   }, []);
@@ -1016,17 +1086,22 @@ Rep: That's a common concern. Can you tell me about your current background and 
           {/* Summary Header */}
           <Box sx={{ mb: 3 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h5" sx={{ fontWeight: 600 }}>
-                Team Performance Overview
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                  Team Performance Overview
+                </Typography>
+                {autoRefreshing && (
+                  <Typography variant="caption" sx={{ color: 'primary.main', fontStyle: 'italic' }}>
+                    Auto-refreshing...
+                  </Typography>
+                )}
+              </Box>
               <Button
                 variant="outlined"
                 startIcon={<TrendingUp />}
                 onClick={async () => {
                   try {
-                    // Refresh daily actions data
-                    const data = await closemoreService.getDailyActions();
-                    setDailyActions(data);
+                    await refreshTeamData();
                     setSnackbarMessage('Daily actions refreshed!');
                     setSnackbarOpen(true);
                   } catch (error) {
