@@ -1,6 +1,5 @@
-from pydantic import BaseModel, Field
-from typing import Dict, Any, Optional, List, Literal
-from datetime import datetime
+from pydantic import BaseModel
+from typing import Dict, Any, Optional, List
 
 
 # Problem diagnosis models for frontend display
@@ -65,62 +64,7 @@ class ScoreResponse(BaseModel):
     avg_propensity: float
 
 
-class TrainRequest(BaseModel):
-    size: int = Field(default=2000, ge=100, le=100000)
-
-
 class CandidatesResponse(BaseModel):
-    candidates: List[Dict[str, Any]]
-    total_candidates: int
+    items: List[Dict[str, Any]]
+    total: int
     threshold: float
-
-
-class MessageRequest(BaseModel):
-    profile: ReferralProfile
-    message_type: str = "referral_invite"
-
-
-class MessageResponse(BaseModel):
-    message: str
-    insights: Dict[str, Any]
-    confidence: float
-
-
-class AnalyticsRequest(BaseModel):
-    sample_size: int = 500
-
-
-class AnalyticsResponse(BaseModel):
-    avg_propensity: float
-    high_bucket_ratio: float
-    medium_bucket_ratio: float
-    low_bucket_ratio: float
-    sample_size: int
-
-
-class EvaluationResponse(BaseModel):
-    model_config = {'protected_namespaces': ()}
-    
-    accuracy: float
-    test_samples: int
-    trained: bool
-    model_name: str
-
-
-# Additional schemas to mirror backend endpoints more closely
-class TrackEvent(BaseModel):
-    referrer_id: str
-    event: Literal["invite", "click", "signup", "converted", "payout"]
-    amount: Optional[float] = 0.0
-
-
-class ProgressMessageRequest(BaseModel):
-    referrer_id: str
-    name: Optional[str] = None
-    use_llm: bool = False
-
-
-class AnalyticsInsightsRequest(BaseModel):
-    sample_size: int = 500
-    use_llm: bool = False
-    horizon_days: int = 7
