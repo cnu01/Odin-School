@@ -309,6 +309,48 @@ async def get_daily_actions(request: DailyActionsRequest):
             detail=f"Error generating daily actions: {str(e)}"
         )
 
+@router.get("/daily-actions-all-reps")
+async def get_daily_actions_for_all_reps(
+    include_low_priority: bool = Query(False, description="Include low priority actions"),
+    max_actions_per_rep: int = Query(8, description="Maximum actions per rep"),
+    focus_area: Optional[str] = Query(None, description="Specific focus area")
+):
+    """
+    Generate daily actions for all active sales representatives
+    
+    Features:
+    - Multi-rep action planning and prioritization
+    - Individual rep performance metrics
+    - Completion tracking and productivity insights
+    - Team-wide action distribution and workload balancing
+    
+    Args:
+        include_low_priority: Whether to include low priority actions
+        max_actions_per_rep: Maximum actions per rep
+        focus_area: Specific focus area for actions
+        
+    Returns:
+        List of daily action summaries for each active sales rep
+    """
+    try:
+        all_reps_actions = await closemore_service.get_daily_actions_for_all_reps(
+            include_low_priority=include_low_priority,
+            max_actions_per_rep=max_actions_per_rep,
+            focus_area=focus_area
+        )
+        return {
+            "total_reps": len(all_reps_actions),
+            "total_actions": sum(rep['pending_actions'] for rep in all_reps_actions),
+            "high_priority_total": sum(rep['high_priority'] for rep in all_reps_actions),
+            "reps": all_reps_actions
+        }
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error generating daily actions for all reps: {str(e)}"
+        )
+
 @router.get("/high-priority-leads")
 async def get_high_priority_leads(
     rep_id: str = Query(..., description="Sales representative ID")
@@ -524,4 +566,26 @@ async def get_conversations(
         raise HTTPException(
             status_code=500,
             detail=f"Error retrieving conversations: {str(e)}"
+        )
+
+@router.post("/generate-call-transcription")
+async def generate_call_transcription():
+    """
+    Generate a realistic call transcription using AI
+    
+    Creates a sample sales call transcript that can be used for testing
+    and demonstration purposes. The transcript includes typical sales
+    conversation elements like objections, questions, and closing attempts.
+    
+    Returns:
+        Generated call transcription text
+    """
+    try:
+        transcription = await closemore_service.generate_sample_call_transcription()
+        return {"transcription": transcription}
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error generating call transcription: {str(e)}"
         )

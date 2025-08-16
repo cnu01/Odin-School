@@ -380,6 +380,29 @@ Return ONLY a JSON array of action objects, no additional text.
         # Simple keyword-based analysis as fallback
         text = conversation.conversation_text.lower()
         
+        # Extract key topics based on keywords
+        key_topics = []
+        if any(word in text for word in ['price', 'cost', 'payment', 'money', 'expensive']):
+            key_topics.append("Pricing")
+        if any(word in text for word in ['demo', 'meeting', 'schedule', 'call']):
+            key_topics.append("Demo Request")
+        if any(word in text for word in ['feature', 'benefit', 'advantage', 'capability']):
+            key_topics.append("Product Features")
+        if any(word in text for word in ['concern', 'worry', 'issue', 'problem']):
+            key_topics.append("Concerns")
+        if any(word in text for word in ['competition', 'competitor', 'compare', 'alternative']):
+            key_topics.append("Competitive Analysis")
+        if any(word in text for word in ['timeline', 'when', 'start', 'begin']):
+            key_topics.append("Timeline")
+        if any(word in text for word in ['technical', 'difficulty', 'math', 'background']):
+            key_topics.append("Technical Requirements")
+        if any(word in text for word in ['job', 'career', 'placement', 'employment']):
+            key_topics.append("Career Outcomes")
+        
+        # Default topics if none detected
+        if not key_topics:
+            key_topics = ["Product Inquiry", "General Interest"]
+        
         # Detect intent based on keywords
         if any(word in text for word in ['book', 'schedule', 'demo', 'meeting', 'ready']):
             intent = LeadIntent.READY_TO_BOOK
@@ -406,7 +429,7 @@ Return ONLY a JSON array of action objects, no additional text.
                 confidence=0.5,
                 emotional_indicators=[]
             ),
-            key_topics=[],
+            key_topics=key_topics,
             next_steps=["Follow up within 24 hours", "Address any concerns raised"],
             recommended_follow_up_time=24,
             conversion_probability=conversion_prob,
@@ -439,3 +462,41 @@ Return ONLY a JSON array of action objects, no additional text.
             conversion_opportunities=0,
             actions=actions
         )
+
+    async def generate_call_transcription_with_bedrock(self) -> str:
+        """Generate a realistic call transcription using Amazon Bedrock"""
+        
+        if not self.bedrock_client:
+            raise Exception("Bedrock client not available")
+        
+        try:
+            prompt = """Generate a realistic sales call transcription for an educational technology company selling data science bootcamps. The conversation should include:
+
+1. A sales representative reaching out to a prospect who downloaded a brochure
+2. The prospect showing interest but having concerns about time commitment and technical difficulty
+3. The rep addressing objections with specific solutions
+4. Discussion of job placement rates and pricing
+5. A successful close with a next meeting scheduled
+
+Make it natural and conversational, with realistic objections and responses. Include specific details like pricing, program duration, job placement rates, etc. Format as a dialogue with 'Rep:' and 'Prospect:' labels."""
+
+            request_body = {
+                "prompt": f"\n\nHuman: {prompt}\n\nAssistant:",
+                "max_tokens_to_sample": 1500,
+                "temperature": 0.7,
+                "stop_sequences": ["\n\nHuman:"]
+            }
+            
+            response = self.bedrock_client.invoke_model(
+                modelId=self.model_id,
+                body=json.dumps(request_body)
+            )
+            
+            response_body = json.loads(response['body'].read())
+            transcription = response_body.get('completion', '').strip()
+            
+            return transcription
+            
+        except Exception as e:
+            print(f"Bedrock transcription generation error: {e}")
+            raise e

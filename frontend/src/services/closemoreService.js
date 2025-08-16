@@ -5,6 +5,39 @@ import api from './api';
  * Handles all API calls for conversation management and sales analysis
  */
 class CloseMoreService {
+  constructor() {
+    this.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+    this.pendingRequests = new Map(); // Track pending requests to prevent duplicates
+  }
+
+  // Helper method to create a unique request key
+  _getRequestKey(endpoint, params = {}) {
+    const sortedParams = Object.keys(params).sort().map(key => `${key}=${params[key]}`).join('&');
+    return `${endpoint}?${sortedParams}`;
+  }
+
+  // Helper method to make API calls with deduplication
+  async _makeRequest(endpoint, params = {}, options = {}) {
+    const requestKey = this._getRequestKey(endpoint, params);
+    
+    // If there's already a pending request for this endpoint, return it
+    if (this.pendingRequests.has(requestKey)) {
+      console.log(`Request already pending for: ${requestKey}, reusing existing request`);
+      return this.pendingRequests.get(requestKey);
+    }
+
+    // Create the request promise
+    const requestPromise = api.get(endpoint, { params, ...options })
+      .finally(() => {
+        // Remove from pending requests when done
+        this.pendingRequests.delete(requestKey);
+      });
+
+    // Store the pending request
+    this.pendingRequests.set(requestKey, requestPromise);
+    
+    return requestPromise;
+  }
   
   /**
    * Analyze a conversation using RAG-enhanced AI
@@ -13,19 +46,12 @@ class CloseMoreService {
    */
   async analyzeConversation(conversationData) {
     try {
-      const response = await api.post('/api/closemore/analyze-rag', {
+      // Use the faster analyze endpoint instead of analyze-rag to avoid timeouts
+      const response = await api.post('/api/closemore/analyze', {
         lead_id: conversationData.lead_id || conversationData.customerName || `lead_${Date.now()}`,
         channel: this.mapChannelType(conversationData.channel),
         conversation_text: conversationData.content || conversationData.conversation_text,
-        rep_id: conversationData.rep_id || 'current_rep',
-        use_rag: true,
-        knowledge_categories: ['objection_handling', 'product_info', 'sales_strategies'],
-        timestamp: new Date().toISOString(),
-        lead_context: {
-          stage: conversationData.stage,
-          priority: conversationData.priority,
-          previous_contacts: conversationData.conversationCount || 1
-        }
+        rep_id: conversationData.rep_id || 'current_rep'
       });
       
       return {
@@ -174,6 +200,36 @@ class CloseMoreService {
   }
 
   /**
+   * Get high priority leads for a sales rep
+   * @param {string} repId - Sales rep ID
+   * @returns {Promise} High priority leads list
+   */
+  async getHighPriorityLeads(repId = 'current_rep') {
+    try {
+      const response = await this._makeRequest('/api/closemore/high-priority-leads', { rep_id: repId });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching high priority leads:', error);
+      return this.getMockHighPriorityLeads();
+    }
+  }
+
+  /**
+   * Get pending follow-ups for a sales rep
+   * @param {string} repId - Sales rep ID
+   * @returns {Promise} Pending follow-ups list
+   */
+  async getPendingFollowUps(repId = 'current_rep') {
+    try {
+      const response = await this._makeRequest('/api/closemore/pending-follow-ups', { rep_id: repId });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching pending follow-ups:', error);
+      return this.getMockPendingFollowUps();
+    }
+  }
+
+  /**
    * Get daily actions for a sales rep
    * @param {string} repId - Sales rep ID
    * @param {Object} options - Options for filtering actions
@@ -181,41 +237,55 @@ class CloseMoreService {
    */
   async getDailyActions(repId = 'current_rep', options = {}) {
     try {
-      const response = await api.post('/api/closemore/daily-actions', {
-        rep_id: repId,
+      console.log('Fetching daily actions for all reps...');
+      
+      // Use the deduplication system to prevent multiple simultaneous calls
+      const response = await this._makeRequest('/api/closemore/daily-actions-all-reps', {
         include_low_priority: options.includeLowPriority || false,
-        max_actions: options.maxActions || 10,
+        max_actions_per_rep: options.maxActions || 8,
         focus_area: options.focusArea
       });
       
       // Transform the API response to match frontend expectations
       const data = response.data;
-      console.log('Daily actions API response:', data); // Debug log
+      console.log('Daily actions for all reps API response:', data);
       
-      const dailyActions = [{
-        rep: repId,
-        avatar: repId.split('_').map(n => n[0]).join('').toUpperCase(),
-        pendingActions: data.total_actions || 0,
-        highPriority: data.high_priority_count || 0,
-        completedToday: Math.floor(Math.random() * 10), // Mock for now
-        winRate: Math.floor(Math.random() * 30 + 60), // Mock 60-90%
-        avgResponseTime: `${(Math.random() * 3 + 1).toFixed(1)} hours`,
-        actions: data.actions || []
-      }];
+      if (!data || !data.reps || !Array.isArray(data.reps)) {
+        console.warn('Invalid response format, using fallback data');
+        return this.getMockDailyActions();
+      }
       
-      console.log('Transformed daily actions:', dailyActions); // Debug log
+      // Map the reps data to frontend format
+      const dailyActions = data.reps.map(rep => ({
+        rep: rep.rep_name || rep.rep_id,
+        repId: rep.rep_id,
+        avatar: rep.avatar,
+        pendingActions: rep.pending_actions || 0,
+        highPriority: rep.high_priority || 0,
+        completedToday: rep.completed_today || 0,
+        winRate: rep.win_rate || 0,
+        avgResponseTime: rep.avg_response_time || '0 hours',
+        totalConversations: rep.total_conversations || 0,
+        meetingBookingRate: rep.meeting_booking_rate || 0,
+        noShowRate: rep.no_show_rate || 0,
+        estimatedTotalTime: rep.estimated_total_time || 0,
+        conversionOpportunities: rep.conversion_opportunities || 0,
+        actions: rep.actions || []
+      }));
+      
+      console.log('Transformed daily actions for all reps:', dailyActions);
       return dailyActions;
     } catch (error) {
-      // Don't log errors for cancelled requests (race conditions)
-      if (error.name !== 'CanceledError' && !error.message?.includes('canceled')) {
-        console.error('Error fetching daily actions:', error);
-        console.error('Error details:', {
-          status: error.response?.status,
-          statusText: error.response?.statusText,
-          data: error.response?.data
-        });
-      }
+      console.error('Error fetching daily actions for all reps:', error);
+      console.error('Error details:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message
+      });
+      
       // Return mock data as fallback
+      console.log('Using mock data as fallback');
       return this.getMockDailyActions();
     }
   }
@@ -308,12 +378,12 @@ class CloseMoreService {
   mapChannelType(channel) {
     const channelMap = {
       'WhatsApp': 'whatsapp',
-      'Phone': 'call_transcript',
+      'Phone': 'phone',
       'Email': 'email',
       'SMS': 'sms',
       'Chat': 'chat'
     };
-    return channelMap[channel] || 'chat';
+    return channelMap[channel] || 'email';
   }
 
   /**
@@ -544,6 +614,41 @@ class CloseMoreService {
         avgResponseTime: '3.1 hours',
       },
     ];
+  }
+
+  // Generate AI call transcription
+  async generateCallTranscription() {
+    try {
+      console.log('Attempting to generate call transcription...');
+      const response = await api.post('/api/closemore/generate-call-transcription');
+      console.log('Transcription API response:', response);
+      console.log('Response data:', response.data);
+      
+      if (response.data && response.data.transcription) {
+        console.log('Transcription generated successfully, length:', response.data.transcription.length);
+        return { success: true, data: response.data.transcription };
+      } else {
+        console.error('Invalid response format:', response.data);
+        return { 
+          success: false, 
+          error: 'Invalid response format from server',
+          data: null 
+        };
+      }
+    } catch (error) {
+      console.error('Error generating call transcription:', error);
+      console.error('Error details:', {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data
+      });
+      return { 
+        success: false, 
+        error: error.response?.data?.detail || error.message || 'Failed to generate call transcription',
+        data: null 
+      };
+    }
   }
 }
 
