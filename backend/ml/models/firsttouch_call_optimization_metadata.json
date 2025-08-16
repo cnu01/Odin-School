@@ -1,0 +1,55 @@
+{
+  "model_name": "firsttouch_call_optimization",
+  "model_type": "classification",
+  "trained_at": "2025-08-12T23:52:21.393571",
+  "training_data_size": 2000,
+  "feature_columns": [
+    "lead_source_score",
+    "lead_intent_score",
+    "lead_urgency_score",
+    "geography_score",
+    "device_type_score",
+    "time_since_inquiry_minutes",
+    "call_time_hour",
+    "day_of_week",
+    "is_peak_hours",
+    "seasonal_factor",
+    "agent_experience_months",
+    "script_quality_score",
+    "call_capacity_ratio",
+    "system_load_factor",
+    "similar_lead_success_rate",
+    "previous_attempt_count",
+    "lead_engagement_score",
+    "estimated_ltv",
+    "call_cost_per_minute",
+    "agent_cost_per_minute"
+  ],
+  "metrics": {
+    "accuracy": 1.0,
+    "classification_report": {
+      "True": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 400.0
+      },
+      "accuracy": 1.0,
+      "macro avg": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 400.0
+      },
+      "weighted avg": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 400.0
+      }
+    },
+    "training_samples": 1600,
+    "test_samples": 400,
+    "features_count": 20
+  }
+}

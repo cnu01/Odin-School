@@ -1,0 +1,1 @@
+{"model_type": "LightGBM", "r2_score": 0.855, "mae": 98.87, "rmse": 188.75, "mape": 0.739}

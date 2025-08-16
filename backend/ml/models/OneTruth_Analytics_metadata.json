@@ -1,0 +1,65 @@
+{
+  "model_name": "OneTruth_Analytics",
+  "model_type": "classification",
+  "trained_at": "2025-08-16T17:00:37.934200",
+  "training_data_size": 500,
+  "feature_columns": [
+    "crm_lead_volume",
+    "crm_qualified_rate",
+    "crm_enrollment_rate",
+    "crm_refund_rate",
+    "ga4_sessions",
+    "ga4_bounce_rate",
+    "ga4_conversion_rate",
+    "ga4_avg_session_duration",
+    "ad_spend_total",
+    "ad_cpl",
+    "ad_ctr",
+    "ad_conversion_rate",
+    "support_ticket_volume",
+    "support_csat_score",
+    "support_resolution_time",
+    "telephony_connect_rate",
+    "telephony_call_volume",
+    "telephony_booking_rate",
+    "lms_active_users",
+    "lms_completion_rate",
+    "lms_engagement_score",
+    "week_of_month",
+    "is_month_end",
+    "seasonal_factor"
+  ],
+  "metrics": {
+    "accuracy": 0.96,
+    "classification_report": {
+      "0": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1-score": 0.0,
+        "support": 4.0
+      },
+      "1": {
+        "precision": 0.96,
+        "recall": 1.0,
+        "f1-score": 0.9795918367346939,
+        "support": 96.0
+      },
+      "accuracy": 0.96,
+      "macro avg": {
+        "precision": 0.48,
+        "recall": 0.5,
+        "f1-score": 0.4897959183673469,
+        "support": 100.0
+      },
+      "weighted avg": {
+        "precision": 0.9216,
+        "recall": 0.96,
+        "f1-score": 0.9404081632653061,
+        "support": 100.0
+      }
+    },
+    "training_samples": 400,
+    "test_samples": 100,
+    "features_count": 24
+  }
+}
