@@ -1372,7 +1372,9 @@ class ClosemoreService:
     async def generate_sample_call_transcription(self) -> str:
         """Generate a realistic call transcription using AI"""
         try:
-            # For now, use sample transcription (can be enhanced with Bedrock later)
+            # Always use fallback for now to avoid timeouts
+            # Future enhancement: Can add Bedrock integration when needed
+            print("Generating call transcription using fast local method")
             return self._get_sample_call_transcription()
                 
         except Exception as e:

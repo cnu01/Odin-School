@@ -620,7 +620,12 @@ class CloseMoreService {
   async generateCallTranscription() {
     try {
       console.log('Attempting to generate call transcription...');
-      const response = await api.post('/api/closemore/generate-call-transcription');
+      
+      // Use shorter timeout for transcription generation since it should be fast
+      const response = await api.post('/api/closemore/generate-call-transcription', {}, {
+        timeout: 10000 // 10 second timeout for this specific call
+      });
+      
       console.log('Transcription API response:', response);
       console.log('Response data:', response.data);
       
@@ -637,6 +642,17 @@ class CloseMoreService {
       }
     } catch (error) {
       console.error('Error generating call transcription:', error);
+      
+      // Check if it's a timeout error
+      if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+        console.error('Request timed out - server may be slow or unresponsive');
+        return {
+          success: false,
+          error: 'Request timed out. The server may be experiencing delays. Please try again.',
+          data: null
+        };
+      }
+      
       console.error('Error details:', {
         message: error.message,
         status: error.response?.status,

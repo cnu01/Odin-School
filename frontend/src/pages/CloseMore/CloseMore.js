@@ -1124,7 +1124,7 @@ Rep: That's a common concern. Can you tell me about your current background and 
                       {rep.highPriority > 0 && (
                         <Chip 
                           label={`${rep.highPriority} High Priority`}
-                          color="error"
+                          color="primary"
                           size="small"
                           icon={<Warning />}
                         />
@@ -1136,7 +1136,7 @@ Rep: That's a common concern. Can you tell me about your current background and 
                       <Grid item xs={6}>
                         <Box sx={{ textAlign: 'center' }}>
                           <Typography variant="h4" sx={{ 
-                            color: rep.pendingActions > 10 ? 'error.main' : 'warning.main', 
+                            color: rep.pendingActions > 10 ? 'primary.main' : 'warning.main', 
                             fontWeight: 'bold' 
                           }}>
                             {rep.pendingActions}
@@ -1149,7 +1149,7 @@ Rep: That's a common concern. Can you tell me about your current background and 
                       <Grid item xs={6}>
                         <Box sx={{ textAlign: 'center' }}>
                           <Typography variant="h4" sx={{ 
-                            color: rep.highPriority > 0 ? 'error.main' : 'success.main', 
+                            color: rep.highPriority > 0 ? 'primary.main' : 'success.main', 
                             fontWeight: 'bold' 
                           }}>
                             {rep.highPriority}
@@ -1172,7 +1172,7 @@ Rep: That's a common concern. Can you tell me about your current background and 
                       <Grid item xs={6}>
                         <Box sx={{ textAlign: 'center' }}>
                           <Typography variant="h4" sx={{ 
-                            color: rep.winRate > 70 ? 'success.main' : rep.winRate > 50 ? 'warning.main' : 'error.main', 
+                            color: rep.winRate > 70 ? 'success.main' : rep.winRate > 50 ? 'warning.main' : 'info.main', 
                             fontWeight: 'bold' 
                           }}>
                             {rep.winRate}%
