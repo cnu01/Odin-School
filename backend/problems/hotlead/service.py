@@ -1365,7 +1365,6 @@ Provide concrete, data-driven analysis that shows why qualified leads are being 
                 technical_requirements=["✅ Random Forest model", "✅ Real-time scoring API", "✅ MongoDB integration"],
                 timeline_weeks=0,
                 success_metrics=["72.5% model accuracy", "Sub-second scoring", "Real-time lead processing"],
-                # current_status="✅ Live in Production",
                 confidence_score=0.95
             ),
             AISolution(
@@ -1378,7 +1377,6 @@ Provide concrete, data-driven analysis that shows why qualified leads are being 
                 technical_requirements=["✅ Multi-factor scoring", "✅ Dynamic thresholds", "✅ Real-time updates"],
                 timeline_weeks=0,
                 success_metrics=["Dynamic 80th percentile", "Source intelligence weighting", "Behavioral amplification"],
-                # current_status="✅ Live in Production",
                 confidence_score=0.92
             ),
             AISolution(
@@ -1391,7 +1389,6 @@ Provide concrete, data-driven analysis that shows why qualified leads are being 
                 technical_requirements=["✅ AWS Bedrock", "✅ Claude 3.5 Sonnet", "✅ Automated analysis"],
                 timeline_weeks=0,
                 success_metrics=["Automated problem detection", "Evidence-based insights", "Actionable recommendations"],
-                # current_status="✅ Live in Production", 
                 confidence_score=0.90
             ),
             AISolution(
@@ -1404,7 +1401,6 @@ Provide concrete, data-driven analysis that shows why qualified leads are being 
                 technical_requirements=["✅ Engagement pattern analysis", "✅ Dynamic priority multiplier", "✅ Real-time scoring"],
                 timeline_weeks=0,
                 success_metrics=["Momentum detection accuracy", "2x priority for high-intent leads", "Enhanced lead temperature indicators"],
-                # current_status="✅ Live in Production",
                 confidence_score=0.88
             )
         ]

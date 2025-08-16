@@ -44,7 +44,7 @@ class AISolution(BaseModel):
     technical_requirements: List[str]
     timeline_weeks: int
     success_metrics: List[str]
-    current_status: str  # "Not Started", "In Progress", "Completed"
+    current_status: Optional[str] = None  # "Not Started", "In Progress", "Completed"
     confidence_score: float  # 0.0 to 1.0
 
 
