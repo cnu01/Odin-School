@@ -198,24 +198,31 @@ const InfluencerHub = () => {
     <Box p={3}>
       {/* Header */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Box>
-          <Typography variant="h4" gutterBottom>
-            🎯 Influencer Hub - CreatorFit AI
+        <Box sx={{ width: '100%' }}>
+          <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
+            Influencer Hub - CreatorFit AI
           </Typography>
           <Typography variant="subtitle1" color="textSecondary">
             AI-powered influencer analysis and lead forecasting for EdTech campaigns
           </Typography>
+        <Alert severity="info" sx={{ mb: 3, mt: 3, borderRadius: '4px', width: '100%' }}>
+            <Typography variant="body2" component="div">
+              <strong>What this analysis delivers</strong>
+              <Box component="ul" sx={{ pl: 3, my: 0, mt: 1, '& > li': { mb: 1.25 } }}>
+                <li>
+                  <strong>Diagnosis</strong>: Reasons why some creators underperform
+                </li>
+                <li>
+                  <strong>Solutions</strong>: AI-driven ways to score fit between creator content and programs
+                </li>
+                <li>
+                  <strong>Forecast qualified leads</strong>: Forecast qualified leads before booking creators
+                </li>
+                
+              </Box>
+            </Typography>
+        </Alert>
         </Box>
-        
-        {analysisResults && (
-          <Button
-            variant="outlined"
-            startIcon={<DownloadIcon />}
-            onClick={exportResults}
-          >
-            Export Results
-          </Button>
-        )}
       </Box>
 
       {/* Alerts */}
@@ -350,6 +357,19 @@ const InfluencerHub = () => {
           <Typography variant="body2" align="center" mt={1}>
             Running AI analysis on creators... This may take up to 60 seconds.
           </Typography>
+        </Box>
+      )}
+
+      {/* Export Results */}
+      {analysisResults && (
+        <Box display="flex" justifyContent="flex-end" my={2}>
+          <Button
+            variant="outlined"
+            startIcon={<DownloadIcon />}
+            onClick={exportResults}
+          >
+            Export Results
+          </Button>
         </Box>
       )}
 
