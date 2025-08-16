@@ -802,7 +802,7 @@ function HotLead() {
                 <Box sx={{ mb: 3 }}>
                   <LinearProgress />
                   <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                    Claude AI is analyzing 150 random leads from MongoDB database...
+                    AI is analyzing 150 random leads from DB...
                   </Typography>
                 </Box>
               )}

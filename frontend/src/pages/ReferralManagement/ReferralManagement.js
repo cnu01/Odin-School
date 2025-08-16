@@ -351,7 +351,7 @@ const ReferralManagement = () => {
                 <Box sx={{ mb: 3 }}>
                   <LinearProgress />
                   <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                    Claude AI is analyzing 100-200 recent referral leads from MongoDB database...
+                    Claude AI is analyzing 100-200 recent referral leads from database...
                   </Typography>
                 </Box>
               )}

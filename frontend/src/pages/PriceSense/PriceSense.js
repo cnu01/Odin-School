@@ -778,7 +778,7 @@ const PriceSense = () => {
             label={dashboardData?.dashboard?.data_points ? `${dashboardData.dashboard.data_points} Real Records` : 'Live Data'} 
             sx={{ mx: 0.5 }} 
           />
-          from your MongoDB database with segment-aware plan recommendations, 
+          from your database with segment-aware plan recommendations, 
           scholarship automation, and churn risk assessment for maximized revenue quality.
         </Typography>
       </Alert>
