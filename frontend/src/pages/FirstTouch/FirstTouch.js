@@ -90,10 +90,7 @@ function FirstTouch() {
   const [optimizationLoading, setOptimizationLoading] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
 
-  useEffect(() => {
-    loadInitialData();
-  }, []);
-
+  // Define loadInitialData function that can be used throughout the component
   const loadInitialData = async () => {
     try {
       setLoading(true);
@@ -110,7 +107,7 @@ function FirstTouch() {
 
       setProblemAnalysis(problemRes);
       setAnalytics(analyticsRes);
-
+      
       // Generate sample leads for demo
       generateSampleLeads();
       
@@ -122,6 +119,27 @@ function FirstTouch() {
       setLoading(false);
     }
   };
+
+  // Load data on component mount with race condition protection
+  useEffect(() => {
+    const abortController = new AbortController();
+    
+    const loadWithDelay = async () => {
+      // Add delay to prevent rapid duplicate requests
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      if (!abortController.signal.aborted) {
+        await loadInitialData();
+      }
+    };
+
+    loadWithDelay();
+    
+    // Cleanup function to prevent race conditions
+    return () => {
+      abortController.abort();
+    };
+  }, []);
 
   const generateSampleLeads = () => {
     const sampleLeads = [

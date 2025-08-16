@@ -32,6 +32,44 @@ class ProblemAnalysisResponse(BaseModel):
     implementation_status: Dict[str, str]
 
 
+# AI Solutions Models
+class AISolution(BaseModel):
+    """Model for individual AI solution recommendations"""
+    solution_id: str
+    title: str
+    description: str
+    problem_addressed: str
+    implementation_complexity: str  # "Low", "Medium", "High"
+    expected_impact: str
+    technical_requirements: List[str]
+    timeline_weeks: int
+    success_metrics: List[str]
+    current_status: Optional[str] = None  # "Not Started", "In Progress", "Completed"
+    confidence_score: float  # 0.0 to 1.0
+
+
+class AIEnhancement(BaseModel):
+    """Model for AI enhancement capabilities"""
+    enhancement_id: str
+    category: str  # "Predictive", "Automation", "Optimization", "Personalization"
+    name: str
+    description: str
+    current_capability: str
+    enhanced_capability: str
+    improvement_metrics: Dict[str, Any]
+    implementation_effort: str
+
+
+class AISolutionsResponse(BaseModel):
+    """Complete AI solutions response for frontend display"""
+    solutions: List[AISolution] 
+    enhancements: List[AIEnhancement]
+    implementation_roadmap: Dict[str, Any]
+    roi_projection: Dict[str, Any]
+    technical_architecture: Dict[str, Any]
+    prioritization_analysis: Optional[Dict[str, Any]] = None
+
+
 class LeadIngestRequest(BaseModel):
     """Request model for ingesting a new lead"""
     email: EmailStr

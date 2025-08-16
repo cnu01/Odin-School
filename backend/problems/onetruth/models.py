@@ -32,6 +32,50 @@ class ProblemAnalysisResponse(BaseModel):
     implementation_status: Dict[str, str]
 
 
+# AI Solution Models for OneTruth
+class DataUnificationSolution(BaseModel):
+    """Model for data unification solution"""
+    solution_id: str
+    title: str
+    description: str
+    technical_approach: str
+    benefits: List[str]
+    implementation_effort: str
+    expected_roi: str
+    success_metrics: List[str]
+
+
+class ExecutiveBriefingSolution(BaseModel):
+    """Model for executive briefing solution"""
+    solution_id: str
+    title: str
+    description: str
+    ai_capabilities: List[str]
+    automation_features: List[str]
+    decision_support: List[str]
+    implementation_effort: str
+    expected_roi: str
+
+
+class SolutionPrioritization(BaseModel):
+    """Model for solution prioritization"""
+    solution_id: str
+    impact_score: float
+    effort_score: float
+    roi_potential: str
+    timeline: str
+    risk_level: str
+    business_priority: str
+
+
+class OneTruthSolutionsResponse(BaseModel):
+    """Complete solutions response for OneTruth"""
+    data_unification: DataUnificationSolution
+    executive_briefing: ExecutiveBriefingSolution
+    prioritization: List[SolutionPrioritization]
+    combined_impact: Dict[str, str]
+
+
 class BusinessAnalyticsRecord(BaseModel):
     """Model for business analytics data"""
     # CRM Metrics

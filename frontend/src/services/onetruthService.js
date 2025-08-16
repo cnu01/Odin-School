@@ -1,196 +1,263 @@
 import api from './api';
 
-const ONETRUTH_BASE_URL = '/api/onetruth';
+/**
+ * OneTruth AI Service - Marketing Analytics with Unified Business Intelligence
+ * Handles all API calls for marketing analytics unification and executive decision support
+ */
+class OnetruthService {
+  constructor() {
+    this.baseURL = '/api/onetruth';
+  }
 
-export const onetruthService = {
-  // Dashboard and Analytics
-  async getDashboard(timeRange = '7d', includeAnomalies = true) {
+  /**
+   * Get system status and model information
+   */
+  async getStatus() {
     try {
-      const response = await api.get(`${ONETRUTH_BASE_URL}/dashboard`, {
+      const response = await api.get(`${this.baseURL}/status`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching OneTruth status:', error);
+      throw new Error('Failed to fetch system status');
+    }
+  }
+
+  /**
+   * Get AI-powered problem analysis for marketing analytics
+   * @param {boolean} forceRefresh - Force refresh of analysis
+   */
+  async getProblemAnalysis(forceRefresh = false) {
+    try {
+      const response = await api.get(`${this.baseURL}/problem-analysis`, {
+        params: { force_refresh: forceRefresh }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching problem analysis:', error);
+      throw new Error('Failed to fetch problem analysis');
+    }
+  }
+
+  /**
+   * Get AI-first solutions for marketing analytics problems
+   */
+  async getProposedSolutions() {
+    try {
+      const response = await api.get(`${this.baseURL}/solutions`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching proposed solutions:', error);
+      throw new Error('Failed to fetch proposed solutions');
+    }
+  }
+
+  /**
+   * Get comprehensive dashboard data for Live Demo
+   * @param {string} timeRange - Time range for data (e.g., "7d", "30d")
+   * @param {boolean} includeAnomalies - Include anomaly detection
+   */
+  async getDashboardData(timeRange = "7d", includeAnomalies = true) {
+    try {
+      const response = await api.get(`${this.baseURL}/dashboard-data`, {
         params: { time_range: timeRange, include_anomalies: includeAnomalies }
       });
       return response.data;
     } catch (error) {
-      throw new Error(`Failed to fetch dashboard: ${error.response?.data?.detail || error.message}`);
+      console.error('Error fetching dashboard data:', error);
+      throw new Error('Failed to fetch dashboard data');
     }
-  },
+  }
 
-  async getAnalytics(sampleSize = 500) {
+  /**
+   * Get unified analytics dashboard
+   * @param {string} timeRange - Time range for analytics
+   * @param {boolean} includeAnomalies - Include anomaly detection
+   */
+  async getUnifiedDashboard(timeRange = "7d", includeAnomalies = true) {
     try {
-      const response = await api.get(`${ONETRUTH_BASE_URL}/analytics`, {
-        params: { sample_size: sampleSize }
+      const response = await api.get(`${this.baseURL}/dashboard`, {
+        params: { time_range: timeRange, include_anomalies: includeAnomalies }
       });
       return response.data;
     } catch (error) {
-      throw new Error(`Failed to fetch analytics: ${error.response?.data?.detail || error.message}`);
+      console.error('Error fetching unified dashboard:', error);
+      throw new Error('Failed to fetch unified dashboard');
     }
-  },
+  }
 
-  // Anomaly Detection
-  async detectAnomalies(timeRange = '7d') {
+  /**
+   * Detect business anomalies across integrated systems
+   * @param {string} timeRange - Time range for anomaly detection
+   */
+  async detectAnomalies(timeRange = "7d") {
     try {
-      const response = await api.get(`${ONETRUTH_BASE_URL}/anomalies`, {
+      const response = await api.get(`${this.baseURL}/anomalies`, {
         params: { time_range: timeRange }
       });
       return response.data;
     } catch (error) {
-      throw new Error(`Failed to detect anomalies: ${error.response?.data?.detail || error.message}`);
+      console.error('Error detecting anomalies:', error);
+      throw new Error('Failed to detect anomalies');
     }
-  },
+  }
 
-  // Executive Intelligence
-  async getExecutiveBrief(useLLM = false, horizonDays = 7) {
+  /**
+   * Generate AI-powered executive brief
+   * @param {boolean} useLLM - Use AI for enhanced insights
+   * @param {number} horizonDays - Analysis horizon in days
+   */
+  async generateExecutiveBrief(useLLM = true, horizonDays = 7) {
     try {
-      const response = await api.post(`${ONETRUTH_BASE_URL}/executive-brief`, {
+      const response = await api.post(`${this.baseURL}/executive-brief`, {
         use_llm: useLLM,
-        horizon_days: horizonDays,
-        include_decisions: true
+        horizon_days: horizonDays
       });
       return response.data;
     } catch (error) {
-      throw new Error(`Failed to generate executive brief: ${error.response?.data?.detail || error.message}`);
+      console.error('Error generating executive brief:', error);
+      throw new Error('Failed to generate AI-powered executive brief');
     }
-  },
+  }
 
+  /**
+   * Get executive decision recommendations
+   */
   async getExecutiveDecisions() {
     try {
-      const response = await api.get(`${ONETRUTH_BASE_URL}/decisions`);
+      const response = await api.get(`${this.baseURL}/decisions`);
       return response.data;
     } catch (error) {
-      throw new Error(`Failed to fetch executive decisions: ${error.response?.data?.detail || error.message}`);
+      console.error('Error fetching executive decisions:', error);
+      throw new Error('Failed to fetch executive decisions');
     }
-  },
+  }
 
-  // Model Operations
-  async trainModel(size = 2000) {
+  /**
+   * Verify data consistency across business systems
+   * @param {Array} systems - List of systems to verify
+   * @param {number} timeRangeDays - Time range for verification
+   */
+  async verifyDataConsistency(systems = ["CRM", "GA4", "Ad Platforms", "Support", "Telephony", "LMS"], timeRangeDays = 7) {
     try {
-      const response = await api.post(`${ONETRUTH_BASE_URL}/train`, { size });
-      return response.data;
-    } catch (error) {
-      throw new Error(`Failed to train model: ${error.response?.data?.detail || error.message}`);
-    }
-  },
-
-  async evaluateModel(sampleSize = 10) {
-    try {
-      const response = await api.get(`${ONETRUTH_BASE_URL}/evaluate`, {
-        params: { sample_size: sampleSize }
-      });
-      return response.data;
-    } catch (error) {
-      throw new Error(`Failed to evaluate model: ${error.response?.data?.detail || error.message}`);
-    }
-  },
-
-  // Data Management
-  async seedDatabase(size = 2000) {
-    try {
-      const response = await api.post(`${ONETRUTH_BASE_URL}/seed`, { size });
-      return response.data;
-    } catch (error) {
-      throw new Error(`Failed to seed database: ${error.response?.data?.detail || error.message}`);
-    }
-  },
-
-  async verifyDataConsistency(systems = ['CRM', 'GA4', 'Ads', 'Support', 'Telephony', 'LMS'], timeRangeDays = 7) {
-    try {
-      const response = await api.post(`${ONETRUTH_BASE_URL}/verify`, {
+      const response = await api.post(`${this.baseURL}/data-verification`, {
         systems,
         time_range_days: timeRangeDays
       });
       return response.data;
     } catch (error) {
-      throw new Error(`Failed to verify data: ${error.response?.data?.detail || error.message}`);
+      console.error('Error verifying data consistency:', error);
+      throw new Error('Failed to verify data consistency');
     }
-  },
-
-  // Analytics Outcome Tracking
-  async recordAnalyticsOutcome(outcome) {
-    try {
-      const response = await api.post(`${ONETRUTH_BASE_URL}/record-outcome`, outcome);
-      return response.data;
-    } catch (error) {
-      throw new Error(`Failed to record outcome: ${error.response?.data?.detail || error.message}`);
-    }
-  },
-
-  // Problem Analysis - REQUIRED BY REFERENCE
-  async getProblemAnalysis() {
-    try {
-      const response = await api.get(`${ONETRUTH_BASE_URL}/problem-analysis`);
-      return response.data;
-    } catch (error) {
-      throw new Error(`Failed to get problem analysis: ${error.response?.data?.detail || error.message}`);
-    }
-  },
-
-  // Enhanced Dashboard Data - REQUIRED BY REFERENCE
-  async getDashboardData() {
-    try {
-      const response = await api.get(`${ONETRUTH_BASE_URL}/dashboard-data`);
-      return response.data;
-    } catch (error) {
-      throw new Error(`Failed to get dashboard data: ${error.response?.data?.detail || error.message}`);
-    }
-  },
-
-  // System Status
-  async getSystemStatus() {
-    try {
-      const response = await api.get(`${ONETRUTH_BASE_URL}/status`);
-      return response.data;
-    } catch (error) {
-      throw new Error(`Failed to get system status: ${error.response?.data?.detail || error.message}`);
-    }
-  },
-
-  // Helper Functions for UI Formatting
-  formatMetricValue(value, type = 'number') {
-    if (type === 'currency') {
-      return `₹${(value / 100000).toFixed(1)}L`;
-    }
-    if (type === 'percentage') {
-      return `${(value * 100).toFixed(1)}%`;
-    }
-    if (type === 'days') {
-      return `${value} days`;
-    }
-    return value;
-  },
-
-  getHealthColor(score) {
-    if (score >= 85) return '#4caf50'; // Green
-    if (score >= 75) return '#2196f3'; // Blue  
-    if (score >= 65) return '#ff9800'; // Orange
-    return '#f44336'; // Red
-  },
-
-  getSeverityColor(severity) {
-    switch (severity?.toLowerCase()) {
-      case 'high':
-        return '#f44336'; // Red
-      case 'medium':
-        return '#ff9800'; // Orange
-      case 'low':
-        return '#2196f3'; // Blue
-      default:
-        return '#9e9e9e'; // Gray
-    }
-  },
-
-  // Create mock executive summary for fallback
-  createMockExecutiveSummary() {
-    return {
-      total_revenue: 23400000,
-      revenue_growth: 0.18,
-      new_enrollments: 342,
-      enrollment_growth: 0.12,
-      customer_satisfaction: 4.3,
-      satisfaction_trend: 0.05,
-      operational_efficiency: 0.87,
-      efficiency_trend: 0.03
-    };
   }
-};
 
+  /**
+   * Get analytics performance metrics
+   * @param {number} sampleSize - Sample size for analytics
+   */
+  async getAnalytics(sampleSize = 500) {
+    try {
+      const response = await api.get(`${this.baseURL}/analytics`, {
+        params: { sample_size: sampleSize }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching analytics:', error);
+      throw new Error('Failed to fetch analytics data');
+    }
+  }
+
+  /**
+   * Train the OneTruth ML model (admin function)
+   * @param {number} size - Training data size
+   */
+  async trainModel(size = 2000) {
+    try {
+      const response = await api.post(`${this.baseURL}/train`, {
+        size
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error training model:', error);
+      throw new Error('Failed to train OneTruth model');
+    }
+  }
+
+  /**
+   * Evaluate model performance (admin function)
+   * @param {number} sampleSize - Evaluation sample size
+   */
+  async evaluateModel(sampleSize = 100) {
+    try {
+      const response = await api.get(`${this.baseURL}/evaluate`, {
+        params: { sample_size: sampleSize }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error evaluating model:', error);
+      throw new Error('Failed to evaluate model');
+    }
+  }
+
+  /**
+   * Seed database with analytics data (admin function)
+   * @param {number} size - Number of records to seed
+   */
+  async seedData(size = 2000) {
+    try {
+      const response = await api.post(`${this.baseURL}/seed`, {
+        size
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error seeding data:', error);
+      throw new Error('Failed to seed analytics data');
+    }
+  }
+
+  /**
+   * Helper function to format health scores
+   * @param {number} score - Health score (0-100)
+   */
+  formatHealthScore(score) {
+    if (score >= 80) return { level: 'Excellent', color: '#4caf50', badge: 'success' };
+    if (score >= 60) return { level: 'Good', color: '#ff9800', badge: 'warning' };
+    if (score >= 40) return { level: 'Fair', color: '#f44336', badge: 'error' };
+    return { level: 'Poor', color: '#9e9e9e', badge: 'default' };
+  }
+
+  /**
+   * Helper function to format currency values
+   * @param {number} amount - Amount in INR
+   */
+  formatCurrency(amount) {
+    if (amount >= 100000) {
+      return `₹${(amount / 100000).toFixed(1)}L`;
+    }
+    if (amount >= 1000) {
+      return `₹${(amount / 1000).toFixed(1)}K`;
+    }
+    return `₹${amount}`;
+  }
+
+  /**
+   * Helper function to format percentages
+   * @param {number} value - Decimal value (0-1)
+   */
+  formatPercentage(value) {
+    return `${(value * 100).toFixed(1)}%`;
+  }
+
+  /**
+   * Helper function to get anomaly severity color
+   * @param {number} anomalyScore - Anomaly score (0-1)
+   */
+  getAnomalySeverityColor(anomalyScore) {
+    if (anomalyScore >= 0.8) return 'error';
+    if (anomalyScore >= 0.5) return 'warning';
+    return 'info';
+  }
+}
+
+// Export singleton instance
+const onetruthService = new OnetruthService();
 export default onetruthService;

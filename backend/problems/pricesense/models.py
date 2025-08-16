@@ -177,6 +177,7 @@ class AnalyticsResponse(BaseModel):
     medium_value_segment_ratio: float
     low_value_segment_ratio: float
     sample_size: int
+    data_source: Optional[str] = "unknown"
 
 
 class EvaluationResponse(BaseModel):

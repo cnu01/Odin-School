@@ -11,8 +11,15 @@ from .service import ClosemoreService
 
 router = APIRouter()
 
-# Initialize service
-closemore_service = ClosemoreService()
+# Singleton service instance
+_closemore_service_instance = None
+
+def get_closemore_service():
+    """Get or create singleton ClosemoreService instance"""
+    global _closemore_service_instance
+    if _closemore_service_instance is None:
+        _closemore_service_instance = ClosemoreService()
+    return _closemore_service_instance
 
 @router.get("/")
 async def closemore_home():
@@ -99,7 +106,8 @@ async def analyze_conversation(conversation_input: ConversationInput):
         ConversationAnalysis with comprehensive AI insights and recommendations
     """
     try:
-        analysis = await closemore_service.analyze_conversation(conversation_input)
+        closemore_service = get_closemore_service()
+        analysis = await get_closemore_service().analyze_conversation(conversation_input)
         return analysis
         
     except Exception as e:
@@ -128,7 +136,7 @@ async def analyze_conversation_with_rag(conversation_input: RAGConversationInput
         RAGConversationAnalysis with knowledge-enhanced insights and recommendations
     """
     try:
-        rag_analysis = await closemore_service.analyze_conversation_with_rag(conversation_input)
+        rag_analysis = await get_closemore_service().analyze_conversation_with_rag(conversation_input)
         return rag_analysis
         
     except Exception as e:
@@ -154,7 +162,7 @@ async def analyze_conversation_batch(batch_input: ConversationBatch):
         List of ConversationAnalysis results for each conversation
     """
     try:
-        analyses = await closemore_service.analyze_conversation_batch(batch_input.conversations)
+        analyses = await get_closemore_service().analyze_conversation_batch(batch_input.conversations)
         return analyses
         
     except Exception as e:
@@ -178,7 +186,7 @@ async def analyze_conversation_legacy(conversation_input: LegacyConversationInpu
         LegacyConversationAnalysis in original format
     """
     try:
-        analysis = await closemore_service.analyze_legacy_conversation(conversation_input)
+        analysis = await get_closemore_service().analyze_legacy_conversation(conversation_input)
         return analysis
         
     except Exception as e:
@@ -208,7 +216,7 @@ async def add_sales_knowledge(knowledge_input: SalesKnowledgeInput):
         Document ID and confirmation of successful addition
     """
     try:
-        doc_id = closemore_service.add_sales_knowledge(knowledge_input)
+        doc_id = get_closemore_service().add_sales_knowledge(knowledge_input)
         return {
             "success": True,
             "doc_id": doc_id,
@@ -242,7 +250,7 @@ async def search_sales_knowledge(query: KnowledgeQuery):
         List of relevant knowledge documents with similarity scores
     """
     try:
-        search_results = closemore_service.search_sales_knowledge(query)
+        search_results = get_closemore_service().search_sales_knowledge(query)
         return search_results
         
     except Exception as e:
@@ -266,7 +274,7 @@ async def get_knowledge_base_stats():
         KnowledgeStats with comprehensive knowledge base metrics
     """
     try:
-        stats = closemore_service.get_knowledge_base_stats()
+        stats = get_closemore_service().get_knowledge_base_stats()
         return stats
         
     except Exception as e:
@@ -295,7 +303,7 @@ async def get_daily_actions(request: DailyActionsRequest):
         DailyActionsSummary with prioritized actions and productivity metrics
     """
     try:
-        actions_summary = await closemore_service.get_daily_actions(
+        actions_summary = await get_closemore_service().get_daily_actions(
             rep_id=request.rep_id,
             include_low_priority=request.include_low_priority,
             max_actions=request.max_actions,
@@ -307,6 +315,48 @@ async def get_daily_actions(request: DailyActionsRequest):
         raise HTTPException(
             status_code=500,
             detail=f"Error generating daily actions: {str(e)}"
+        )
+
+@router.get("/daily-actions-all-reps")
+async def get_daily_actions_for_all_reps(
+    include_low_priority: bool = Query(False, description="Include low priority actions"),
+    max_actions_per_rep: int = Query(8, description="Maximum actions per rep"),
+    focus_area: Optional[str] = Query(None, description="Specific focus area")
+):
+    """
+    Generate daily actions for all active sales representatives
+    
+    Features:
+    - Multi-rep action planning and prioritization
+    - Individual rep performance metrics
+    - Completion tracking and productivity insights
+    - Team-wide action distribution and workload balancing
+    
+    Args:
+        include_low_priority: Whether to include low priority actions
+        max_actions_per_rep: Maximum actions per rep
+        focus_area: Specific focus area for actions
+        
+    Returns:
+        List of daily action summaries for each active sales rep
+    """
+    try:
+        all_reps_actions = await get_closemore_service().get_daily_actions_for_all_reps(
+            include_low_priority=include_low_priority,
+            max_actions_per_rep=max_actions_per_rep,
+            focus_area=focus_area
+        )
+        return {
+            "total_reps": len(all_reps_actions),
+            "total_actions": sum(rep['pending_actions'] for rep in all_reps_actions),
+            "high_priority_total": sum(rep['high_priority'] for rep in all_reps_actions),
+            "reps": all_reps_actions
+        }
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error generating daily actions for all reps: {str(e)}"
         )
 
 @router.get("/high-priority-leads")
@@ -329,7 +379,7 @@ async def get_high_priority_leads(
         List of high-priority leads with context and recommendations
     """
     try:
-        high_priority_leads = closemore_service.get_high_priority_leads(rep_id)
+        high_priority_leads = get_closemore_service().get_high_priority_leads(rep_id)
         return {
             "rep_id": rep_id,
             "high_priority_count": len(high_priority_leads),
@@ -362,7 +412,7 @@ async def get_pending_follow_ups(
         List of pending follow-ups sorted by urgency and overdue time
     """
     try:
-        pending_follow_ups = closemore_service.get_pending_follow_ups(rep_id)
+        pending_follow_ups = get_closemore_service().get_pending_follow_ups(rep_id)
         return {
             "rep_id": rep_id,
             "pending_count": len(pending_follow_ups),
@@ -399,7 +449,7 @@ async def get_rep_performance_metrics(
         PipelineMetrics with comprehensive performance data for coaching and improvement
     """
     try:
-        metrics = closemore_service.get_rep_performance_metrics(rep_id)
+        metrics = get_closemore_service().get_rep_performance_metrics(rep_id)
         return metrics
         
     except Exception as e:
@@ -428,7 +478,7 @@ async def get_conversation_insights(
         ConversationInsights with actionable coaching recommendations
     """
     try:
-        insights = closemore_service.get_conversation_insights(rep_id)
+        insights = get_closemore_service().get_conversation_insights(rep_id)
         return insights
         
     except Exception as e:
@@ -457,7 +507,7 @@ async def get_lead_conversation_history(
         Complete conversation history with analysis progression
     """
     try:
-        history = closemore_service.get_lead_conversation_history(lead_id)
+        history = get_closemore_service().get_lead_conversation_history(lead_id)
         return {
             "lead_id": lead_id,
             "total_conversations": len(history),
@@ -489,7 +539,7 @@ async def get_problem_analysis():
         Problem analysis with diagnosed problems, segment challenges, and implementation status
     """
     try:
-        problem_analysis = await closemore_service.get_problem_analysis()
+        problem_analysis = await get_closemore_service().get_problem_analysis()
         return problem_analysis
         
     except Exception as e:
@@ -517,11 +567,33 @@ async def get_conversations(
         Conversation list with summary statistics and filtering metadata
     """
     try:
-        conversations_data = await closemore_service.get_conversations(rep_id, limit)
+        conversations_data = await get_closemore_service().get_conversations(rep_id, limit)
         return conversations_data
         
     except Exception as e:
         raise HTTPException(
             status_code=500,
             detail=f"Error retrieving conversations: {str(e)}"
+        )
+
+@router.post("/generate-call-transcription")
+async def generate_call_transcription():
+    """
+    Generate a realistic call transcription using AI
+    
+    Creates a sample sales call transcript that can be used for testing
+    and demonstration purposes. The transcript includes typical sales
+    conversation elements like objections, questions, and closing attempts.
+    
+    Returns:
+        Generated call transcription text
+    """
+    try:
+        transcription = await get_closemore_service().generate_sample_call_transcription()
+        return {"transcription": transcription}
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error generating call transcription: {str(e)}"
         )

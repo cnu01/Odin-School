@@ -2,9 +2,7 @@ from fastapi import APIRouter, HTTPException
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 from .models import (
-    ScoreRequest, ScoreResponse, MessageRequest, MessageResponse,
-    TrainRequest, AnalyticsResponse, ReferralProfile, TrackEvent,
-    ProgressMessageRequest, AnalyticsInsightsRequest, ProblemAnalysisResponse
+    ReferralProfile, CandidatesResponse, ProblemAnalysisResponse
 )
 from .service import RefermoreService
 
@@ -19,38 +17,12 @@ def get_service() -> RefermoreService:
     return _service
 
 
-@router.get("/")
-async def refermore_home():
-    return {
-        "problem": "ReferMore - Referral System Enhancement",
-        "description": "AI-driven referral optimization and automation",
-        "status": "Ready",
-        "endpoints": [
-            "GET /api/refermore/status",
-            "POST /api/refermore/train?size=2000",
-            "POST /api/refermore/score",
-            "GET /api/refermore/candidates",
-            "POST /api/refermore/message",
-            "GET /api/refermore/analytics",
-            "GET /api/refermore/evaluate",
-        ],
-    }
-
-
 @router.get("/status")
 async def refermore_status():
     try:
         return await get_service().get_status()
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Status check failed: {e}")
-
-
-@router.post("/train")
-async def train_refermore(size: int = 2000):
-    try:
-        return await get_service().train(size)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Training failed: {e}")
 
 
 @router.post("/score")
@@ -69,51 +41,177 @@ async def score_referral_profile(profile: ReferralProfile):
 async def get_candidates(limit: int = 20, threshold: float = 0.6):
     try:
         resp = await get_service().candidates(limit=limit, threshold=threshold)
-        # Shape to backend: { total, items: [...] }
-        items: List[Dict[str, Any]] = []
-        for c in resp.candidates:
-            items.append({
-                "student_id": c.get("profile", {}).get("student_id", None),
-                "score": c.get("propensity_score"),
-                "likelihood": c.get("insights", {}).get("likelihood_bucket"),
-                "optimal_timing": c.get("insights", {}).get("recommendations", [None])[0] if c.get("insights") else None,
-                "suggested_incentive": "standard_reward",
-            })
-        items.sort(key=lambda x: (x.get("score") or 0), reverse=True)
-        return {"total": len(items), "items": items[:limit]}
+        # Return the data in the format expected by frontend
+        return {
+            "total": resp.total,
+            "items": resp.items,
+            "threshold": resp.threshold
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Candidates retrieval failed: {e}")
 
 
-@router.post("/message", response_model=MessageResponse)
-async def generate_message(request: MessageRequest):
-    try:
-        return await get_service().message(request.profile, request.message_type)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Message generation failed: {e}")
-
-
 @router.post("/messages/personalize")
-async def personalize_message(profile: ReferralProfile):
+async def personalize_message(candidate_data: Dict[str, Any]):
     try:
-        # Reuse single score then message
-        svc = get_service()
-        scored = await svc.score_referral_propensity([profile])
-        pred = scored.results[0] if scored.results else {}
-        msg_resp = await svc.message(profile, "referral_invite")
-        return {"message": msg_resp.message, "insights": pred.get("insights", {})}
+        # Handle both ReferralProfile and candidate object formats
+        if "student_name" in candidate_data:
+            # This is a candidate object from the frontend - use AI to generate truly personalized content
+            from services.aws import get_bedrock_service
+            
+            name = candidate_data.get("student_name", "there")
+            course = candidate_data.get("course_name", "your course")
+            completion_rate = candidate_data.get("completion_rate", 0.7)
+            engagement_score = candidate_data.get("engagement_score", 60)
+            nps = candidate_data.get("net_promoter_score", 7)
+            propensity_score = candidate_data.get("propensity_score", 70)
+            likelihood = candidate_data.get("likelihood", "Medium")
+            forum_posts = candidate_data.get("forum_posts", 0)
+            social_shares = candidate_data.get("social_shares", 0)
+            certificate_earned = candidate_data.get("certificate_earned", False)
+            
+            # Try to generate AI-powered message using Claude
+            message = None
+            try:
+                bedrock = get_bedrock_service()
+                if hasattr(bedrock, 'bedrock_runtime') and bedrock.bedrock_runtime is not None:
+                    # Create detailed prompt for AI to generate truly personalized message
+                    prompt = f"""Create a personalized referral message for OdinSchool student with these details:
+
+Student Profile:
+- Name: {name}
+- Course: {course}
+- Completion Rate: {completion_rate*100:.0f}%
+- Engagement Score: {engagement_score}/100
+- NPS Score: {nps}
+- Propensity: {likelihood} ({propensity_score:.0f}%)
+- Forum Posts: {forum_posts}
+- Social Shares: {social_shares}
+- Certificate: {"Earned" if certificate_earned else "In Progress"}
+
+Requirements:
+1. Address the student by name personally
+2. Reference their specific course and achievements
+3. Tailor tone based on their engagement level and propensity
+4. Include specific referral rewards (₹2,000 enrollment bonus + ₹1,000 completion bonus)
+5. Make it feel genuine and personal, not template-like
+6. Keep it under 150 words
+7. Use appropriate emojis but don't overdo it
+8. End with "OdinSchool Team"
+
+Create a unique message that reflects their specific learning journey and motivations. Don't mention NPS scores or technical metrics directly."""
+
+                    message = await bedrock.generate_text(prompt, max_tokens=300)
+                    
+                    # Clean up the message
+                    if message:
+                        message = message.strip()
+                        # Ensure it has proper greeting and closing
+                        if not message.startswith(("Hi", "Hello", "Hey")):
+                            message = f"Hi {name}! 👋\n\n" + message
+                        if not "OdinSchool Team" in message:
+                            message += "\n\nBest regards,\nOdinSchool Team"
+                            
+            except Exception as ai_error:
+                print(f"AI generation failed: {ai_error}")
+                message = None
+            
+            # Fallback to personalized templates if AI fails
+            if not message:
+                if likelihood == "High" and completion_rate > 0.8:
+                    achievement_phrase = "certificate earned" if certificate_earned else "outstanding progress"
+                    social_phrase = f"with {forum_posts} forum contributions" if forum_posts > 5 else "dedication to learning"
+                    
+                    message = f"""Hi {name}! 🌟
+
+Congratulations on your {achievement_phrase} in {course}! Your {completion_rate*100:.0f}% completion rate and {social_phrase} show real commitment to excellence.
+
+We'd love for you to share this transformative experience with others who could benefit. Our referral program offers:
+
+🎁 ₹2,000 immediate bonus when your referral enrolls
+💰 Additional ₹1,000 when they complete their course  
+🏆 Recognition as a top community advocate
+
+Your success story could be exactly what someone needs to take their next career step. Ready to help others while earning great rewards?
+
+Best regards,
+OdinSchool Team"""
+                
+                elif likelihood == "Medium" and engagement_score >= 70:
+                    course_progress = "Nearly completed" if completion_rate > 0.8 else "Making great progress in"
+                    engagement_note = f"Your {engagement_score}/100 engagement shows genuine interest"
+                    
+                    message = f"""Hello {name}! 👋
+
+{course_progress} {course}! {engagement_note} in learning, and we truly appreciate students like you.
+
+Since you're experiencing firsthand how valuable our programs are, you might know someone who could benefit too:
+
+✅ ₹2,000 referral bonus for successful enrollments
+✅ ₹1,000 additional reward for course completions
+✅ Build your professional network while helping others
+
+Your authentic recommendation could make all the difference for someone considering their next career move.
+
+Interested in sharing the opportunity?
+
+Warm regards,
+OdinSchool Team"""
+                
+                else:
+                    personal_touch = f"in {course}" if course != "your course" else "with us"
+                    encouragement = "Every learning journey is valuable" if completion_rate < 0.5 else "Your commitment to learning is inspiring"
+                    
+                    message = f"""Hi {name}! 🚀
+
+Thank you for being part of our learning community {personal_touch}! {encouragement}, and we believe in the power of shared knowledge.
+
+Would you like to help others discover the same opportunities you're exploring?
+
+🎯 Earn ₹2,000 for successful referrals
+💡 Help friends/colleagues advance their careers  
+🌟 Join our community of learning advocates
+
+Even if you're still on your own journey, your perspective could be exactly what someone needs to get started.
+
+Ready to make a positive impact?
+
+Best wishes,
+OdinSchool Team"""
+            
+            insights = {
+                "propensity_score": propensity_score,
+                "likelihood": likelihood,
+                "personalization_factors": [
+                    f"Completion rate: {completion_rate*100:.0f}%",
+                    f"Engagement score: {engagement_score}",
+                    f"NPS: {nps}",
+                    f"Course: {course}",
+                    f"Forum activity: {forum_posts} posts",
+                    f"Social sharing: {social_shares} shares"
+                ],
+                "recommendation": f"Targeting {likelihood.lower()}-propensity referrer with {'AI-generated' if message else 'template-based'} personalized approach"
+            }
+            
+        else:
+            # This is a ReferralProfile format - use existing logic
+            profile = ReferralProfile(**candidate_data)
+            svc = get_service()
+            scored = await svc.score_referral_propensity([profile])
+            pred = scored.results[0] if scored.results else {}
+            msg_resp = await svc.message(profile, "referral_invite")
+            message = msg_resp.message
+            insights = pred.get("insights", {})
+        
+        return {
+            "message": message,
+            "insights": insights,
+            "generated_at": datetime.now().isoformat(),
+            "message_type": "ai_personalized"
+        }
+        
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Message generation failed: {e}")
-
-
-@router.post("/referrals/track")
-async def track_referral(event: TrackEvent):
-    try:
-        return await get_service().track_event(event)
-    except ValueError as ve:
-        raise HTTPException(status_code=400, detail=str(ve))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Tracking failed: {e}")
 
 
 @router.get("/analytics")
@@ -125,77 +223,36 @@ async def analytics(sample_size: int = 500):
         raise HTTPException(status_code=500, detail=f"Analytics failed: {e}")
 
 
-@router.get("/evaluate")
-async def evaluate(sample_size: int = 100):
-    try:
-        # Return detailed evaluation similar to backend tests
-        return await get_service().evaluate_detailed(sample_size=sample_size)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Evaluation failed: {e}")
-
-
-@router.get("/analytics/summary")
-async def analytics_summary(sample_size: int = 500):
-    try:
-        return await get_service().analytics_summary(sample_size=sample_size)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Analytics summary failed: {e}")
-
-
-@router.post("/analytics/insights")
-async def analytics_insights(req: AnalyticsInsightsRequest):
-    try:
-        base = await get_service().analytics_summary(sample_size=req.sample_size)
-        # Simple rule-based narrative (LLM option exists in service but we keep simple here)
-        roi = base.get("roi", {})
-        dist = base.get("distribution", base)
-        actions = []
-        if roi.get("totals", {}).get("signups", 0) < 5:
-            actions.append("Launch a limited-time reward to push first 5 signups.")
-        if dist.get("high_share", 0) < 30:
-            actions.append("Target medium bucket with tailored nudges to boost high-propensity share.")
-        narrative = (
-            f"Avg propensity {dist.get('avg_propensity', 0)} with {dist.get('high_share', 0)}% high. "
-            f"Tracked {roi.get('totals', {}).get('invites', 0)} invites → {roi.get('totals', {}).get('signups', 0)} signups. "
-            + ("Next: " + " ".join(actions) if actions else "Keep momentum with top referrers.")
-        )
-        return {"insight": narrative, "summary": base}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Analytics insights failed: {e}")
-
-
-@router.post("/messages/progress")
-async def progress_message(req: ProgressMessageRequest):
-    try:
-        return await get_service().progress_message(req)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Progress message failed: {e}")
-
-
 @router.get("/problem-analysis", response_model=ProblemAnalysisResponse)
-async def get_problem_analysis():
+async def get_problem_analysis(force_refresh: bool = False):
     """
     Get complete problem diagnosis and analysis for ReferMore frontend display
     Shows identified issues, segment challenges, and implementation status
+    
+    Args:
+        force_refresh: If True, bypasses cache and generates fresh analysis
     """
     try:
         service = get_service()
-        analysis = await service.get_problem_analysis()
+        analysis = await service.get_problem_analysis(force_refresh=force_refresh)
         return analysis
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"ReferMore problem analysis failed: {e}")
 
 
 @router.get("/dashboard-data")
-async def get_dashboard_data():
+async def get_dashboard_data(force_refresh: bool = False):
     """
     Get combined data for ReferMore dashboard including problems and metrics
+    
+    Args:
+        force_refresh: If True, bypasses cache and generates fresh analysis
     """
     try:
         service = get_service()
         
-        # Get problem analysis
-        problem_analysis = await service.get_problem_analysis()
+        # Get problem analysis with force refresh option
+        problem_analysis = await service.get_problem_analysis(force_refresh=force_refresh)
         
         # Get current analytics
         status = await service.get_status()
@@ -210,7 +267,8 @@ async def get_dashboard_data():
             "participation_improvement": problem_analysis.overall_impact.get("participation_improvement", "40-60%"),
             "problem_analysis": problem_analysis,
             "system_status": status,
-            "last_updated": datetime.now().isoformat()
+            "last_updated": datetime.now().isoformat(),
+            "cache_refreshed": force_refresh
         }
         
         return dashboard_data

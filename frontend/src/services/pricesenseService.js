@@ -1,8 +1,8 @@
 import api from './api';
 
 /**
- * PriceSense AI Service
- * Handles all API calls for pricing optimization and strategy
+ * PriceSense AI Service - Pricing Optimization with Segment-Aware Recommendations
+ * Handles all API calls for pricing optimization, plan recommendations, and messaging
  */
 class PriceSenseService {
   constructor() {
@@ -19,6 +19,52 @@ class PriceSenseService {
     } catch (error) {
       console.error('Error fetching PriceSense status:', error);
       throw new Error('Failed to fetch system status');
+    }
+  }
+
+  /**
+   * Get AI-powered problem analysis for pricing optimization
+   * @param {boolean} forceRefresh - Force refresh of analysis
+   */
+  async getProblemAnalysis(forceRefresh = false) {
+    try {
+      const response = await api.get(`${this.baseURL}/problem-analysis`, {
+        params: { force_refresh: forceRefresh }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching problem analysis:', error);
+      throw new Error('Failed to fetch problem analysis');
+    }
+  }
+
+  /**
+   * Get AI-first solutions for pricing optimization
+   */
+  async getProposedSolutions() {
+    try {
+      const response = await api.get(`${this.baseURL}/solutions`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching proposed solutions:', error);
+      throw new Error('Failed to fetch proposed solutions');
+    }
+  }
+
+  /**
+   * Get comprehensive dashboard data for Live Demo
+   * @param {string} timeRange - Time range for data (e.g., "7d", "30d")
+   * @param {boolean} includeAnomalies - Include anomaly detection
+   */
+  async getDashboardData(timeRange = "7d", includeAnomalies = true) {
+    try {
+      const response = await api.get(`${this.baseURL}/dashboard-data`, {
+        params: { time_range: timeRange, include_anomalies: includeAnomalies }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+      throw new Error('Failed to fetch dashboard data');
     }
   }
 
@@ -169,10 +215,13 @@ class PriceSenseService {
 
   /**
    * Get problem analysis for business insights
+   * @param {boolean} forceRefresh - Force refresh of analysis
    */
-  async getProblemAnalysis() {
+  async getProblemAnalysis(forceRefresh = false) {
     try {
-      const response = await api.get(`${this.baseURL}/problem-analysis`);
+      const response = await api.get(`${this.baseURL}/problem-analysis`, {
+        params: { force_refresh: forceRefresh }
+      });
       return response.data;
     } catch (error) {
       console.error('Error fetching problem analysis:', error);
@@ -181,11 +230,15 @@ class PriceSenseService {
   }
 
   /**
-   * Get dashboard data (combined metrics and analysis)
+   * Get comprehensive dashboard data for Live Demo
+   * @param {string} timeRange - Time range for data (e.g., "7d", "30d")
+   * @param {boolean} includeAnomalies - Include anomaly detection
    */
-  async getDashboardData() {
+  async getDashboardData(timeRange = "7d", includeAnomalies = true) {
     try {
-      const response = await api.get(`${this.baseURL}/dashboard-data`);
+      const response = await api.get(`${this.baseURL}/dashboard-data`, {
+        params: { time_range: timeRange, include_anomalies: includeAnomalies }
+      });
       return response.data;
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
