@@ -199,6 +199,8 @@ function HotLead() {
     // Refresh all data (used for manual refresh)
     try {
       setLoading(true);
+      setError(null);
+      
       const [priorityResponse, analyticsResponse, statusResponse] = await Promise.all([
         hotleadService.getPriorityQueue({ limit: 20, min_score: 0 }),
         hotleadService.getAnalytics(),

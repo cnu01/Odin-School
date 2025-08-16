@@ -7,21 +7,31 @@ import api from './api';
 class TrustDeskService {
   
   /**
-   * Analyze a comment using RAG-enhanced AI
+   * Analyze a comment using AI
    * @param {Object} commentData - Comment data to analyze
    * @returns {Promise} Analysis result
    */
   async analyzeComment(commentData) {
     try {
-      const response = await api.post('/api/trustdesk/analyze-rag', {
-        text: commentData.content,
-        use_rag: true,
-        include_context: true
+      const response = await api.post('/api/trustdesk/analyze', {
+        comment_text: commentData.content,
+        customer_name: commentData.author || 'Anonymous',
+        platform: commentData.platform || 'manual_input',
+        comment_type: 'general'
       });
       
+      // Transform the response to match frontend expectations
+      const data = response.data;
       return {
         success: true,
-        data: response.data
+        data: {
+          sentiment: data.sentiment,
+          category: this._categorizeFromSentiment(data.sentiment, data.urgency_score),
+          priority: this._mapUrgencyToPriority(data.urgency_score),
+          confidence: 0.85, // Default confidence since legacy endpoint doesn't provide it
+          summary: data.reasoning || 'Comment analyzed successfully',
+          suggested_response: data.suggested_reply
+        }
       };
     } catch (error) {
       console.error('Error analyzing comment:', error);
@@ -30,6 +40,25 @@ class TrustDeskService {
         error: error.response?.data?.detail || error.message
       };
     }
+  }
+
+  /**
+   * Helper method to categorize based on sentiment and urgency
+   */
+  _categorizeFromSentiment(sentiment, urgencyScore) {
+    if (urgencyScore >= 8) return 'urgent';
+    if (sentiment === 'negative') return 'negative';
+    if (sentiment === 'positive') return 'positive';
+    return 'question';
+  }
+
+  /**
+   * Helper method to map urgency score to priority
+   */
+  _mapUrgencyToPriority(urgencyScore) {
+    if (urgencyScore >= 8) return 'urgent';
+    if (urgencyScore >= 5) return 'medium';
+    return 'low';
   }
 
   /**
