@@ -7,7 +7,8 @@ from .models import (
     DataVerificationRequest, BusinessAnalyticsRecord, 
     StatusResponse, AnomalyDetectionResponse, BusinessHealthResponse,
     ExecutiveDecisionResponse, ModelEvaluationResponse, SeedResponse,
-    AnalyticsOutcome, AnalyticsDiagnosticsResponse, ProblemAnalysisResponse
+    AnalyticsOutcome, AnalyticsDiagnosticsResponse, ProblemAnalysisResponse,
+    OneTruthSolutionsResponse
 )
 from .service import OnetruthService
 
@@ -225,31 +226,59 @@ async def get_problem_analysis():
         raise HTTPException(status_code=500, detail=f"OneTruth problem analysis failed: {e}")
 
 
-@router.get("/dashboard-data")
-async def get_dashboard_data():
-    """
-    Get combined data for OneTruth dashboard including problems and metrics
-    """
+@router.get("/solutions", response_model=OneTruthSolutionsResponse)
+async def get_proposed_solutions():
+    """Get AI-first solutions for OneTruth marketing analytics problems"""
     try:
+        return await onetruth_service.get_proposed_solutions()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/dashboard-data")
+async def get_dashboard_data(
+    time_range: str = "7d",
+    include_anomalies: bool = True
+):
+    """Get comprehensive dashboard data for OneTruth Live Demo"""
+    try:
+        # Get unified analytics dashboard
+        dashboard = await onetruth_service.get_dashboard_data(time_range, include_anomalies)
+        
+        # Get analytics metrics
+        analytics = await onetruth_service.get_analytics(500)
+        
         # Get problem analysis
         problem_analysis = await onetruth_service.get_problem_analysis()
         
-        # Get current system status
-        status = await onetruth_service.get_system_status()
+        # Get proposed solutions
+        solutions = await onetruth_service.get_proposed_solutions()
         
-        # Create dashboard summary
-        dashboard_data = {
-            "problems_identified": len(problem_analysis.diagnosed_problems),
-            "segments_analyzed": len(problem_analysis.segment_challenges),
-            "implementation_progress": len([status for status in problem_analysis.implementation_status.values() if "✅" in status]),
-            "total_implementation_items": len(problem_analysis.implementation_status),
-            "intelligence_opportunity": problem_analysis.overall_impact.get("intelligence_unification", "₹48L+ annually"),
-            "decision_acceleration": problem_analysis.overall_impact.get("decision_acceleration", "5-10x faster"),
-            "problem_analysis": problem_analysis,
-            "system_status": status,
-            "last_updated": datetime.now().isoformat()
+        # Get current system status
+        from ml.onetruth_model import onetruth_model
+        system_status = {
+            "system": "OneTruth",
+            "status": "active",
+            "model_trained": onetruth_model.model is not None,
+            "database_connected": True,
+            "data_sources": {
+                "crm": "connected",
+                "ga4": "connected", 
+                "ad_platforms": "connected",
+                "support": "connected",
+                "telephony": "connected",
+                "lms": "connected"
+            }
         }
         
-        return dashboard_data
+        return {
+            "dashboard": dashboard,
+            "analytics": analytics,
+            "problem_analysis": problem_analysis,
+            "solutions": solutions,
+            "system_status": system_status,
+            "time_range": time_range,
+            "last_updated": datetime.now().isoformat()
+        }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"OneTruth dashboard data failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))

@@ -439,15 +439,36 @@ class HotLeadService {
    * Get problem analysis and business insights - REQUIRED BY REFERENCE
    * @returns {Promise} Problem analysis data
    */
-  async getProblemAnalysis() {
+  async getProblemAnalysis(forceRefresh = false) {
     try {
-      const response = await api.get('/api/hotlead/problem-analysis');
+      const params = forceRefresh ? '?force_refresh=true' : '';
+      const response = await api.get(`/api/hotlead/problem-analysis${params}`);
       return {
         success: true,
         data: response.data
       };
     } catch (error) {
       console.error('Error fetching problem analysis:', error);
+      return {
+        success: false,
+        error: error.response?.data?.detail || error.message
+      };
+    }
+  }
+
+  /**
+   * Get AI Solutions and enhancement recommendations
+   * @returns {Promise} AI Solutions data including roadmap and ROI projections
+   */
+  async getAISolutions() {
+    try {
+      const response = await api.get('/api/hotlead/ai-solutions');
+      return {
+        success: true,
+        data: response.data
+      };
+    } catch (error) {
+      console.error('Error fetching AI Solutions:', error);
       return {
         success: false,
         error: error.response?.data?.detail || error.message
