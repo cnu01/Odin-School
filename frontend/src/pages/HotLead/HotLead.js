@@ -976,7 +976,11 @@ function HotLead() {
                   </Typography>
                   
                   <Grid container spacing={3} sx={{ mb: 4 }}>
-                    {aiSolutions.solutions?.filter(sol => sol.current_status && sol.current_status.includes('✅')).map((solution, index) => (
+                    {aiSolutions.solutions?.filter(sol => 
+                      sol.timeline_weeks === 0 || 
+                      sol.title?.includes('✅') || 
+                      sol.implementation_complexity === 'Completed'
+                    ).map((solution, index) => (
                       <Grid item xs={12} md={6} lg={4} key={solution.solution_id}>
                         <Card sx={{ 
                           height: '100%',
@@ -1058,7 +1062,11 @@ function HotLead() {
                   </Typography>
                   
                   <Grid container spacing={3} sx={{ mb: 4 }}>
-                    {aiSolutions.solutions?.filter(sol => sol.current_status === 'Ready to Implement').map((solution, index) => (
+                    {aiSolutions.solutions?.filter(sol => 
+                      sol.timeline_weeks > 0 && 
+                      sol.implementation_complexity !== 'Completed' &&
+                      !sol.title?.includes('✅')
+                    ).map((solution, index) => (
                       <Grid item xs={12} md={6} key={solution.solution_id}>
                         <Card sx={{ 
                           height: '100%',
