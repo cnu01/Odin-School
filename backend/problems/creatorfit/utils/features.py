@@ -118,13 +118,10 @@ def compute_fit_scores(
     if not isinstance(program_text, str) or not program_text.strip():
         raise ValueError("program_text must be a non-empty string.")
 
-    # Prepare texts
     texts = _normalize_text_series(df["recent_video_transcript"])
 
-    # Get embedding model (cached by name unless a model is explicitly provided)
     emb = model or _get_emb_model(emb_model_name)
 
-    # Encode target program and all creator transcripts
     prog_vec = _encode_texts([program_text], emb, batch_size=1, normalize=True)         # (1, d)
     creator_mat = _encode_texts(texts, emb, batch_size=batch_size, normalize=True)      # (N, d)
 
@@ -231,15 +228,6 @@ def build_features(
     if X.isna().any().any():
         nan_cols = X.columns[X.isna().any()].tolist()
         raise ValueError(f"Missing values in features: {nan_cols}")
-
-    # 9) EdTech-specific reporting
-    educational_creators = df["is_educational"].sum()
-    
-    print(f"[EDTECH] Built {len(numeric)} numeric + {len(categorical)} categorical features")
-    print(f"[EDTECH] Creator tiers: {df['creator_tier'].value_counts().to_dict()}")
-    print(f"[EDTECH] Educational content: {educational_creators}/{len(df)} ({educational_creators/len(df)*100:.1f}%)")
-    print(f"[EDTECH] Language distribution: {df['language'].value_counts().to_dict()}")
-    print(f"[EDTECH] Average fit score: {df['fit_score'].mean():.3f}")
 
     meta = {"numeric": numeric, "categorical": categorical, "target": target}
     return X, y, meta

@@ -24,7 +24,12 @@ import {
   LinearProgress,
   Badge,
   Tooltip,
-  IconButton
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField
 } from '@mui/material';
 
 import {
@@ -60,6 +65,10 @@ const InfluencerHub = () => {
   // Results state
   const [analysisResults, setAnalysisResults] = useState(null);
   const [creators, setCreators] = useState([]);
+  
+  // Modal state for View Input
+  const [inputModalOpen, setInputModalOpen] = useState(false);
+  const [selectedCreatorInput, setSelectedCreatorInput] = useState(null);
   
   // Table pagination
   const [page, setPage] = useState(0);
@@ -192,6 +201,27 @@ const InfluencerHub = () => {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+  };
+
+  const handleViewInput = ({input_data}) => {
+
+    const inputData = {
+      creator_id: input_data?.creator_id ?? "Unknown Creator",
+      topic: input_data?.topic ?? "Unknown Topic",
+      recent_video_transcript: input_data?.recent_video_transcript || "Sample transcript data",
+      posting_cadence_days: input_data?.posting_cadence_days ?? 0,
+      views_90d: input_data?.views_90d ?? 0,
+      clicks: input_data?.clicks ?? 0,
+      leads: input_data?.leads ?? 0,
+      qualified_leads: input_data?.qualified_leads ?? 0,
+      enrollments: input_data?.enrollments ?? 0,
+      refunds: input_data?.refunds ?? 0,
+      geography: input_data?.geography ?? "Unknown",
+      language: input_data?.language ?? "Unknown",
+    };
+    
+    setSelectedCreatorInput(inputData);
+    setInputModalOpen(true);
   };
 
   return (
@@ -401,6 +431,8 @@ const InfluencerHub = () => {
                     <TableCell>Views (90d)</TableCell>
                     <TableCell>Tier</TableCell>
                     <TableCell>Recommendation</TableCell>
+                    <TableCell>Insights</TableCell>
+
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -456,6 +488,17 @@ const InfluencerHub = () => {
                             />
                           </Tooltip>
                         </TableCell>
+                        <TableCell>
+                        <Box display="flex" justifyContent="flex-end" my={2}>
+                        <Button
+                          variant="outlined"
+                          onClick={() => handleViewInput(creator)}
+                          size="small"
+                        >
+                          View more
+                        </Button>
+                      </Box>
+                        </TableCell>
                       </TableRow>
                     ))}
                 </TableBody>
@@ -487,6 +530,83 @@ const InfluencerHub = () => {
           </Typography>
         </Paper>
       )}
+
+      {/* Input Data Modal */}
+      <Dialog 
+        open={inputModalOpen} 
+        onClose={() => setInputModalOpen(false)} 
+        maxWidth="md" 
+        fullWidth
+      >
+        <DialogTitle>
+          <Box display="flex" alignItems="center" gap={2}>
+            <InfoIcon color="primary" />
+            <Typography variant="h6">
+              Input CSV Data for Creator: {selectedCreatorInput?.creator_id}
+            </Typography>
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
+            This shows the original CSV input values that were used to generate the AI analysis for this creator.
+          </Typography>
+          
+          {selectedCreatorInput ? (
+            <TableContainer component={Paper} sx={{ mt: 2 }}>
+              <Table>
+                <TableHead>
+                  <TableRow sx={{ backgroundColor: 'grey.100' }}>
+                    <TableCell sx={{ fontWeight: 600, fontSize: '0.875rem' }}>CSV Column</TableCell>
+                    <TableCell sx={{ fontWeight: 600, fontSize: '0.875rem' }}>Input Value</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {Object.entries(selectedCreatorInput).map(([key, value]) => (
+                    <TableRow key={key}>
+                      <TableCell sx={{ 
+                        fontWeight: 500, 
+                        backgroundColor: 'grey.50', 
+                        fontFamily: 'monospace',
+                        fontSize: '0.875rem'
+                      }}>
+                        {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      </TableCell>
+                      <TableCell>
+                        <TextField 
+                          fullWidth 
+                          size="small" 
+                          value={value || ''} 
+                          InputProps={{ readOnly: true }}
+                          variant="outlined"
+                          sx={{ 
+                            '& .MuiInputBase-input': { 
+                              backgroundColor: 'grey.50',
+                              cursor: 'default',
+                              fontFamily: 'monospace',
+                              fontSize: '0.875rem'
+                            }
+                          }}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          ) : (
+            <Box sx={{ textAlign: 'center', py: 4 }}>
+              <Typography variant="body1" color="textSecondary">
+                No input data available for this creator.
+              </Typography>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setInputModalOpen(false)} variant="contained">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

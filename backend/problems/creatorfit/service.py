@@ -161,7 +161,22 @@ class CreatorFitService:
                     'views_90d': int(row['views_90d']),
                     'creator_tier': str(row['creator_tier']),
                     'posting_cadence_days': int(row['posting_cadence_days']),
-                    'recommendation': 'BOOK' if leads > 100 and row['confidence_score'] > 0.8 else 'REVIEW' if leads > 50 else 'SKIP'
+                    'recommendation': 'BOOK' if leads > 100 and row['confidence_score'] > 0.8 else 'REVIEW' if leads > 50 else 'SKIP',
+                    'input_data': {
+                        'creator_id': str(row['creator_id']),
+                        'topic': str(row['topic']),
+                        'recent_video_transcript': str(row.get('recent_video_transcript', '')),
+                        'posting_cadence_days': int(row['posting_cadence_days']),
+                        'views_90d': int(row['views_90d']),
+                        'clicks': int(row.get('clicks', 0)),
+                        'leads': int(row.get('leads', 0)),
+                        'qualified_leads': int(row.get('qualified_leads', 0)),
+                        'enrollments': int(row.get('enrollments', 0)),
+                        'refunds': int(row.get('refunds', 0)),
+                        'geography': str(row.get('geography', '')),
+                        'language': str(row['language']),
+                        'category_tag': str(row.get('category_tag', ''))
+                    }
                 }
                 results.append(result)
             
