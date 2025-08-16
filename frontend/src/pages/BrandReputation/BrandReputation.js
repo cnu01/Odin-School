@@ -11,7 +11,6 @@ import {
   Paper,
   Tabs,
   Tab,
-  Badge,
   TextField,
   Dialog,
   DialogTitle,
@@ -198,12 +197,6 @@ function BrandReputation() {
       urgent: 'error',
     };
     return colors[priority];
-  };
-
-  const getCategoryBadgeCount = (category) => {
-    return commentsData.filter(comment => 
-      comment.category === category && comment.status === 'new'
-    ).length;
   };
 
   const handleGenerateReply = async (comment) => {
@@ -686,31 +679,11 @@ function BrandReputation() {
       {/* Tabs for Comment Categories */}
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
         <Tabs value={selectedTab} onChange={(e, newValue) => setSelectedTab(newValue)}>
-          <Tab label={
-            <Badge badgeContent={filteredComments.length} color="primary">
-              All Comments
-            </Badge>
-          } />
-          <Tab label={
-            <Badge badgeContent={getCategoryBadgeCount('urgent')} color="error">
-              Urgent
-            </Badge>
-          } />
-          <Tab label={
-            <Badge badgeContent={getCategoryBadgeCount('negative')} color="warning">
-              Negative
-            </Badge>
-          } />
-          <Tab label={
-            <Badge badgeContent={getCategoryBadgeCount('question')} color="info">
-              Questions
-            </Badge>
-          } />
-          <Tab label={
-            <Badge badgeContent={getCategoryBadgeCount('positive')} color="success">
-              Positive
-            </Badge>
-          } />
+          <Tab label="All Comments" />
+          <Tab label="Urgent" />
+          <Tab label="Negative" />
+          <Tab label="Questions" />
+          <Tab label="Positive" />
         </Tabs>
       </Box>
 
