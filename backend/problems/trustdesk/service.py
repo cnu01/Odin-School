@@ -27,6 +27,9 @@ async def get_bedrock_analysis(comment_text: str) -> dict:
         Dictionary containing AI analysis results from Bedrock
     """
     try:
+        # Quick timeout for Bedrock to prevent long waits
+        import asyncio
+        
         # Construct the detailed prompt for Claude model
         prompt = f"""You are 'TrustDesk', an AI brand reputation analyst for Odin School, an online education platform. Your task is to analyze a user's comment and provide a structured analysis to help the human support team.
 
@@ -59,17 +62,28 @@ Here is the user comment:
             "stop_sequences": ["\n\nHuman:"]
         }
         
-        # Invoke the Bedrock model
-        response = bedrock_client.invoke_model(
-            body=json.dumps(request_body),
-            modelId='anthropic.claude-v2',
-            accept='application/json',
-            contentType='application/json'
-        )
+        # Wrap Bedrock call in timeout
+        async def call_bedrock():
+            # Invoke the Bedrock model
+            response = bedrock_client.invoke_model(
+                body=json.dumps(request_body),
+                modelId='anthropic.claude-v2',
+                accept='application/json',
+                contentType='application/json'
+            )
+            
+            # Parse the response from Bedrock
+            response_body = json.loads(response.get('body').read())
+            generated_text = response_body.get('completion', '').strip()
+            
+            return generated_text
         
-        # Parse the response from Bedrock
-        response_body = json.loads(response.get('body').read())
-        generated_text = response_body.get('completion', '').strip()
+        # Set 5-second timeout for Bedrock call
+        try:
+            generated_text = await asyncio.wait_for(call_bedrock(), timeout=5.0)
+        except asyncio.TimeoutError:
+            print("Bedrock call timed out, using fallback")
+            raise Exception("Bedrock timeout")
         
         # Extract and parse JSON from the generated text
         try:
@@ -95,7 +109,75 @@ Here is the user comment:
         
     except Exception as e:
         # Handle any errors during the Bedrock API call
+        print(f"Bedrock analysis failed: {e}")
         raise Exception(f"Error calling Bedrock API: {str(e)}")
+
+async def get_fallback_analysis(comment_text: str) -> dict:
+    """
+    Fallback analysis when Bedrock is not available
+    Uses simple keyword-based analysis
+    
+    Args:
+        comment_text: The customer comment to analyze
+        
+    Returns:
+        Dictionary containing basic analysis results
+    """
+    comment_lower = comment_text.lower()
+    
+    # Simple sentiment analysis based on keywords
+    positive_words = ['love', 'great', 'amazing', 'excellent', 'fantastic', 'awesome', 'good', 'best', 'recommend', 'thank', 'appreciate']
+    negative_words = ['hate', 'terrible', 'awful', 'bad', 'worst', 'disappointed', 'frustrated', 'angry', 'refund', 'complaint']
+    urgent_words = ['urgent', 'immediate', 'asap', 'emergency', 'help', 'problem', 'issue', 'error', 'broken', 'not working']
+    question_words = ['how', 'what', 'when', 'where', 'why', 'can', 'should', 'would', 'could', '?']
+    
+    # Count occurrences
+    positive_count = sum(1 for word in positive_words if word in comment_lower)
+    negative_count = sum(1 for word in negative_words if word in comment_lower)
+    urgent_count = sum(1 for word in urgent_words if word in comment_lower)
+    question_count = sum(1 for word in question_words if word in comment_lower)
+    
+    # Determine sentiment
+    if positive_count > negative_count:
+        sentiment = "Positive"
+        urgency_score = 2
+        summary = f"Positive feedback expressing satisfaction with the service"
+    elif negative_count > positive_count:
+        sentiment = "Negative"
+        urgency_score = 7
+        summary = f"Negative feedback expressing dissatisfaction or concerns"
+    else:
+        sentiment = "Neutral"
+        urgency_score = 5
+        summary = f"Neutral comment requiring review"
+    
+    # Adjust for urgency
+    if urgent_count > 0:
+        urgency_score = max(urgency_score, 8)
+        summary = f"Urgent issue requiring immediate attention"
+    
+    # Detect questions
+    if question_count > 0 and urgent_count == 0:
+        urgency_score = 5
+        summary = f"Customer inquiry requiring informational response"
+    
+    # Generate appropriate response
+    if sentiment == "Positive":
+        suggested_reply = "Thank you so much for your wonderful feedback! We're thrilled to hear about your positive experience with our courses."
+    elif sentiment == "Negative":
+        suggested_reply = "Thank you for your feedback. We take all concerns seriously and would like to address this personally. Please contact our support team for immediate assistance."
+    elif urgent_count > 0:
+        suggested_reply = "We're sorry for the inconvenience! Our support team is looking into this issue. Please contact us directly for immediate assistance."
+    else:
+        suggested_reply = "Thank you for reaching out! Our team will review your message and get back to you shortly."
+    
+    return {
+        "sentiment": sentiment,
+        "urgency_score": urgency_score,
+        "is_sensitive": negative_count > 2 or urgent_count > 1,
+        "suggested_reply": suggested_reply,
+        "summary": summary
+    }
 
 async def get_ai_analysis(comment_text: str) -> dict:
     """
@@ -124,13 +206,16 @@ async def get_ai_analysis(comment_text: str) -> dict:
             "sentiment": sentiment_map.get(bedrock_result.get("urgency", "Medium"), "Neutral"),
             "urgency_score": urgency_score_map.get(bedrock_result.get("urgency", "Medium"), 5),
             "is_sensitive": bedrock_result.get("is_sensitive", False),
-            "suggested_reply": bedrock_result.get("draft_reply", "Thank you for your feedback.")
+            "suggested_reply": bedrock_result.get("draft_reply", "Thank you for your feedback."),
+            "summary": bedrock_result.get("summary", "Comment analysis completed")  # Add summary to legacy format
         }
         
         return legacy_result
         
     except Exception as e:
-        raise Exception(f"Error in AI analysis: {str(e)}")
+        # Fallback analysis without AWS dependencies
+        print(f"Bedrock analysis failed: {e}")
+        return await get_fallback_analysis(comment_text)
 
 async def analyze_comment(comment_request: CommentRequest) -> AIAnalysisResponse:
     """
@@ -170,30 +255,30 @@ async def process_comment_with_ai(comment_text: str) -> AnalyzedComment:
         AnalyzedComment model with AI insights
     """
     try:
-        # Get AI analysis using legacy format
+        # Get AI analysis (which includes fallback)
         ai_result = await get_ai_analysis(comment_text)
         
-        # Create and return AnalyzedComment model
+        # Create and return AnalyzedComment model with proper summary
         analyzed_comment = AnalyzedComment(
             original_comment=comment_text,
             sentiment=ai_result.get("sentiment", "Neutral"),
             urgency_score=ai_result.get("urgency_score", 5),
             is_sensitive=ai_result.get("is_sensitive", False),
             suggested_reply=ai_result.get("suggested_reply", "Thank you for your feedback. We appreciate your input."),
-            reasoning="Analysis powered by Amazon Bedrock Claude model"
+            reasoning=ai_result.get("summary", "Comment analysis completed")  # Use summary from analysis
         )
         
         return analyzed_comment
         
     except Exception as e:
-        # Return a fallback response in case of AI service failure
+        # Return a fallback response in case of complete service failure
         return AnalyzedComment(
             original_comment=comment_text,
             sentiment="Neutral",
             urgency_score=5,
             is_sensitive=False,
-            suggested_reply=f"Thank you for your feedback. We're currently experiencing technical difficulties with our analysis service, but we'll review your comment manually and get back to you soon. Error: {str(e)}",
-            reasoning="Fallback response due to service error"
+            suggested_reply="Thank you for your feedback. We're currently experiencing technical difficulties with our analysis service, but we'll review your comment manually and get back to you soon.",
+            reasoning="Analysis service temporarily unavailable"
         )
 
 class TrustdeskService:
