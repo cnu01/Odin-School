@@ -106,7 +106,7 @@ class OnetruthService {
    * @param {boolean} useLLM - Use AI for enhanced insights
    * @param {number} horizonDays - Analysis horizon in days
    */
-  async generateExecutiveBrief(useLLM = false, horizonDays = 7) {
+  async generateExecutiveBrief(useLLM = true, horizonDays = 7) {
     try {
       const response = await api.post(`${this.baseURL}/executive-brief`, {
         use_llm: useLLM,
@@ -115,7 +115,7 @@ class OnetruthService {
       return response.data;
     } catch (error) {
       console.error('Error generating executive brief:', error);
-      throw new Error('Failed to generate executive brief');
+      throw new Error('Failed to generate AI-powered executive brief');
     }
   }
 

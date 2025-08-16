@@ -21,12 +21,19 @@ class OnetruthService:
     def __init__(self):
         self.collection_name = "business_analytics"
     
-    def _get_database(self):
+    async def _get_database(self):
         """Get database connection at runtime"""
-        db = get_database()
-        if db is None:
+        try:
+            # Ensure database connection is established
+            from database import connect_to_mongo, get_database
+            await connect_to_mongo()
+            db = get_database()
+            if db is None:
+                raise Exception("Database not connected")
+            return db
+        except Exception as e:
+            logger.warning(f"Database connection failed: {e}")
             raise Exception("Database not connected")
-        return db
         
     async def train_model(self, size: int = 2000) -> Dict[str, Any]:
         """Train the OneTruth anomaly detection model"""
@@ -49,7 +56,7 @@ class OnetruthService:
     async def get_dashboard_data(self, time_range: str = "7d", include_anomalies: bool = True) -> Dict[str, Any]:
         """Get unified analytics dashboard data"""
         try:
-            db = self._get_database()
+            db = await self._get_database()
             collection = db[self.collection_name]
             
             # Calculate date range
@@ -141,7 +148,7 @@ class OnetruthService:
             if onetruth_model.model is None:
                 raise Exception("Model not trained. Please train the model first.")
             
-            db = self._get_database()
+            db = await self._get_database()
             collection = db[self.collection_name]
             
             # Get recent data
@@ -187,7 +194,7 @@ class OnetruthService:
             
             # Get real database records for decision generation
             try:
-                db = self._get_database()
+                db = await self._get_database()
                 collection = db[self.collection_name]
                 cursor = collection.find().sort("week_date", -1).limit(horizon_days * 3)  # Get more records for better analysis
                 records = await cursor.to_list(length=horizon_days * 3)
@@ -278,8 +285,10 @@ class OnetruthService:
             
             # Get test data
             try:
-                db = self._get_database()
+                db = await self._get_database()
                 collection = db[self.collection_name]
+                
+                # Get test data
                 cursor = collection.find().sort("week_date", -1).limit(sample_size)
                 records = await cursor.to_list(length=sample_size)
                 
@@ -354,7 +363,7 @@ class OnetruthService:
             
             # Insert into MongoDB if connected
             try:
-                db = self._get_database()
+                db = await self._get_database()
                 collection = db[self.collection_name]
                 # Clear existing data
                 await collection.delete_many({})
@@ -417,7 +426,7 @@ class OnetruthService:
         """Record analytics prediction outcome for model improvement"""
         try:
             try:
-                db = self._get_database()
+                db = await self._get_database()
                 collection = db["analytics_outcomes"]
                 
                 outcome_doc = {
@@ -445,7 +454,7 @@ class OnetruthService:
         """Get analytics performance and model insights"""
         try:
             try:
-                db = self._get_database()
+                db = await self._get_database()
                 collection = db[self.collection_name]
                 
                 # Get total record count
@@ -919,7 +928,7 @@ Make all recommendations specific to the provided metrics, not generic advice.""
     async def _calculate_real_metrics(self) -> Dict[str, Any]:
         """Calculate real metrics from database analytics data"""
         try:
-            db = self._get_database()
+            db = await self._get_database()
             
             # Get analytics records from the correct collection
             analytics_cursor = db.business_analytics.find().limit(1000)
