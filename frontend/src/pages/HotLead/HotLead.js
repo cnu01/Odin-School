@@ -1056,7 +1056,7 @@ function HotLead() {
                   </Grid>
 
                   {/* Proposed AI Enhancements */}
-                  <Typography variant="h6" sx={{ mb: 3, color: 'primary.main', display: 'flex', alignItems: 'center' }}>
+                  {/* <Typography variant="h6" sx={{ mb: 3, color: 'primary.main', display: 'flex', alignItems: 'center' }}>
                     <RocketLaunch sx={{ mr: 1 }} />
                     Proposed AI-Driven Lead Scoring Enhancements
                   </Typography>
@@ -1137,10 +1137,10 @@ function HotLead() {
                         </Card>
                       </Grid>
                     ))}
-                  </Grid>
+                  </Grid> */}
 
                   {/* Fast Routing Implementation */}
-                  {aiSolutions.implementation_roadmap && (
+                  {/* {aiSolutions.implementation_roadmap && (
                     <Card sx={{ bgcolor: 'info.50', borderLeft: '4px solid', borderLeftColor: 'info.main' }}>
                       <CardContent>
                         <Typography variant="h6" sx={{ mb: 3, color: 'info.main', display: 'flex', alignItems: 'center' }}>
@@ -1213,7 +1213,7 @@ function HotLead() {
                         )}
                       </CardContent>
                     </Card>
-                  )}
+                  )} */}
                 </Box>
               )}
             </CardContent>
