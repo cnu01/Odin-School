@@ -286,7 +286,6 @@ class CreatorFitPredictionPipeline:
                 )
 
                 blended_confidence = confidence[i] * creator_confidence 
-                print('blended_confidence:', blended_confidence)
                 
                 result = {
                     'rank': i + 1,
