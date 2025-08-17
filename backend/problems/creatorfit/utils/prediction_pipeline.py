@@ -154,6 +154,42 @@ class CreatorFitPredictionPipeline:
         
         return df
     
+    def calculate_confidence_score(self, fit_score: float, qualified_leads: int, leads: int, 
+                                  enrollments: int, refunds: int, posting_cadence_days: int) -> float:
+        """
+        Calculate confidence score using the comprehensive formula:
+        Confidence Score = fit_score * PerformanceScore * ReliabilityFactor
+        
+        Where:
+        PerformanceScore = (0.2 * min(1, qualified_leads / leads)) + (0.4 * enrollments / qualified_leads) + (0.4 * (1 - refunds / enrollments))
+        ReliabilityFactor = exp(-0.05 * posting_cadence_days)
+        """
+        import math
+        
+        # Handle edge cases to avoid division by zero
+        if leads == 0:
+            leads = 1
+        if qualified_leads == 0:
+            qualified_leads = 1
+        if enrollments == 0:
+            enrollments = 1
+        
+        conversion_rate = min(1.0, qualified_leads / leads)
+        enrollment_rate = enrollments / qualified_leads
+        retention_rate = 1 - (refunds / enrollments)
+        
+        performance_score = (0.2 * conversion_rate) + (0.4 * enrollment_rate) + (0.4 * retention_rate)
+        
+        reliability_factor = math.exp(-0.05 * posting_cadence_days)
+        
+        # Final Confidence Score
+        confidence_score = fit_score * performance_score * reliability_factor
+        
+        # Ensure score is between 0 and 1
+        confidence_score = max(0.0, min(1.0, confidence_score))
+        
+        return confidence_score
+
     def predict_with_confidence(self, X: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
         """Make predictions with confidence intervals."""
         
@@ -232,18 +268,28 @@ class CreatorFitPredictionPipeline:
             # 6. Prepare detailed results
             results = []
             for i in range(len(df_clean)):
+                # Calculate confidence using the new formula
+                creator_confidence = self.calculate_confidence_score(
+                    fit_score=X.iloc[i]['fit_score'],
+                    qualified_leads=int(df_clean.iloc[i].get('qualified_leads', 0)),
+                    leads=int(df_clean.iloc[i].get('leads', 0)),
+                    enrollments=int(df_clean.iloc[i].get('enrollments', 0)),
+                    refunds=int(df_clean.iloc[i].get('refunds', 0)),
+                    posting_cadence_days=int(df_clean.iloc[i].get('posting_cadence_days', 14))
+                )
+                
                 result = {
                     'rank': i + 1,
                     'creator_id': str(df_clean.iloc[i]['creator_id']),
-                    'predicted_qualified_leads': max(0, int(predictions[i])),  # Ensure non-negative
+                    'predicted_qualified_leads': max(0, int(predictions[i])),
                     'fit_score': float(round(X.iloc[i]['fit_score'], 3)),
-                    'confidence_score': float(round(confidence[i], 3)),
+                    'confidence_score': float(round(creator_confidence, 3)),
                     'topic': str(df_clean.iloc[i]['topic']),
                     'language': str(df_clean.iloc[i]['language']),
                     'views_90d': int(df_clean.iloc[i]['views_90d']),
                     'creator_tier': str(X.iloc[i]['creator_tier']),
-                    'posting_cadence_days': int(df_clean.iloc[i]['posting_cadence_days']),
-                    'recommendation': 'BOOK' if predictions[i] > 100 and confidence[i] > 0.7 else 'REVIEW' if predictions[i] > 50 else 'SKIP'
+                    'posting_cadence_days': int(df_clean.iloc[i].get('posting_cadence_days', 14)),
+                    'recommendation': 'BOOK' if predictions[i] > 100 and creator_confidence > 0.8 else 'REVIEW' if predictions[i] > 50 else 'SKIP'
                 }
                 results.append(result)
             

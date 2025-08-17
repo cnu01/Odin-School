@@ -121,6 +121,45 @@ class CreatorFitService:
                 'details': 'Check CSV format and try again'
             }
     
+    def calculate_confidence_score(self, fit_score: float, qualified_leads: int, leads: int, 
+                                  enrollments: int, refunds: int, posting_cadence_days: int) -> float:
+        """
+        Calculate confidence score using the comprehensive formula:
+        Confidence Score = fit_score * PerformanceScore * ReliabilityFactor
+        
+        Where:
+        PerformanceScore = (0.2 * min(1, qualified_leads / leads)) + (0.4 * enrollments / qualified_leads) + (0.4 * (1 - refunds / enrollments))
+        ReliabilityFactor = exp(-0.05 * posting_cadence_days)
+        """
+        import math
+        
+        # Handle edge cases to avoid division by zero
+        if leads == 0:
+            leads = 1
+        if qualified_leads == 0:
+            qualified_leads = 1
+        if enrollments == 0:
+            enrollments = 1
+        
+        # Calculate Performance Score components
+        conversion_rate = min(1.0, qualified_leads / leads)
+        enrollment_rate = enrollments / qualified_leads
+        retention_rate = 1 - (refunds / enrollments)
+        
+        # Weighted Performance Score
+        performance_score = (0.2 * conversion_rate) + (0.4 * enrollment_rate) + (0.4 * retention_rate)
+        
+        # Reliability Factor based on posting consistency
+        reliability_factor = math.exp(-0.05 * posting_cadence_days)
+        
+        # Final Confidence Score
+        confidence_score = fit_score * performance_score * reliability_factor
+        
+        # Ensure score is between 0 and 1
+        confidence_score = max(0.0, min(1.0, confidence_score))
+        
+        return confidence_score
+
     def _lightweight_analysis(self, csv_path: str, program_type: str):
         """Fast analysis using simple algorithms without heavy ML dependencies"""
         try:
@@ -130,13 +169,24 @@ class CreatorFitService:
             # Load data
             df = pd.read_csv(csv_path)
             
-            # Create creator_tier from category_tag
-            tier_mapping = {'beginner-friendly': 'Growing', 'practical': 'Established', 'quick-start': 'Emerging'}
-            df['creator_tier'] = df['category_tag'].map(tier_mapping).fillna('Growing')
+            # Create creator_tier from views_90d (consistent with ML pipeline)
+            def classify_creator_tier(views):
+                if views >= 100000:
+                    return "Established"
+                elif views >= 25000:
+                    return "Growing"
+                else:
+                    return "Emerging"
+            
+            df['creator_tier'] = df['views_90d'].apply(classify_creator_tier)
+            
+            # Debug logging for tier calculation
+            print(f"DEBUG: Tier calculation for first 5 creators:")
+            for i, row in df.head().iterrows():
+                print(f"  Creator {row['creator_id']}: {row['views_90d']} views → {row['creator_tier']} tier")
             
             # Simple feature engineering
             df['fit_score'] = np.random.uniform(0.3, 0.9, len(df))  # Realistic fit scores
-            df['confidence_score'] = np.random.uniform(0.6, 0.95, len(df))  # High confidence
             
             # Use actual qualified_leads from CSV, enhanced with fit score
             df['predicted_qualified_leads'] = (
@@ -150,18 +200,29 @@ class CreatorFitService:
             results = []
             for i, row in df.iterrows():
                 leads = int(row['predicted_qualified_leads'])
+                
+                # Calculate confidence using the new formula
+                creator_confidence = self.calculate_confidence_score(
+                    fit_score=row['fit_score'],
+                    qualified_leads=int(row.get('qualified_leads', 0)),
+                    leads=int(row.get('leads', 0)),
+                    enrollments=int(row.get('enrollments', 0)),
+                    refunds=int(row.get('refunds', 0)),
+                    posting_cadence_days=int(row.get('posting_cadence_days', 14))
+                )
+                
                 result = {
                     'rank': i + 1,
                     'creator_id': str(row['creator_id']),
                     'predicted_qualified_leads': leads,
                     'fit_score': float(round(row['fit_score'], 3)),
-                    'confidence_score': float(round(row['confidence_score'], 3)),
+                    'confidence_score': float(round(creator_confidence, 3)),
                     'topic': str(row['topic']),
                     'language': str(row['language']),
                     'views_90d': int(row['views_90d']),
                     'creator_tier': str(row['creator_tier']),
                     'posting_cadence_days': int(row['posting_cadence_days']),
-                    'recommendation': 'BOOK' if leads > 100 and row['confidence_score'] > 0.8 else 'REVIEW' if leads > 50 else 'SKIP',
+                    'recommendation': 'BOOK' if leads > 100 and creator_confidence > 0.7 else 'REVIEW' if leads > 50 else 'SKIP',
                     'input_data': {
                         'creator_id': str(row['creator_id']),
                         'topic': str(row['topic']),
