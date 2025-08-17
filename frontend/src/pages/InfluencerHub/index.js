@@ -150,13 +150,30 @@ const InfluencerHub = () => {
         );
       }
 
-      if (result.success) {
-        setAnalysisResults(result);
-        setCreators(creatorfitService.formatCreatorResults(result.results || []));
-        
-        const analysisTypeLabel = analysisType === 'analyze' ? 'Analysis' : 'Forecasting';
-        showSuccess(`${analysisTypeLabel} completed successfully! Found ${result.results?.length || 0} creators.`);
-      } else {
+             if (result.success) {
+         setAnalysisResults(result);
+         let formattedCreators = creatorfitService.formatCreatorResults(result.results || []);
+         
+         // Sort by recommendation priority for analyze endpoint
+         if (analysisType === 'analyze') {
+           const recommendationPriority = { 'BOOK': 1, 'REVIEW': 2, 'SKIP': 3 };
+           formattedCreators.sort((a, b) => {
+             const priorityA = recommendationPriority[a.recommendation] || 4;
+             const priorityB = recommendationPriority[b.recommendation] || 4;
+             return priorityA - priorityB;
+           });
+           
+           // Update ranks after sorting
+           formattedCreators.forEach((creator, index) => {
+             creator.rank = index + 1;
+           });
+         }
+         
+         setCreators(formattedCreators);
+         
+         const analysisTypeLabel = analysisType === 'analyze' ? 'Analysis' : 'Forecasting';
+         showSuccess(`${analysisTypeLabel} completed successfully! Found ${result.results?.length || 0} creators.`);
+       } else {
         showError(result.error || 'Analysis failed');
       }
     } catch (error) {
@@ -407,16 +424,28 @@ const InfluencerHub = () => {
       {creators.length > 0 && (
         <Card>
           <CardContent>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-              <Typography variant="h6">
-                🎭 Creator Analysis Results ({creators.length} creators)
-              </Typography>
-              <Tooltip title="Refresh results">
-                <IconButton onClick={runAnalysis} disabled={loading}>
-                  <RefreshIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
+                         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+               <Box>
+                 <Typography variant="h6">
+                   Creator Analysis Results ({creators.length} creators)
+                 </Typography>
+                 {analysisType === 'analyze' && (
+                   <Typography variant="caption" color="textSecondary">
+                     Sorted by recommendation priority: BOOK → REVIEW → SKIP
+                   </Typography>
+                 )}
+                 {analysisType === 'forecast' && (
+                   <Typography variant="caption" color="textSecondary">
+                     Sorted by predicted leads (highest first)
+                   </Typography>
+                 )}
+               </Box>
+               <Tooltip title="Refresh results">
+                 <IconButton onClick={runAnalysis} disabled={loading}>
+                   <RefreshIcon />
+                 </IconButton>
+               </Tooltip>
+             </Box>
             
             <TableContainer>
               <Table>
@@ -481,16 +510,23 @@ const InfluencerHub = () => {
                         <TableCell>
                           <Chip size="small" label={creator.creator_tier} />
                         </TableCell>
-                        <TableCell>
-                          <Tooltip title={creator.recommendation}>
-                            <Chip
-                              size="small"
-                              label={creator.recommendation}
-                              color={creator.statusColor}
-                              icon={getStatusIcon(creator.recommendation)}
-                            />
-                          </Tooltip>
-                        </TableCell>
+                                                 <TableCell>
+                           <Tooltip title={`${creator.recommendation} - ${analysisType === 'analyze' ? 'Priority-based sorting' : 'Lead-based sorting'}`}>
+                             <Chip
+                               size="small"
+                               label={creator.recommendation}
+                               color={creator.statusColor}
+                               icon={getStatusIcon(creator.recommendation)}
+                               sx={{
+                                 fontWeight: 'bold',
+                                 ...(analysisType === 'analyze' && creator.recommendation === 'BOOK' && {
+                                   border: '2px solid',
+                                   borderColor: 'success.main'
+                                 })
+                               }}
+                             />
+                           </Tooltip>
+                         </TableCell>
                         <TableCell padding="none">
                         <Box display="flex" justifyContent="flex-end" my={2} >
                         <Button
