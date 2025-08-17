@@ -1,14 +1,3 @@
-"""
-Enterprise-grade pipeline for high-accuracy lead predictions with:
-- Advanced data validation and quality scoring
-- Production-ready feature engineering with business intelligence
-- Model ensemble for maximum accuracy
-- Confidence scoring and uncertainty estimation
-- CPL analysis and ROI recommendations
-
-Usage:
-    python prediction_pipeline.py input.csv data_science
-"""
 import os
 import sys
 import json
