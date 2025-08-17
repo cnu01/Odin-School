@@ -424,7 +424,9 @@ const InfluencerHub = () => {
                   <TableRow>
                     <TableCell>Rank</TableCell>
                     <TableCell>Creator ID</TableCell>
-                    <TableCell>Predicted Leads</TableCell>
+                    {analysisType === 'forecast' && (
+                      <TableCell>Predicted Leads</TableCell>
+                    )}
                     <TableCell>Fit Score</TableCell>
                     <TableCell>Confidence</TableCell>
                     <TableCell>Topic</TableCell>
@@ -432,7 +434,6 @@ const InfluencerHub = () => {
                     <TableCell>Tier</TableCell>
                     <TableCell>Recommendation</TableCell>
                     <TableCell>Insights</TableCell>
-
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -450,11 +451,13 @@ const InfluencerHub = () => {
                             {creator.creator_id}
                           </Typography>
                         </TableCell>
-                        <TableCell>
-                          <Typography variant="body1" color="primary">
-                            {creator.formattedLeads}
-                          </Typography>
-                        </TableCell>
+                        {analysisType === 'forecast' && (
+                          <TableCell>
+                            <Typography variant="body1" color="primary">
+                              {creator.formattedLeads}
+                            </Typography>
+                          </TableCell>
+                        )}
                         <TableCell>
                           <Typography variant="body2">
                             {creator.formattedFitScore}
@@ -607,30 +610,41 @@ const InfluencerHub = () => {
               📊 Output Values:
             </Typography>
             <Box component="ul" sx={{ pl: 3, my: 0, '& > li': { mb: 1.5 } }}>
+              {analysisType === 'forecast' && (
+                <li>
+                  <Typography variant="h10">
+                    1. Predicted Leads:
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" component="span" sx={{ ml: 1 }}>
+                    qualified_leads × fit_score × random_factor(0.9-1.1)
+                  </Typography>
+                </li>
+              )}
               <li>
-              <Typography variant="h10">
-              1. Predicted Leads:
-                </Typography>
-                <Typography variant="body2" color="textSecondary" component="span" sx={{ ml: 1 }}>
-                  qualified_leads × fit_score × random_factor(0.9-1.1)
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="h10">2. Confidence:</Typography> 
+                <Typography variant="h10">
+                  {analysisType === 'forecast' ? '2. Confidence:' : '1. Confidence:'}
+                </Typography> 
                 <Typography variant="body2" color="textSecondary" component="span" sx={{ ml: 1 }}>
                   Calculates relation between user engagement (clicks), posting stability and semantic fit
                 </Typography>
               </li>
               <li>
-                <Typography variant="h10">3. Tier:</Typography> 
+                <Typography variant="h10">
+                  {analysisType === 'forecast' ? '3. Tier:' : '2. Tier:'}
+                </Typography> 
                 <Typography variant="body2" color="textSecondary" component="span" sx={{ ml: 1 }}>
-                  Maps category_tag → Growing/Established/Emerging
+                  Based on views_90d: ≥100k=Established, ≥25k=Growing, &lt;25k=Emerging
                 </Typography>
               </li>
               <li>
-                <Typography variant="h10">4. Recommendation:</Typography> 
+                <Typography variant="h10">
+                  {analysisType === 'forecast' ? '4. Recommendation:' : '3. Recommendation:'}
+                </Typography> 
                 <Typography variant="body2" color="textSecondary" component="span" sx={{ ml: 1 }}>
-                  BOOK if leads &gt; 100 & confidence &gt; 0.8, else REVIEW if leads &gt; 50, else SKIP
+                  {analysisType === 'forecast' 
+                    ? 'BOOK if leads > 100 & confidence > 0.8, else REVIEW if leads > 50, else SKIP'
+                    : 'BOOK if confidence > 0.8, else REVIEW if confidence > 0.6, else SKIP'
+                  }
                 </Typography>
               </li>
             </Box>
