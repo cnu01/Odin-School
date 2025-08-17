@@ -11,11 +11,9 @@ from sklearn.ensemble import VotingRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import logging
 
-# Suppress warnings for cleaner output
 warnings.filterwarnings('ignore')
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Add project root to path for imports
 sys.path.append(str(Path(__file__).parent.parent.parent.parent))
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
@@ -85,18 +83,15 @@ class CreatorFitPredictionPipeline:
             quality_report['issues_found'].append(f"Missing critical fields: {missing_critical[missing_critical].index.tolist()}")
             quality_report['quality_score'] *= 0.8
         
-        # Check for unrealistic values
         if (df['views_90d'] > 10000000).any():  # 1 crore+ views unlikely
             quality_report['issues_found'].append("Unrealistic view counts detected")
             quality_report['quality_score'] *= 0.9
         
-        # Check for empty transcripts
         empty_transcripts = df['recent_video_transcript'].str.len() < 50
         if empty_transcripts.any():
             quality_report['issues_found'].append(f"{empty_transcripts.sum()} creators with very short transcripts")
             quality_report['quality_score'] *= 0.85
         
-        # Check for topic relevance
         from data_preprocessing import EDTECH_TOPICS
         irrelevant_topics = ~df['topic'].str.contains('|'.join(EDTECH_TOPICS), case=False, na=False)
         if irrelevant_topics.any():
@@ -179,41 +174,68 @@ class CreatorFitPredictionPipeline:
         
         return confidence_score
 
+    # def predict_with_confidence(self, X: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
+    #     """Make predictions with confidence intervals."""
+        
+    #     # Primary prediction with LightGBM
+    #     primary_pred = self.models['lgb'].predict(X)
+        
+    #     # If ensemble models are available, use them
+    #     if len(self.models) > 1:
+    #         predictions = []
+    #         for name, model in self.models.items():
+    #             if name != 'lgb':
+    #                 try:
+    #                     # Quick fit for ensemble models (on current data)
+    #                     if not hasattr(model, 'feature_importances_'):
+    #                         # For new models, we'll use the primary prediction as baseline
+    #                         pred = primary_pred + np.random.normal(0, 0.1 * primary_pred.std(), len(primary_pred))
+    #                     else:
+    #                         pred = model.predict(X)
+    #                     predictions.append(pred)
+    #                 except:
+    #                     continue
+            
+    #         if predictions:
+    #             # Ensemble prediction (weighted average)
+    #             all_preds = np.column_stack([primary_pred] + predictions)
+    #             ensemble_pred = np.mean(all_preds, axis=1)
+    #             confidence = 1.0 - (np.std(all_preds, axis=1) / (np.mean(all_preds, axis=1) + 1e-8))
+    #             confidence = np.clip(confidence, 0.0, 1.0)
+    #             return ensemble_pred, confidence
+        
+    #     # Single model prediction with synthetic confidence
+    #     confidence = np.ones(len(primary_pred)) * 0.85  # High confidence for trained model
+    #     return primary_pred, confidence
+    
     def predict_with_confidence(self, X: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
         """Make predictions with confidence intervals."""
         
-        # Primary prediction with LightGBM
         primary_pred = self.models['lgb'].predict(X)
         
-        # If ensemble models are available, use them
+        # If ensemble models are available, use them for a robust confidence estimate
         if len(self.models) > 1:
-            predictions = []
+            all_preds = [primary_pred]
             for name, model in self.models.items():
                 if name != 'lgb':
-                    try:
-                        # Quick fit for ensemble models (on current data)
-                        if not hasattr(model, 'feature_importances_'):
-                            # For new models, we'll use the primary prediction as baseline
-                            pred = primary_pred + np.random.normal(0, 0.1 * primary_pred.std(), len(primary_pred))
-                        else:
-                            pred = model.predict(X)
-                        predictions.append(pred)
-                    except:
-                        continue
+                    all_preds.append(model.predict(X))
             
-            if predictions:
-                # Ensemble prediction (weighted average)
-                all_preds = np.column_stack([primary_pred] + predictions)
-                ensemble_pred = np.mean(all_preds, axis=1)
-                confidence = 1.0 - (np.std(all_preds, axis=1) / (np.mean(all_preds, axis=1) + 1e-8))
-                confidence = np.clip(confidence, 0.0, 1.0)
-                return ensemble_pred, confidence
+            all_preds = np.column_stack(all_preds)
+            ensemble_pred = np.mean(all_preds, axis=1)
+            
+            # Confidence is inversely proportional to the standard deviation of predictions
+            prediction_std = np.std(all_preds, axis=1)
+            # Normalize std dev to get a 0-1 confidence score
+            model_confidence = 1.0 - (prediction_std / (ensemble_pred + 1e-8))
+            model_confidence = np.clip(model_confidence, 0.0, 1.0)
+            
+            return ensemble_pred, model_confidence
         
-        # Single model prediction with synthetic confidence
-        confidence = np.ones(len(primary_pred)) * 0.85  # High confidence for trained model
-        return primary_pred, confidence
-    
-
+        # A simple proxy is to assume higher confidence for higher predictions.
+        max_pred = np.max(primary_pred) if len(primary_pred) > 0 else 1
+        model_confidence = primary_pred / (max_pred + 1e-8)
+        model_confidence = np.clip(model_confidence, 0.3, 0.95) # Assume no prediction is 100% or 0% certain
+        return primary_pred, model_confidence
     
     def process_csv_file(self, csv_path: str, program_type: str = "data_science") -> Dict[str, Any]:
         """Production CSV processing with maximum accuracy pipeline."""
@@ -234,7 +256,7 @@ class CreatorFitPredictionPipeline:
             df_clean = _fold_rare_categories(df, cols=("topic", "category_tag"), min_count=0)
             
             # 3. Build standard features first
-            X, y_actual, meta = build_features(df_clean, program_type=program_type)
+            X, _, meta = build_features(df_clean, program_type=program_type)
             
             # 4. Add production features (optional)
             try:
@@ -246,18 +268,14 @@ class CreatorFitPredictionPipeline:
             except Exception as e:
                 logging.warning(f"Production features skipped: {e}")
             
-            # 5. Prepare features for prediction
             feature_cols = meta['numeric'] + meta['categorical']
             X_pred = X[feature_cols]
             X_processed = self.preprocessor.transform(X_pred)
             
-            # 5. Make production predictions with confidence
             predictions, confidence = self.predict_with_confidence(X_processed)
             
-            # 6. Prepare detailed results
             results = []
             for i in range(len(df_clean)):
-                # Calculate confidence using the new formula
                 creator_confidence = self.calculate_confidence_score(
                     fit_score=X.iloc[i]['fit_score'],
                     qualified_leads=int(df_clean.iloc[i].get('qualified_leads', 0)),
@@ -266,30 +284,44 @@ class CreatorFitPredictionPipeline:
                     refunds=int(df_clean.iloc[i].get('refunds', 0)),
                     posting_cadence_days=int(df_clean.iloc[i].get('posting_cadence_days', 14))
                 )
+
+                blended_confidence = confidence[i] * creator_confidence 
+                print('blended_confidence:', blended_confidence)
                 
                 result = {
                     'rank': i + 1,
                     'creator_id': str(df_clean.iloc[i]['creator_id']),
                     'predicted_qualified_leads': max(0, int(predictions[i])),
                     'fit_score': float(round(X.iloc[i]['fit_score'], 3)),
-                    'confidence_score': float(round(creator_confidence, 3)),
+                    # 'confidence_score': float(round(creator_confidence, 3)),
+                    'confidence_score': float(round(blended_confidence, 3)),
                     'topic': str(df_clean.iloc[i]['topic']),
                     'language': str(df_clean.iloc[i]['language']),
                     'views_90d': int(df_clean.iloc[i]['views_90d']),
                     'creator_tier': str(X.iloc[i]['creator_tier']),
                     'posting_cadence_days': int(df_clean.iloc[i].get('posting_cadence_days', 14)),
-                    'recommendation': 'BOOK' if predictions[i] > 100 and creator_confidence > 0.8 else 'REVIEW' if predictions[i] > 50 else 'SKIP'
+                    # 'recommendation': 'BOOK' if predictions[i] > 100 and creator_confidence > 0.8 else 'REVIEW' if predictions[i] > 50 else 'SKIP'
+                    'recommendation': "TEMP" # Placeholder
                 }
                 results.append(result)
             
-            # 8. Sort by predicted leads (descending)
             results.sort(key=lambda x: x['predicted_qualified_leads'], reverse=True)
             
-            # Update ranks after sorting
             for i, result in enumerate(results):
                 result['rank'] = i + 1
             
-            # 9. Prepare final output
+            if results:
+                top_5_percent_threshold = np.percentile([r['predicted_qualified_leads'] for r in results], 95)
+                median_confidence = np.median([r['confidence_score'] for r in results])
+                
+                for r in results:
+                    if r['predicted_qualified_leads'] >= top_5_percent_threshold and r['confidence_score'] >= median_confidence:
+                        r['recommendation'] = 'BOOK'
+                    elif r['predicted_qualified_leads'] > 0:
+                        r['recommendation'] = 'REVIEW'
+                    else:
+                        r['recommendation'] = 'SKIP'
+
             output = {
                 'success': True,
                 'program_type': program_type,
@@ -343,25 +375,6 @@ def main():
     # Process with production pipeline
     result = predictor.process_csv_file(csv_file, program_type)
     
-    if result['success']:
-        print(f"\n🚀 PRODUCTION CREATORFIT ANALYSIS COMPLETE!")
-        print(f"Program: {result['program_type'].title()}")
-        print(f"Creators Analyzed: {len(result['results'])}")
-        print(f"Data Quality Score: {result['data_quality']['quality_score']:.1%}")
-        
-        print(f"\n📊 TOP 5 CREATORS:")
-        for creator in result['results'][:5]:
-            print(f"  {creator['rank']}. {creator['creator_id']} - {creator['predicted_qualified_leads']} leads "
-                  f"(Fit: {creator['fit_score']:.3f}, Confidence: {creator['confidence_score']:.3f}) - {creator['recommendation']}")
-        
-        print(f"\n💡 RECOMMENDATIONS:")
-        for rec in result['recommendations'].values():
-            if isinstance(rec, list):
-                print(f"  • Book immediately: {len(rec)} high-confidence creators")
-            else:
-                print(f"  • {rec}")
-    else:
-        print(f"[ERROR] {result.get('error', 'Unknown error')}")
 
 if __name__ == "__main__":
     main()
