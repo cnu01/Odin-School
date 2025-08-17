@@ -199,6 +199,8 @@ function HotLead() {
     // Refresh all data (used for manual refresh)
     try {
       setLoading(true);
+      setError(null);
+      
       const [priorityResponse, analyticsResponse, statusResponse] = await Promise.all([
         hotleadService.getPriorityQueue({ limit: 20, min_score: 0 }),
         hotleadService.getAnalytics(),
@@ -974,7 +976,11 @@ function HotLead() {
                   </Typography>
                   
                   <Grid container spacing={3} sx={{ mb: 4 }}>
-                    {aiSolutions.solutions?.filter(sol => sol.current_status.includes('✅')).map((solution, index) => (
+                    {aiSolutions.solutions?.filter(sol => 
+                      sol.timeline_weeks === 0 || 
+                      sol.title?.includes('✅') || 
+                      sol.implementation_complexity === 'Completed'
+                    ).map((solution, index) => (
                       <Grid item xs={12} md={6} lg={4} key={solution.solution_id}>
                         <Card sx={{ 
                           height: '100%',
@@ -984,12 +990,14 @@ function HotLead() {
                         }}>
                           <CardContent>
                             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                              <Chip 
-                                label={solution.current_status}
-                                color="success"
-                                size="small"
-                                sx={{ mr: 1 }}
-                              />
+                              {solution.current_status && (
+                                <Chip 
+                                  label={solution.current_status}
+                                  color="success"
+                                  size="small"
+                                  sx={{ mr: 1 }}
+                                />
+                              )}
                               <Chip 
                                 label={`${solution.confidence_score * 100}% accuracy`}
                                 variant="outlined"
@@ -1048,13 +1056,17 @@ function HotLead() {
                   </Grid>
 
                   {/* Proposed AI Enhancements */}
-                  <Typography variant="h6" sx={{ mb: 3, color: 'primary.main', display: 'flex', alignItems: 'center' }}>
+                  {/* <Typography variant="h6" sx={{ mb: 3, color: 'primary.main', display: 'flex', alignItems: 'center' }}>
                     <RocketLaunch sx={{ mr: 1 }} />
                     Proposed AI-Driven Lead Scoring Enhancements
                   </Typography>
                   
                   <Grid container spacing={3} sx={{ mb: 4 }}>
-                    {aiSolutions.solutions?.filter(sol => sol.current_status === 'Ready to Implement').map((solution, index) => (
+                    {aiSolutions.solutions?.filter(sol => 
+                      sol.timeline_weeks > 0 && 
+                      sol.implementation_complexity !== 'Completed' &&
+                      !sol.title?.includes('✅')
+                    ).map((solution, index) => (
                       <Grid item xs={12} md={6} key={solution.solution_id}>
                         <Card sx={{ 
                           height: '100%',
@@ -1064,12 +1076,14 @@ function HotLead() {
                         }}>
                           <CardContent>
                             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                              <Chip 
-                                label={solution.current_status}
-                                color="primary"
-                                size="small"
-                                sx={{ mr: 1 }}
-                              />
+                              {solution.current_status && (
+                                <Chip 
+                                  label={solution.current_status}
+                                  color="primary"
+                                  size="small"
+                                  sx={{ mr: 1 }}
+                                />
+                              )}
                               <Chip 
                                 label={`${solution.timeline_weeks} weeks`}
                                 variant="outlined"
@@ -1123,10 +1137,10 @@ function HotLead() {
                         </Card>
                       </Grid>
                     ))}
-                  </Grid>
+                  </Grid> */}
 
                   {/* Fast Routing Implementation */}
-                  {aiSolutions.implementation_roadmap && (
+                  {/* {aiSolutions.implementation_roadmap && (
                     <Card sx={{ bgcolor: 'info.50', borderLeft: '4px solid', borderLeftColor: 'info.main' }}>
                       <CardContent>
                         <Typography variant="h6" sx={{ mb: 3, color: 'info.main', display: 'flex', alignItems: 'center' }}>
@@ -1199,7 +1213,7 @@ function HotLead() {
                         )}
                       </CardContent>
                     </Card>
-                  )}
+                  )} */}
                 </Box>
               )}
             </CardContent>
@@ -1696,12 +1710,14 @@ function HotLead() {
                                 <Typography variant="body2" sx={{ fontWeight: 600 }}>
                                   {solution.title}
                                 </Typography>
-                                <Chip 
-                                  label={solution.current_status}
-                                  color={solution.current_status.includes('✅') ? 'success' : 'warning'}
-                                  size="small"
-                                  sx={{ mt: 0.5 }}
-                                />
+                                {solution.current_status && (
+                                  <Chip 
+                                    label={solution.current_status}
+                                    color={solution.current_status.includes('✅') ? 'success' : 'warning'}
+                                    size="small"
+                                    sx={{ mt: 0.5 }}
+                                  />
+                                )}
                               </Box>
                             </TableCell>
                             <TableCell align="center">

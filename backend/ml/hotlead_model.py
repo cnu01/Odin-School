@@ -321,11 +321,12 @@ def generate_synthetic_training_data(num_samples: int = 5000) -> List[Dict[str, 
     import os
     
     # Try to load the enhanced dataset first
-    enhanced_data_path = "/Users/batman/Movies/odinschool/Odin-School/backend/data/enhanced_leads_5000.csv"
+    backend_dir = os.path.dirname(os.path.dirname(__file__))  # Go up two levels from ml/ to backend/
+    enhanced_data_path = os.path.join(backend_dir, "data", "enhanced_leads_5000.csv")
     
     try:
         if os.path.exists(enhanced_data_path):
-            logger.info("Loading enhanced 5000-lead dataset from CSV...")
+            logger.info(f"Loading enhanced 5000-lead dataset from {enhanced_data_path}")
             df = pd.read_csv(enhanced_data_path)
             
             # Convert DataFrame to list of dictionaries

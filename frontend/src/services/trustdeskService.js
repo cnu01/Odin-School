@@ -7,29 +7,143 @@ import api from './api';
 class TrustDeskService {
   
   /**
-   * Analyze a comment using RAG-enhanced AI
+   * Analyze a comment using AI
    * @param {Object} commentData - Comment data to analyze
    * @returns {Promise} Analysis result
    */
   async analyzeComment(commentData) {
     try {
-      const response = await api.post('/api/trustdesk/analyze-rag', {
-        text: commentData.content,
-        use_rag: true,
-        include_context: true
+      // Use shorter timeout for comment analysis to prevent long waits
+      const response = await api.post('/api/trustdesk/analyze', {
+        comment_text: commentData.content,
+        customer_name: commentData.author || 'Anonymous',
+        platform: commentData.platform || 'manual_input',
+        comment_type: 'general'
+      }, {
+        timeout: 8000 // 8 second timeout for comment analysis
       });
       
+      // Transform the response to match frontend expectations
+      const data = response.data;
       return {
         success: true,
-        data: response.data
+        data: {
+          sentiment: data.sentiment,
+          category: this._categorizeFromSentiment(data.sentiment, data.urgency_score),
+          priority: this._mapUrgencyToPriority(data.urgency_score),
+          confidence: 0.85, // Default confidence since legacy endpoint doesn't provide it
+          summary: data.reasoning || 'Comment analyzed successfully',
+          suggested_response: data.suggested_reply
+        }
       };
     } catch (error) {
       console.error('Error analyzing comment:', error);
+      
+      // If it's a timeout error, provide immediate local analysis
+      if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+        return this._getLocalAnalysis(commentData.content);
+      }
+      
       return {
         success: false,
         error: error.response?.data?.detail || error.message
       };
     }
+  }
+
+  /**
+   * Provide immediate local analysis when API times out
+   * @param {string} commentText - Comment text to analyze
+   * @returns {Object} Local analysis result
+   */
+  _getLocalAnalysis(commentText) {
+    const text = commentText.toLowerCase();
+    
+    // Simple keyword-based analysis
+    const positiveWords = ['love', 'great', 'amazing', 'excellent', 'fantastic', 'awesome', 'good', 'best', 'recommend', 'thank'];
+    const negativeWords = ['hate', 'terrible', 'awful', 'bad', 'worst', 'disappointed', 'frustrated', 'angry', 'refund'];
+    const urgentWords = ['urgent', 'immediate', 'help', 'problem', 'issue', 'error', 'broken', 'not working'];
+    const questionWords = ['how', 'what', 'when', 'where', 'why', 'can', 'should', 'would', '?'];
+    
+    const positiveCount = positiveWords.filter(word => text.includes(word)).length;
+    const negativeCount = negativeWords.filter(word => text.includes(word)).length;
+    const urgentCount = urgentWords.filter(word => text.includes(word)).length;
+    const questionCount = questionWords.filter(word => text.includes(word)).length;
+    
+    let sentiment, category, priority, summary;
+    
+    if (positiveCount > negativeCount) {
+      sentiment = 'positive';
+      category = 'positive';
+      priority = 'low';
+      summary = 'Positive feedback expressing satisfaction';
+    } else if (negativeCount > positiveCount) {
+      sentiment = 'negative';
+      category = 'negative';
+      priority = 'high';
+      summary = 'Negative feedback expressing concerns';
+    } else {
+      sentiment = 'neutral';
+      category = 'question';
+      priority = 'medium';
+      summary = 'Neutral comment requiring review';
+    }
+    
+    if (urgentCount > 0) {
+      priority = 'urgent';
+      category = 'urgent';
+      summary = 'Urgent issue requiring immediate attention';
+    } else if (questionCount > 0 && urgentCount === 0) {
+      category = 'question';
+      summary = 'Customer inquiry requiring response';
+    }
+    
+    return {
+      success: true,
+      data: {
+        sentiment,
+        category,
+        priority,
+        confidence: 0.65, // Lower confidence for local analysis
+        summary,
+        suggested_response: this._getQuickResponse(category)
+      }
+    };
+  }
+
+  /**
+   * Get quick response template based on category
+   * @param {string} category - Comment category
+   * @returns {string} Quick response template
+   */
+  _getQuickResponse(category) {
+    const responses = {
+      positive: "Thank you so much for your wonderful feedback! We're thrilled to hear about your positive experience.",
+      negative: "Thank you for your feedback. We take all concerns seriously and would like to address this personally. Please contact our support team.",
+      urgent: "We're sorry for the inconvenience! Our support team is looking into this issue. Please contact us directly for immediate assistance.",
+      question: "Thank you for reaching out! Our team will review your question and get back to you shortly."
+    };
+    
+    return responses[category] || responses.question;
+  }
+
+  /**
+   * Helper method to categorize based on sentiment and urgency
+   */
+  _categorizeFromSentiment(sentiment, urgencyScore) {
+    if (urgencyScore >= 8) return 'urgent';
+    if (sentiment === 'negative') return 'negative';
+    if (sentiment === 'positive') return 'positive';
+    return 'question';
+  }
+
+  /**
+   * Helper method to map urgency score to priority
+   */
+  _mapUrgencyToPriority(urgencyScore) {
+    if (urgencyScore >= 8) return 'urgent';
+    if (urgencyScore >= 5) return 'medium';
+    return 'low';
   }
 
   /**

@@ -1365,7 +1365,6 @@ Provide concrete, data-driven analysis that shows why qualified leads are being 
                 technical_requirements=["✅ Random Forest model", "✅ Real-time scoring API", "✅ MongoDB integration"],
                 timeline_weeks=0,
                 success_metrics=["72.5% model accuracy", "Sub-second scoring", "Real-time lead processing"],
-                current_status="✅ Live in Production",
                 confidence_score=0.95
             ),
             AISolution(
@@ -1378,7 +1377,6 @@ Provide concrete, data-driven analysis that shows why qualified leads are being 
                 technical_requirements=["✅ Multi-factor scoring", "✅ Dynamic thresholds", "✅ Real-time updates"],
                 timeline_weeks=0,
                 success_metrics=["Dynamic 80th percentile", "Source intelligence weighting", "Behavioral amplification"],
-                current_status="✅ Live in Production",
                 confidence_score=0.92
             ),
             AISolution(
@@ -1391,7 +1389,6 @@ Provide concrete, data-driven analysis that shows why qualified leads are being 
                 technical_requirements=["✅ AWS Bedrock", "✅ Claude 3.5 Sonnet", "✅ Automated analysis"],
                 timeline_weeks=0,
                 success_metrics=["Automated problem detection", "Evidence-based insights", "Actionable recommendations"],
-                current_status="✅ Live in Production", 
                 confidence_score=0.90
             ),
             AISolution(
@@ -1404,7 +1401,6 @@ Provide concrete, data-driven analysis that shows why qualified leads are being 
                 technical_requirements=["✅ Engagement pattern analysis", "✅ Dynamic priority multiplier", "✅ Real-time scoring"],
                 timeline_weeks=0,
                 success_metrics=["Momentum detection accuracy", "2x priority for high-intent leads", "Enhanced lead temperature indicators"],
-                current_status="✅ Live in Production",
                 confidence_score=0.88
             )
         ]
@@ -1417,8 +1413,8 @@ Provide concrete, data-driven analysis that shows why qualified leads are being 
         """Prioritize & Justify solutions by impact vs. effort with specific success metrics"""
         
         # Categorize solutions by implementation status
-        live_solutions = [s for s in all_solutions if s.current_status == "✅ Live in Production"]
-        pending_solutions = [s for s in all_solutions if s.current_status == "Ready to Implement"]
+        # live_solutions = [s for s in all_solutions if s.current_status == "✅ Live in Production"]
+        # pending_solutions = [s for s in all_solutions if s.current_status == "Ready to Implement"]
         
         # Calculate impact scores (0-100)
         def calculate_impact_score(solution: AISolution) -> int:
@@ -1477,8 +1473,8 @@ Provide concrete, data-driven analysis that shows why qualified leads are being 
         return {
             "summary": {
                 "total_solutions": len(all_solutions),
-                "live_solutions": len(live_solutions),
-                "pending_solutions": len(pending_solutions),
+                # "live_solutions": len(live_solutions),
+                # "pending_solutions": len(pending_solutions),
                 "avg_confidence": round(sum(s.confidence_score for s in all_solutions) / len(all_solutions), 2),
                 "combined_impact": "Target: +25% lead→enrollment conversion in 60 days; median first-touch < 3 minutes"
             },
@@ -1488,9 +1484,9 @@ Provide concrete, data-driven analysis that shows why qualified leads are being 
                 "phase_2_quick_wins": [s for s in prioritized_solutions if 1 <= s["timeline_weeks"] <= 3],
                 "phase_3_strategic": [s for s in prioritized_solutions if s["timeline_weeks"] > 3],
                 "recommended_sequence": [
-                    "1. Leverage existing ML scoring (95% confidence, already live)",
-                    "2. Optimize dynamic prioritization (92% confidence, already live)", 
-                    "3. Enhance behavioral momentum scoring (88% confidence, already live)",
+                    "1. Leverage existing ML scoring (95% confidence,)",
+                    "2. Optimize dynamic prioritization (92% confidence)", 
+                    "3. Enhance behavioral momentum scoring (88% confidence)",
                     "4. Continuous optimization and monitoring"
                 ]
             },

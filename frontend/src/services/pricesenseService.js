@@ -215,10 +215,13 @@ class PriceSenseService {
 
   /**
    * Get problem analysis for business insights
+   * @param {boolean} forceRefresh - Force refresh of analysis
    */
-  async getProblemAnalysis() {
+  async getProblemAnalysis(forceRefresh = false) {
     try {
-      const response = await api.get(`${this.baseURL}/problem-analysis`);
+      const response = await api.get(`${this.baseURL}/problem-analysis`, {
+        params: { force_refresh: forceRefresh }
+      });
       return response.data;
     } catch (error) {
       console.error('Error fetching problem analysis:', error);
@@ -227,11 +230,15 @@ class PriceSenseService {
   }
 
   /**
-   * Get dashboard data (combined metrics and analysis)
+   * Get comprehensive dashboard data for Live Demo
+   * @param {string} timeRange - Time range for data (e.g., "7d", "30d")
+   * @param {boolean} includeAnomalies - Include anomaly detection
    */
-  async getDashboardData() {
+  async getDashboardData(timeRange = "7d", includeAnomalies = true) {
     try {
-      const response = await api.get(`${this.baseURL}/dashboard-data`);
+      const response = await api.get(`${this.baseURL}/dashboard-data`, {
+        params: { time_range: timeRange, include_anomalies: includeAnomalies }
+      });
       return response.data;
     } catch (error) {
       console.error('Error fetching dashboard data:', error);

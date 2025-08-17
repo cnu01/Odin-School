@@ -7,6 +7,7 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 import joblib
 import json
 import logging
+import os
 from typing import Dict, Any, List, Tuple
 from datetime import datetime, timedelta
 import random
@@ -206,10 +207,11 @@ def train_refermore_model(data: pd.DataFrame) -> Dict[str, Any]:
     feature_importance = dict(zip(FEATURES, model.feature_importances_))
     
     # Save model artifacts
-    model_path = "/Users/batman/Movies/odinschool/Odin-School/backend/ml/models/"
+    model_path = os.environ.get("MODEL_DIR", os.path.join(os.path.dirname(__file__), "models"))
+    os.makedirs(model_path, exist_ok=True)
     
-    joblib.dump(model, f"{model_path}refermore_propensity_model.pkl")
-    joblib.dump(scaler, f"{model_path}refermore_propensity_scaler.pkl")
+    joblib.dump(model, os.path.join(model_path, "refermore_propensity_model.pkl"))
+    joblib.dump(scaler, os.path.join(model_path, "refermore_propensity_scaler.pkl"))
     
     # Save metadata
     metadata = {
@@ -225,7 +227,7 @@ def train_refermore_model(data: pd.DataFrame) -> Dict[str, Any]:
         "model_type": "RandomForestClassifier"
     }
     
-    with open(f"{model_path}refermore_propensity_metadata.json", 'w') as f:
+    with open(os.path.join(model_path, "refermore_propensity_metadata.json"), 'w') as f:
         json.dump(metadata, f, indent=2)
     
     print(f"Model trained with accuracy: {accuracy:.3f}")
@@ -243,11 +245,11 @@ def predict_referral_propensity(learner_data: List[Dict[str, Any]]) -> List[Dict
     """Predict referral propensity for learners"""
     
     try:
-        model_path = "/Users/batman/Movies/odinschool/Odin-School/backend/ml/models/"
+        model_path = os.environ.get("MODEL_DIR", os.path.join(os.path.dirname(__file__), "models"))
         
         # Load model and scaler
-        model = joblib.load(f"{model_path}refermore_propensity_model.pkl")
-        scaler = joblib.load(f"{model_path}refermore_propensity_scaler.pkl")
+        model = joblib.load(os.path.join(model_path, "refermore_propensity_model.pkl"))
+        scaler = joblib.load(os.path.join(model_path, "refermore_propensity_scaler.pkl"))
         
         # Prepare features
         df = pd.DataFrame(learner_data)
