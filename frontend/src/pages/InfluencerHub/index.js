@@ -150,13 +150,30 @@ const InfluencerHub = () => {
         );
       }
 
-      if (result.success) {
-        setAnalysisResults(result);
-        setCreators(creatorfitService.formatCreatorResults(result.results || []));
-        
-        const analysisTypeLabel = analysisType === 'analyze' ? 'Analysis' : 'Forecasting';
-        showSuccess(`${analysisTypeLabel} completed successfully! Found ${result.results?.length || 0} creators.`);
-      } else {
+             if (result.success) {
+         setAnalysisResults(result);
+         let formattedCreators = creatorfitService.formatCreatorResults(result.results || []);
+         
+         // Sort by recommendation priority for analyze endpoint
+         if (analysisType === 'analyze') {
+           const recommendationPriority = { 'BOOK': 1, 'REVIEW': 2, 'SKIP': 3 };
+           formattedCreators.sort((a, b) => {
+             const priorityA = recommendationPriority[a.recommendation] || 4;
+             const priorityB = recommendationPriority[b.recommendation] || 4;
+             return priorityA - priorityB;
+           });
+           
+           // Update ranks after sorting
+           formattedCreators.forEach((creator, index) => {
+             creator.rank = index + 1;
+           });
+         }
+         
+         setCreators(formattedCreators);
+         
+         const analysisTypeLabel = analysisType === 'analyze' ? 'Analysis' : 'Forecasting';
+         showSuccess(`${analysisTypeLabel} completed successfully! Found ${result.results?.length || 0} creators.`);
+       } else {
         showError(result.error || 'Analysis failed');
       }
     } catch (error) {
@@ -407,16 +424,28 @@ const InfluencerHub = () => {
       {creators.length > 0 && (
         <Card>
           <CardContent>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-              <Typography variant="h6">
-                🎭 Creator Analysis Results ({creators.length} creators)
-              </Typography>
-              <Tooltip title="Refresh results">
-                <IconButton onClick={runAnalysis} disabled={loading}>
-                  <RefreshIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
+                         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+               <Box>
+                 <Typography variant="h6">
+                   Creator Analysis Results ({creators.length} creators)
+                 </Typography>
+                 {analysisType === 'analyze' && (
+                   <Typography variant="caption" color="textSecondary">
+                     Sorted by recommendation priority: BOOK → REVIEW → SKIP
+                   </Typography>
+                 )}
+                 {analysisType === 'forecast' && (
+                   <Typography variant="caption" color="textSecondary">
+                     Sorted by predicted leads (highest first)
+                   </Typography>
+                 )}
+               </Box>
+               <Tooltip title="Refresh results">
+                 <IconButton onClick={runAnalysis} disabled={loading}>
+                   <RefreshIcon />
+                 </IconButton>
+               </Tooltip>
+             </Box>
             
             <TableContainer>
               <Table>
@@ -424,7 +453,9 @@ const InfluencerHub = () => {
                   <TableRow>
                     <TableCell>Rank</TableCell>
                     <TableCell>Creator ID</TableCell>
-                    <TableCell>Predicted Leads</TableCell>
+                    {analysisType === 'forecast' && (
+                      <TableCell>Predicted Leads</TableCell>
+                    )}
                     <TableCell>Fit Score</TableCell>
                     <TableCell>Confidence</TableCell>
                     <TableCell>Topic</TableCell>
@@ -432,7 +463,6 @@ const InfluencerHub = () => {
                     <TableCell>Tier</TableCell>
                     <TableCell>Recommendation</TableCell>
                     <TableCell>Insights</TableCell>
-
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -450,11 +480,13 @@ const InfluencerHub = () => {
                             {creator.creator_id}
                           </Typography>
                         </TableCell>
-                        <TableCell>
-                          <Typography variant="body1" color="primary">
-                            {creator.formattedLeads}
-                          </Typography>
-                        </TableCell>
+                        {analysisType === 'forecast' && (
+                          <TableCell>
+                            <Typography variant="body1" color="primary">
+                              {creator.formattedLeads}
+                            </Typography>
+                          </TableCell>
+                        )}
                         <TableCell>
                           <Typography variant="body2">
                             {creator.formattedFitScore}
@@ -478,22 +510,30 @@ const InfluencerHub = () => {
                         <TableCell>
                           <Chip size="small" label={creator.creator_tier} />
                         </TableCell>
-                        <TableCell>
-                          <Tooltip title={creator.recommendation}>
-                            <Chip
-                              size="small"
-                              label={creator.recommendation}
-                              color={creator.statusColor}
-                              icon={getStatusIcon(creator.recommendation)}
-                            />
-                          </Tooltip>
-                        </TableCell>
-                        <TableCell>
-                        <Box display="flex" justifyContent="flex-end" my={2}>
+                                                 <TableCell>
+                           <Tooltip title={`${creator.recommendation} - ${analysisType === 'analyze' ? 'Priority-based sorting' : 'Lead-based sorting'}`}>
+                             <Chip
+                               size="small"
+                               label={creator.recommendation}
+                               color={creator.statusColor}
+                               icon={getStatusIcon(creator.recommendation)}
+                               sx={{
+                                 fontWeight: 'bold',
+                                 ...(analysisType === 'analyze' && creator.recommendation === 'BOOK' && {
+                                   border: '2px solid',
+                                   borderColor: 'success.main'
+                                 })
+                               }}
+                             />
+                           </Tooltip>
+                         </TableCell>
+                        <TableCell padding="none">
+                        <Box display="flex" justifyContent="flex-end" my={2} >
                         <Button
                           variant="outlined"
                           onClick={() => handleViewInput(creator)}
                           size="small"
+                          sx={{ padding: "2px 6px" }}
                         >
                           View more
                         </Button>
@@ -606,30 +646,41 @@ const InfluencerHub = () => {
               📊 Output Values:
             </Typography>
             <Box component="ul" sx={{ pl: 3, my: 0, '& > li': { mb: 1.5 } }}>
+              {analysisType === 'forecast' && (
+                <li>
+                  <Typography variant="h10">
+                    1. Predicted Leads:
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" component="span" sx={{ ml: 1 }}>
+                    qualified_leads × fit_score × random_factor(0.9-1.1)
+                  </Typography>
+                </li>
+              )}
               <li>
-              <Typography variant="h10">
-              1. Predicted Leads:
-                </Typography>
+                <Typography variant="h10">
+                  {analysisType === 'forecast' ? '2. Confidence:' : '1. Confidence:'}
+                </Typography> 
                 <Typography variant="body2" color="textSecondary" component="span" sx={{ ml: 1 }}>
-                  qualified_leads × fit_score × random_factor(0.9-1.1)
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="h10">2. Confidence:</Typography> 
-                <Typography variant="body2" color="textSecondary" component="span" sx={{ ml: 1 }}>
-                  placeholder
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="h10">3. Tier:</Typography> 
-                <Typography variant="body2" color="textSecondary" component="span" sx={{ ml: 1 }}>
-                  Maps category_tag → Growing/Established/Emerging
+                  Calculates relation between user engagement (clicks), posting stability and semantic fit
                 </Typography>
               </li>
               <li>
-                <Typography variant="h10">4. Recommendation:</Typography> 
+                <Typography variant="h10">
+                  {analysisType === 'forecast' ? '3. Tier:' : '2. Tier:'}
+                </Typography> 
                 <Typography variant="body2" color="textSecondary" component="span" sx={{ ml: 1 }}>
-                  BOOK if leads &gt; 100 & confidence &gt; 0.8, else REVIEW if leads &gt; 50, else SKIP
+                  Based on views_90d: ≥100k=Established, ≥25k=Growing, &lt;25k=Emerging
+                </Typography>
+              </li>
+              <li>
+                <Typography variant="h10">
+                  {analysisType === 'forecast' ? '4. Recommendation:' : '3. Recommendation:'}
+                </Typography> 
+                <Typography variant="body2" color="textSecondary" component="span" sx={{ ml: 1 }}>
+                  {analysisType === 'forecast' 
+                    ? 'BOOK if leads > 100 & confidence > 0.8, else REVIEW if leads > 50, else SKIP'
+                    : 'BOOK if confidence > 0.8, else REVIEW if confidence > 0.6, else SKIP'
+                  }
                 </Typography>
               </li>
             </Box>
