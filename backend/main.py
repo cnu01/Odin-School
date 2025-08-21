@@ -8,7 +8,7 @@ import os
 load_dotenv()
 
 app = FastAPI(
-    title="Odin School - EdTech Solutions",
+    title="APEX AI - EdTech Solutions",
     description="AI-driven solutions for EdTech problems",
     version="1.0.0"
 )
@@ -76,7 +76,7 @@ app.include_router(closemore_router, prefix="/api/closemore", tags=["CloseMore -
 @app.get("/")
 async def root():
     return {
-        "message": "Odin School EdTech Solutions API",
+        "message": "APEX AI EdTech Solutions API",
         "problems": [
             "HotLead - Sales Lead Scoring",
             "CreatorFit - Influencer Marketing",

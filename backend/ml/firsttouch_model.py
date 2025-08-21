@@ -589,7 +589,7 @@ async def generate_call_script(lead_data: Dict[str, Any], prediction: Dict[str, 
     
     # Build personalized script
     # Opening (compliance + brand introduction)
-    opening = "Hi, this is [Agent Name] calling from Odin School. I'm calling regarding your recent inquiry about our tech career programs. Do you have 2-3 minutes to chat?"
+    opening = "Hi, this is [Agent Name] calling from APEX AI. I'm calling regarding your recent inquiry about our tech career programs. Do you have 2-3 minutes to chat?"
     
     # Consent line
     consent = "Great! Before we begin, I want to let you know this call may be recorded for quality and training purposes. Is that okay with you?"
@@ -600,7 +600,7 @@ async def generate_call_script(lead_data: Dict[str, Any], prediction: Dict[str, 
     elif script_type == "follow_up_nurture":
         discovery = "I wanted to follow up on your interest in our programs. Have you had a chance to think about what we discussed previously?"
     elif script_type == "organic_relationship":
-        discovery = f"I noticed you found us through {source.replace('_', ' ')}. What initially caught your attention about Odin School?"
+        discovery = f"I noticed you found us through {source.replace('_', ' ')}. What initially caught your attention about APEX AI?"
     else:
         discovery = "I'd love to understand what brought you to look into tech career programs. Are you currently working, or looking to make a career change?"
     

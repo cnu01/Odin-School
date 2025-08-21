@@ -221,7 +221,7 @@ class SalesKnowledgeManager:
         if os.path.exists(self.knowledge_file):
             return  # Knowledge already exists
         
-        # Default sales knowledge for Odin School
+        # Default sales knowledge for APEX AI
         default_knowledge = [
             {
                 "title": "Price Objection - High Course Fee",
@@ -241,7 +241,7 @@ class SalesKnowledgeManager:
             },
             {
                 "title": "Competitor Comparison - DataCamp",
-                "content": "DataCamp vs Odin School: DataCamp offers self-paced online courses but lacks: 1) Live instructor interaction 2) Job placement support 3) Industry project experience 4) Personalized mentorship 5) Local market focus. Odin School provides comprehensive career transformation with proven results.",
+                "content": "DataCamp vs APEX AI: DataCamp offers self-paced online courses but lacks: 1) Live instructor interaction 2) Job placement support 3) Industry project experience 4) Personalized mentorship 5) Local market focus. APEX AI provides comprehensive career transformation with proven results.",
                 "doc_type": "objection_script",
                 "category": "competitor_comparison",
                 "tags": ["datacamp", "comparison", "advantages"],
@@ -249,7 +249,7 @@ class SalesKnowledgeManager:
             },
             {
                 "title": "Competitor Comparison - Simplilearn",
-                "content": "Simplilearn vs Odin School: While Simplilearn has broader course catalog, Odin School excels in: 1) Smaller batch sizes (max 20 students) 2) Industry-specific curriculum 3) Higher placement rates (85% vs 65%) 4) Local market expertise 5) Personalized career coaching 6) Strong alumni network in your region",
+                "content": "Simplilearn vs APEX AI: While Simplilearn has broader course catalog, APEX AI excels in: 1) Smaller batch sizes (max 20 students) 2) Industry-specific curriculum 3) Higher placement rates (85% vs 65%) 4) Local market expertise 5) Personalized career coaching 6) Strong alumni network in your region",
                 "doc_type": "objection_script",
                 "category": "competitor_comparison",
                 "tags": ["simplilearn", "comparison", "advantages"],

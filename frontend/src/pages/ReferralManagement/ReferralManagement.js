@@ -318,7 +318,7 @@ const ReferralManagement = () => {
           
           <Alert severity="warning" sx={{ mb: 3 }}>
             <Typography variant="body2">
-              <strong>OdinSchool Referral Challenge:</strong> Despite high student satisfaction (8.8/10 average), 
+              <strong>APEX AI Referral Challenge:</strong> Despite high student satisfaction (8.8/10 average), 
               only 15-20% participate in referral programs, missing significant organic growth opportunities.
             </Typography>
           </Alert>

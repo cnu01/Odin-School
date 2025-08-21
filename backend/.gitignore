@@ -127,7 +127,7 @@ temp/
 profile_default/
 ipython_config.py
 
-# Machine Learning Models (IMPORTANT for Odin-School)
+# Machine Learning Models (IMPORTANT for APEX AI)
 # Ignore large model files but keep metadata
 # *.pkl
 *.joblib
@@ -269,7 +269,7 @@ pip-delete-this-directory.txt
 # PEP 582
 __pypackages__/
 
-# Odin-School specific ignores
+# APEX AI specific ignores
 # Keep requirements and setup files
 !requirements.txt
 !setup.py

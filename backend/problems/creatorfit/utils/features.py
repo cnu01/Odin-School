@@ -156,7 +156,7 @@ def build_features(
     Build EdTech-specific features for predicting qualified leads.
     
     EdTech CreatorFit features:
-      - Content-program fit score (semantic similarity with Odin School programs)
+      - Content-program fit score (semantic similarity with APEX AI programs)
       - Creator tier classification (Established/Growing/Emerging)  
       - Language scoring (English premium, Hindi/Telugu regional)
       - Educational content validation

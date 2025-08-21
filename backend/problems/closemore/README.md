@@ -173,7 +173,7 @@
 - **Performance Optimization:** Cached embeddings and similarity computations
 
 ### RAG-Enhanced Deployment
-- **Knowledge Base Initialization:** Pre-loaded with Odin School sales content
+- **Knowledge Base Initialization:** Pre-loaded with APEX AI sales content
 - **Real-time Enhancement:** Live knowledge integration during analysis
 - **Scalable Architecture:** Efficient vector operations for large knowledge bases
 - **Quality Assurance:** Confidence scoring and relevance validation

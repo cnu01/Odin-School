@@ -76,7 +76,7 @@ async def personalize_message(candidate_data: Dict[str, Any]):
                 bedrock = get_bedrock_service()
                 if hasattr(bedrock, 'bedrock_runtime') and bedrock.bedrock_runtime is not None:
                     # Create detailed prompt for AI to generate truly personalized message
-                    prompt = f"""Create a personalized referral message for OdinSchool student with these details:
+                    prompt = f"""Create a personalized referral message for APEX AI student with these details:
 
 Student Profile:
 - Name: {name}
@@ -97,7 +97,7 @@ Requirements:
 5. Make it feel genuine and personal, not template-like
 6. Keep it under 150 words
 7. Use appropriate emojis but don't overdo it
-8. End with "OdinSchool Team"
+8. End with "APEX AI Team"
 
 Create a unique message that reflects their specific learning journey and motivations. Don't mention NPS scores or technical metrics directly."""
 
@@ -109,8 +109,8 @@ Create a unique message that reflects their specific learning journey and motiva
                         # Ensure it has proper greeting and closing
                         if not message.startswith(("Hi", "Hello", "Hey")):
                             message = f"Hi {name}! 👋\n\n" + message
-                        if not "OdinSchool Team" in message:
-                            message += "\n\nBest regards,\nOdinSchool Team"
+                        if not "APEX AI Team" in message:
+                            message += "\n\nBest regards,\nAPEX AI Team"
                             
             except Exception as ai_error:
                 print(f"AI generation failed: {ai_error}")
@@ -135,7 +135,7 @@ We'd love for you to share this transformative experience with others who could 
 Your success story could be exactly what someone needs to take their next career step. Ready to help others while earning great rewards?
 
 Best regards,
-OdinSchool Team"""
+APEX AI Team"""
                 
                 elif likelihood == "Medium" and engagement_score >= 70:
                     course_progress = "Nearly completed" if completion_rate > 0.8 else "Making great progress in"
@@ -156,7 +156,7 @@ Your authentic recommendation could make all the difference for someone consider
 Interested in sharing the opportunity?
 
 Warm regards,
-OdinSchool Team"""
+APEX AI Team"""
                 
                 else:
                     personal_touch = f"in {course}" if course != "your course" else "with us"
@@ -177,7 +177,7 @@ Even if you're still on your own journey, your perspective could be exactly what
 Ready to make a positive impact?
 
 Best wishes,
-OdinSchool Team"""
+APEX AI Team"""
             
             insights = {
                 "propensity_score": propensity_score,

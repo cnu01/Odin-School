@@ -25,7 +25,7 @@ def get_database():
         return None
 
 class BaseMLModel:
-    """Base class for all ML models in Odin School AI systems - MongoDB version"""
+    """Base class for all ML models in APEX AI systems - MongoDB version"""
     
     def __init__(self, model_name: str, model_type: str = "classification"):
         self.model_name = model_name

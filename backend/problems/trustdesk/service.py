@@ -31,7 +31,7 @@ async def get_bedrock_analysis(comment_text: str) -> dict:
         import asyncio
         
         # Construct the detailed prompt for Claude model
-        prompt = f"""You are 'TrustDesk', an AI brand reputation analyst for Odin School, an online education platform. Your task is to analyze a user's comment and provide a structured analysis to help the human support team.
+        prompt = f"""You are 'TrustDesk', an AI brand reputation analyst for APEX AI, an online education platform. Your task is to analyze a user's comment and provide a structured analysis to help the human support team.
 
 Your tone must be professional, empathetic, and helpful.
 

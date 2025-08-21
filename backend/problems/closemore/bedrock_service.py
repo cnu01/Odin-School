@@ -54,10 +54,10 @@ class ClosemoreBedrockService:
         current_time = datetime.now()
         
         prompt = f"""
-You are an expert sales coach and conversation analyst for Odin School, a leading EdTech company specializing in professional tech courses.
+You are an expert sales coach and conversation analyst for APEX AI, a leading EdTech company specializing in professional tech courses.
 
 COMPANY CONTEXT:
-- Odin School offers career-focused technology courses (Data Science, Software Development, AI/ML, Digital Marketing)
+- APEX AI offers career-focused technology courses (Data Science, Software Development, AI/ML, Digital Marketing)
 - Target audience: Working professionals seeking career advancement
 - Key value props: Industry-relevant curriculum, job placement support, flexible learning, expert mentors
 - Price range: ₹50,000 - ₹2,50,000 depending on course and duration
@@ -132,7 +132,7 @@ Return ONLY the JSON object, no additional text or formatting.
         conversations_summary = json.dumps(conversations_data, indent=2)
         
         prompt = f"""
-You are a sales manager creating an optimized daily action plan for sales rep {rep_id} at Odin School.
+You are a sales manager creating an optimized daily action plan for sales rep {rep_id} at APEX AI.
 
 BUSINESS OBJECTIVES:
 - Increase meeting booking rate by 15%

@@ -4,7 +4,7 @@
 
 ```bash
 # Navigate to project root
-cd /path/to/your/Odin-School
+cd /path/to/your/APEX-AI
 
 # Run FastAPI server
 python -m uvicorn main:app --reload --port 8000
