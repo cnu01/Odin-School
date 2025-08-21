@@ -17,7 +17,7 @@ import ReferralManagement from './pages/ReferralManagement/ReferralManagement';
 import FirstTouch from './pages/FirstTouch/FirstTouch';
 import AdLift from './pages/AdLift/AdLift';
 
-// Odin School brand theme
+// APEX AI brand theme
 const theme = createTheme({
   palette: {
     primary: {

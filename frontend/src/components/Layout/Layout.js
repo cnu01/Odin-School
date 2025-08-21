@@ -122,7 +122,7 @@ function Layout({ children }) {
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ p: 3, textAlign: 'center' }}>
         <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-          Odin School
+          APEX AI
         </Typography>
         <Typography variant="body2" color="text.secondary">
           Analytics Hub

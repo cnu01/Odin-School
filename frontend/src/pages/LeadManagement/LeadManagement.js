@@ -200,7 +200,7 @@ const botMetrics = {
 
 // Mock scripts and scheduling rules
 const botScripts = {
-  introduction: "Hi, this is Sarah calling from Odin School. Am I speaking with {LEAD_NAME}? Great! I'm calling because you recently showed interest in our {PROGRAM_NAME} course. Do you have 2 minutes to discuss how we can help accelerate your career?",
+  introduction: "Hi, this is Sarah calling from APEX AI. Am I speaking with {LEAD_NAME}? Great! I'm calling because you recently showed interest in our {PROGRAM_NAME} course. Do you have 2 minutes to discuss how we can help accelerate your career?",
   qualifiers: [
     "What's your current background - are you working in tech or looking to transition?",
     "What's your timeline for starting a new program - within 3 months or 6 months?",

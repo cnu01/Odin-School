@@ -1,4 +1,4 @@
-# Odin School Analytics Hub
+# APEX AI Analytics Hub
 
 A comprehensive EdTech analytics and management platform built with React and Material-UI. This frontend application provides unified analytics, lead management, influencer analysis, brand reputation management, and pricing optimization tools.
 
@@ -87,7 +87,7 @@ A comprehensive EdTech analytics and management platform built with React and Ma
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd odin-school-frontend
+   cd apex-ai-frontend
    ```
 
 2. **Install dependencies**
@@ -162,7 +162,7 @@ src/
 ## Customization
 
 ### Theme
-The application uses a custom Material-UI theme with Odin School branding:
+The application uses a custom Material-UI theme with APEX AI branding:
 - Primary color: Professional blue (#1976d2)
 - Secondary color: Accent orange (#ff9800)
 - Clean typography with Inter font family
@@ -202,7 +202,7 @@ Currently uses mock data for demonstration. To integrate with real APIs:
 
 ## License
 
-This project is proprietary software for Odin School.
+This project is proprietary software for APEX AI.
 
 ---
 

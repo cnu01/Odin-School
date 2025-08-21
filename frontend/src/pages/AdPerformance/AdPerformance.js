@@ -244,9 +244,9 @@ function AdPerformance() {
 
   const generateReferralMessage = (referrer) => {
     const messages = [
-      `Hey! I just completed the ${referrer.course} course at Odin School and it was incredible! The hands-on projects and mentorship really helped me level up my skills. Thought you might be interested too! 🚀`,
-      `Just wanted to share - I recently finished the ${referrer.course} program at Odin School. The curriculum is so practical and industry-relevant. They're offering some great courses that might align with your career goals!`,
-      `Hi! Remember how I was planning to upskill in tech? Well, I just completed the ${referrer.course} course at Odin School and I'm amazed by the transformation! The projects were real-world and the support was fantastic. Check it out!`,
+      `Hey! I just completed the ${referrer.course} course at APEX AI and it was incredible! The hands-on projects and mentorship really helped me level up my skills. Thought you might be interested too! 🚀`,
+      `Just wanted to share - I recently finished the ${referrer.course} program at APEX AI. The curriculum is so practical and industry-relevant. They're offering some great courses that might align with your career goals!`,
+      `Hi! Remember how I was planning to upskill in tech? Well, I just completed the ${referrer.course} course at APEX AI and I'm amazed by the transformation! The projects were real-world and the support was fantastic. Check it out!`,
     ];
     return messages[Math.floor(Math.random() * messages.length)];
   };

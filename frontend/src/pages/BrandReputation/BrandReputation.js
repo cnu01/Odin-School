@@ -69,7 +69,7 @@ const responseTemplates = {
     "We appreciate your honest feedback and apologize for not meeting expectations. Let's make this right - please reach out to our support team for immediate assistance.",
   ],
   urgent: [
-    "We're sorry for the inconvenience! Our technical team is looking into the payment issue. Please try again, and if it persists, contact our support at support@odinschool.com for immediate assistance.",
+    "We're sorry for the inconvenience! Our technical team is looking into the payment issue. Please try again, and if it persists, contact our support at support@apexai.com for immediate assistance.",
     "Thanks for reporting this issue. We're resolving it on priority. Meanwhile, you can also enroll by calling our helpline at +91-XXXX-XXXX.",
   ],
 };

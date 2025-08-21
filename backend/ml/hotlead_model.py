@@ -1,6 +1,6 @@
 """
 HotLead AI System - Lead Scoring and Conversion Prediction Model
-MongoDB Integration for Odin-School
+MongoDB Integration for APEX AI
 """
 import numpy as np
 import logging

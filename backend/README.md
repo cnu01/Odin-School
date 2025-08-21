@@ -1,4 +1,4 @@
-# 🎯 Odin School - EdTech Solutions Backend
+# 🎯 APEX AI - EdTech Solutions Backend
 
 FastAPI backend for 9 AI-driven EdTech solutions. Ready for 24-hour development sprint.
 

@@ -771,7 +771,7 @@ function HotLead() {
           
           <Alert severity="info" sx={{ mb: 3 }}>
             <Typography variant="body2">
-              <strong>OdinSchool Business Context:</strong> EdTech platform with 600+ hiring partners. 
+              <strong>APEX AI Business Context:</strong> EdTech platform with 600+ hiring partners. 
               Challenge: Converting website traffic to paid enrollments efficiently with healthy traffic but uneven conversion patterns.
             </Typography>
           </Alert>

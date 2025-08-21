@@ -38,7 +38,7 @@ TARGET = 'will_refer'
 
 def generate_synthetic_referral_data(size: int = 5000) -> pd.DataFrame:
     """
-    Generate realistic synthetic referral propensity data for OdinSchool
+    Generate realistic synthetic referral propensity data for APEX AI
     
     Based on real-world referral patterns:
     - High completers more likely to refer

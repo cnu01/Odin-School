@@ -500,13 +500,13 @@ class HotLeadService:
                 fallback_message = f"""
                 Hi {lead.get('first_name', 'there')},
                 
-                I noticed you've been exploring our courses at Odin School. Based on your interest in {lead.get('course_interest', 'our programs')}, I'd love to help you find the perfect fit for your learning goals.
+                I noticed you've been exploring our courses at APEX AI. Based on your interest in {lead.get('course_interest', 'our programs')}, I'd love to help you find the perfect fit for your learning goals.
                 
                 Would you be available for a quick call this week to discuss how we can help you advance your career?
                 
                 Best regards,
                 {request.rep_name}
-                Odin School
+                APEX AI
                 """
                 
                 return {
@@ -627,7 +627,7 @@ class HotLeadService:
                 "display_ads_conversion_rate": 0.0,
                 "source_variance": "0% to 33.3%",
                 "analysis_type": "Real Lead Data Analysis",
-                "sample_basis": "Actual OdinSchool lead database"
+                "sample_basis": "Actual APEX AI lead database"
             }
         )
         
@@ -696,7 +696,7 @@ class HotLeadService:
         
         # Implementation status
         implementation_status = {
-            "data_analysis": "✅ Complete - Real lead data analysis from OdinSchool database",
+            "data_analysis": "✅ Complete - Real lead data analysis from APEX AI database",
             "problem_identification": "✅ Complete - 2 critical problems identified with supporting evidence",
             "ai_powered_diagnosis": "✅ Complete - AI-enhanced problem diagnosis with quantified impact",
             "recommendations": "🔄 Ready - Lead scoring system and response time optimization recommended",
@@ -796,12 +796,12 @@ class HotLeadService:
             
             # Create comprehensive prompt for Claude
             prompt = f"""
-You are an expert sales analyst for OdinSchool, a leading EdTech company with 600+ hiring partners offering career-oriented bootcamps in Data Science, AI, and Investment Banking.
+You are an expert sales analyst for APEX AI, a leading EdTech company with 600+ hiring partners offering career-oriented bootcamps in Data Science, AI, and Investment Banking.
 
 ANALYZE THE FOLLOWING LEAD DATA AND IDENTIFY CRITICAL PROBLEMS:
 
 **BUSINESS CONTEXT:**
-- Company: OdinSchool - EdTech career platform
+- Company: APEX AI - EdTech career platform
 - Market: Fast-growing online education industry
 - Challenge: Converting website traffic to paid enrollments efficiently  
 - Current State: Healthy traffic but uneven conversion patterns
@@ -817,7 +817,7 @@ Average Time on Site: {avg_time_on_site:.0f} seconds
 {chr(10).join([f"- {source}: {data['count']} leads, {data['conversion_rate']*100:.1f}% conversion" for source, data in source_performance.items()])}
 
 **YOUR TASK:**
-Based on this REAL data from OdinSchool's database, identify 1-2 critical problems where qualified leads are NOT being prioritized effectively.
+Based on this REAL data from APEX AI's database, identify 1-2 critical problems where qualified leads are NOT being prioritized effectively.
 
 For each problem, provide:
 1. **Problem Title** (specific and actionable)
@@ -856,7 +856,7 @@ Provide concrete, data-driven analysis that shows why qualified leads are being 
         conversion_rate = (converted_leads / total_leads) * 100 if total_leads > 0 else 0
         
         return f"""
-**Problem Analysis - OdinSchool Lead Data**
+**Problem Analysis - APEX AI Lead Data**
 
 **Problem 1: Inconsistent Lead Prioritization**
 - Symptom: Equal treatment of all {total_leads} leads regardless of conversion probability
@@ -1796,7 +1796,7 @@ Provide concrete, data-driven analysis that shows why qualified leads are being 
                 })
             
             prompt = f"""
-You are an AI solutions architect for OdinSchool's HotLead system. Based on the following REAL problems identified from data analysis, generate specific AI solutions.
+You are an AI solutions architect for APEX AI's HotLead system. Based on the following REAL problems identified from data analysis, generate specific AI solutions.
 
 IDENTIFIED PROBLEMS:
 {chr(10).join([f"• {p['title']}: {p['root_cause']}" for p in problems_summary])}
@@ -1823,7 +1823,7 @@ Focus on solutions like:
 - Cross-Source Intelligence (multi-touchpoint analysis)
 - Escalation Intelligence (automatic priority adjustments)
 
-Make solutions specific to the EdTech/OdinSchool context with realistic implementation estimates.
+Make solutions specific to the EdTech/APEX AI context with realistic implementation estimates.
 """
 
             claude_response = await bedrock_service.generate_text(prompt, max_tokens=2500)

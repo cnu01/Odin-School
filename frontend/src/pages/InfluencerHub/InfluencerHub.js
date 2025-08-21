@@ -262,7 +262,7 @@ function InfluencerHub() {
                 AI-Powered Creator Analysis
               </Typography>
               <Typography variant="body2">
-                <strong>High Fit Score (92%):</strong> Content aligns perfectly with Odin School's target audience. 
+                <strong>High Fit Score (92%):</strong> Content aligns perfectly with APEX AI's target audience. 
                 Recent videos on "Career Switch to Tech" and "AI Fundamentals" show strong engagement from our 
                 demographic. Audience is 65% career switchers aged 22-35.
               </Typography>

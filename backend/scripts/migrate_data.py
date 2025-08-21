@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Data Migration Script: PostgreSQL to MongoDB
-Migrates HotLead, ReferMore, and OneTruth data from backend PostgreSQL to Odin-School MongoDB
+Migrates HotLead, ReferMore, and OneTruth data from backend PostgreSQL to APEX AI MongoDB
 """
 
 import asyncio
@@ -35,7 +35,7 @@ class DataMigrator:
             'password': 'odin_secure_2025'
         }
         
-        # MongoDB connection (Odin-School)
+        # MongoDB connection (APEX AI)
         self.mongo_url = os.getenv("MONGODB_URL", "mongodb+srv://cnu:jb1y6avC2cm6oRxg@cluster0.xiuz0db.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
         self.mongo_db_name = os.getenv("DATABASE_NAME", "odin_school_db")
         
