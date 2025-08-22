@@ -1,5 +1,5 @@
 from __future__ import annotations
-
+import re
 from typing import Tuple, Dict, List, Optional, Iterable
 
 import numpy as np
@@ -13,8 +13,7 @@ except ImportError as e:
     SentenceTransformer = None
     SENTENCE_TRANSFORMERS_AVAILABLE = False
 
-
-DEFAULT_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+DEFAULT_EMBEDDING_MODEL = "sentence-transformers/all-mpnet-base-v2"
 
 _MODEL_CACHE: Dict[str, any] = {}
 
@@ -27,26 +26,79 @@ EDTECH_TOPICS = [
 ]
 
 ODIN_SCHOOL_PROGRAMS = {
-    "data_science": "Learn Python programming, statistics, machine learning, deep learning, data analysis, visualization with pandas, numpy, scikit-learn, tensorflow for data science career",
-    "web_development": "Master HTML, CSS, JavaScript, React, Node.js, databases, APIs, full-stack web development for frontend backend programming career",
-    "python_programming": "Complete Python programming course covering basics, advanced concepts, data structures, algorithms, web frameworks, automation, career guidance",
-    "career_guidance": "Technical interview preparation, system design, coding practice, resume building, job search strategies for software engineering careers"
+    "data_science": """
+    Data science programming tutorial covering Python basics, pandas dataframes, 
+    machine learning algorithms, statistics concepts, data visualization, 
+    deep learning neural networks, career advice for data scientists
+    """,
+    "web_development": """
+    Web development tutorial teaching HTML CSS basics, JavaScript programming,
+    React components, Node.js backend, database integration, full-stack projects,
+    frontend backend development career guidance
+    """,
+    "python_programming": """
+    Complete Python programming bootcamp covering basics syntax variables functions,
+    object-oriented programming classes inheritance, data structures lists dictionaries,
+    algorithms problem solving, web frameworks Django Flask, automation scripting,
+    testing debugging, project development, Python developer career advice
+    """,
+    "career_guidance": """
+    Technical career guidance covering software engineering interview preparation,
+    coding practice algorithms data structures, system design concepts,
+    resume building portfolio development, job search strategies,
+    salary negotiation, career progression in tech industry
+    """
 }
 
+def truncate_text(text: str, max_tokens: int = 128) -> str:
+    """
+    Truncate text while preserving semantic integrity.
+    Keeps beginning and end to maintain context.
+    """
+    words = text.split()
+    if len(words) <= max_tokens:
+        return text
+    
+    # Keep first 60% and last 40% to preserve context
+    first_part = int(max_tokens * 0.6)
+    last_part = max_tokens - first_part
+    
+    truncated = words[:first_part] + words[-last_part:]
+    return ' '.join(truncated)
 
 def _get_emb_model(name: str):
     """Return a cached SentenceTransformer instance for the given model name."""
     if not SENTENCE_TRANSFORMERS_AVAILABLE:
-        return None
+        raise ValueError("SentenceTransformers library is not available.")
+
     if name not in _MODEL_CACHE:
+        _MODEL_CACHE.clear()  # Clear the cache to avoid conflicts
         _MODEL_CACHE[name] = SentenceTransformer(name)
+    else:
+        print(f"[INFO] Using cached model: {name}")
+
     return _MODEL_CACHE[name]
 
 def _normalize_text_series(s: pd.Series) -> pd.Series:
     """
-    Basic cleanup for transcript text.
+    text preprocessing for better semantic matching.
     """
-    return s.fillna("").astype(str).str.strip()
+    def clean_text(text: str) -> str:
+        if not text or pd.isna(text):
+            return ""
+        
+        text = str(text).lower()
+        
+        text = re.sub(r'\s+', ' ', text)
+        
+        text = re.sub(r'\b(um|uh|like|you know|basically|actually)\b', '', text)
+        
+        # Remove special characters but keep punctuation for context
+        text = re.sub(r'[^\w\s.,!?-]', ' ', text)
+        
+        return text.strip()
+    
+    return s.apply(clean_text)
 
 
 def add_audience_and_exposure(df: pd.DataFrame) -> pd.DataFrame:
@@ -96,51 +148,42 @@ def _encode_texts(
         show_progress_bar=False,
     )
 
-
 def compute_fit_scores(
     df: pd.DataFrame,
     program_text: str,
-    emb_model_name: str = DEFAULT_EMBEDDING_MODEL,
+    emb_model_name = DEFAULT_EMBEDDING_MODEL,
     model = None,
     batch_size: int = 256,
-    to_unit_interval: bool = True,
 ) -> pd.Series:
     """
     Compute semantic Fit Score between each creator transcript and the program description.
-    Implementation: cosine similarity of embeddings.
-      - If embeddings are normalized, dot product == cosine similarity.
-      - Optionally map cosine from [-1, 1] to [0, 1] for friendlier scale.
-
-    Returns
-    -------
-    pd.Series named 'fit_score' aligned to df.index
     """
     if not isinstance(program_text, str) or not program_text.strip():
         raise ValueError("program_text must be a non-empty string.")
 
     texts = _normalize_text_series(df["recent_video_transcript"])
 
+    program_text_truncated = truncate_text(program_text, max_tokens=128)
+    texts_truncated = texts.apply(lambda x: truncate_text(x, max_tokens=128))
+
     emb = model or _get_emb_model(emb_model_name)
-
-    prog_vec = _encode_texts([program_text], emb, batch_size=1, normalize=True)         # (1, d)
-    creator_mat = _encode_texts(texts, emb, batch_size=batch_size, normalize=True)      # (N, d)
-
-    # Cosine similarity via dot (since both are normalized)
     if emb is None:
-        # Fallback: use simple text matching for similarity
-        program_words = set(program_text.lower().split())
-        cos = np.array([
-            len(program_words.intersection(set(str(text).lower().split()))) / (len(program_words) + 1)
-            for text in texts
-        ])
-    else:
-        cos = (creator_mat @ prog_vec.T).ravel()  # shape: (N,)
+        raise ValueError("Embedding model is not available.")
 
-    # Optional: map cosine [-1, 1] -> [0, 1]
-    if to_unit_interval:
-        cos = 0.5 * (cos + 1.0)
+    # Encode program text and creator transcripts
+    # prog_vec = _encode_texts([program_text], emb, batch_size=1, normalize=True)  # (1, d)
+    # creator_mat = _encode_texts(texts, emb, batch_size=batch_size, normalize=True)  # (N, d)
 
-    # Defensive clamp (rare numerical drift)
+    prog_vec = _encode_texts([program_text_truncated], emb, batch_size=1, normalize=True)
+    creator_mat = _encode_texts(texts_truncated, emb, batch_size=batch_size, normalize=True)
+
+    cos = (creator_mat @ prog_vec.T).ravel()
+
+    actual_min, actual_max = cos.min(), cos.max()
+
+    if actual_min < 0:
+        cos = (cos - actual_min) / (actual_max - actual_min)
+
     cos = np.clip(cos, 0.0, 1.0)
 
     return pd.Series(cos, index=df.index, name="fit_score")
@@ -175,10 +218,8 @@ def build_features(
         program_text=program_text,
         emb_model_name=emb_model_name,
         model=model,
-        to_unit_interval=True,
     )
     
-    # EdTech-specific features for CPL optimization
     # Educational content validation (using our specific topics)
     edtech_pattern = "|".join(EDTECH_TOPICS)
     df["is_educational"] = df["topic"].str.contains(
