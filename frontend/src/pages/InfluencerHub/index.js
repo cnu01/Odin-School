@@ -154,20 +154,13 @@ const InfluencerHub = () => {
          setAnalysisResults(result);
          let formattedCreators = creatorfitService.formatCreatorResults(result.results || []);
          
-         // Sort by recommendation priority for analyze endpoint
-         if (analysisType === 'analyze') {
-           const recommendationPriority = { 'BOOK': 1, 'REVIEW': 2, 'SKIP': 3 };
-           formattedCreators.sort((a, b) => {
-             const priorityA = recommendationPriority[a.recommendation] || 4;
-             const priorityB = recommendationPriority[b.recommendation] || 4;
-             return priorityA - priorityB;
-           });
-           
-           // Update ranks after sorting
-           formattedCreators.forEach((creator, index) => {
+         // Sort by fit_score
+         formattedCreators.sort((a, b) => b.fit_score - a.fit_score); // Sort by fit_score
+         
+         // Update ranks after sorting
+         formattedCreators.forEach((creator, index) => {
              creator.rank = index + 1;
-           });
-         }
+         });
          
          setCreators(formattedCreators);
          
@@ -431,7 +424,7 @@ const InfluencerHub = () => {
                  </Typography>
                  {analysisType === 'analyze' && (
                    <Typography variant="caption" color="textSecondary">
-                     Sorted by recommendation priority: BOOK → REVIEW → SKIP
+                     Sorted by Fit Score beween creator content and program
                    </Typography>
                  )}
                  {analysisType === 'forecast' && (
@@ -461,7 +454,9 @@ const InfluencerHub = () => {
                     <TableCell>Topic</TableCell>
                     <TableCell>Views (90d)</TableCell>
                     <TableCell>Tier</TableCell>
-                    <TableCell>Recommendation</TableCell>
+                    {analysisType === 'forecast' && (
+                      <TableCell>Recommendation</TableCell>
+                    )}
                     <TableCell>Insights</TableCell>
                   </TableRow>
                 </TableHead>
@@ -510,7 +505,8 @@ const InfluencerHub = () => {
                         <TableCell>
                           <Chip size="small" label={creator.creator_tier} />
                         </TableCell>
-                                                 <TableCell>
+                                                 {analysisType === 'forecast' && (
+                          <TableCell>
                            <Tooltip title={`${creator.recommendation} - ${analysisType === 'analyze' ? 'Priority-based sorting' : 'Lead-based sorting'}`}>
                              <Chip
                                size="small"
@@ -526,7 +522,8 @@ const InfluencerHub = () => {
                                }}
                              />
                            </Tooltip>
-                         </TableCell>
+                          </TableCell>
+                        )}
                         <TableCell padding="none">
                         <Box display="flex" justifyContent="flex-end" my={2} >
                         <Button
