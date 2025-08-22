@@ -164,6 +164,15 @@ const InfluencerHub = () => {
          
          setCreators(formattedCreators);
          
+         if (analysisType === 'forecast') {
+           const recommendationPriority = { 'BOOK': 1, 'REVIEW': 2, 'SKIP': 3 };
+           formattedCreators.sort((a, b) => {
+             const priorityA = recommendationPriority[a.recommendation] || 4;
+             const priorityB = recommendationPriority[b.recommendation] || 4;
+             return priorityA - priorityB;
+           });
+         }
+         
          const analysisTypeLabel = analysisType === 'analyze' ? 'Analysis' : 'Forecasting';
          showSuccess(`${analysisTypeLabel} completed successfully! Found ${result.results?.length || 0} creators.`);
        } else {
