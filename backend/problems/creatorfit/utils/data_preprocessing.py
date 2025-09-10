@@ -42,8 +42,6 @@ EDTECH_TOPICS = [
 VALID_LANGUAGES = ["English", "Hindi", "Telugu"]
 VALID_GEOGRAPHY = ["INDIA"]
 
-SCHEMA_ADAPTER: Dict[str, str] = {}
-
 def project_root() -> Path:
     """Return repo root (two levels up from this file)."""
     return Path(__file__).resolve().parents[2]
@@ -51,18 +49,6 @@ def project_root() -> Path:
 def dataset_path(filename: str) -> Path:
     """Join dataset/filename under repo root."""
     return project_root() / "dataset" / filename
-
-def _apply_schema_adapter(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    If the incoming CSV uses alias column names (e.g., 'country' instead of 'geography'),
-    rename them here once so downstream code stays stable.
-    """
-    if SCHEMA_ADAPTER:
-        # Only rename keys that actually exist in df
-        rename_map = {src: dst for src, dst in SCHEMA_ADAPTER.items() if src in df.columns}
-        if rename_map:
-            df = df.rename(columns=rename_map)
-    return df
 
 def _coerce_and_normalize(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -192,8 +178,8 @@ def _fold_rare_categories(
     return df
 
 def load_and_clean_data(
-    raw_filename: str = "creator_campaign_audience_EDTECH.csv",
-    cleaned_filename: str = "creator_campaign_audience_EDTECH.cleaned.csv",
+    raw_filename: str = "creator_campaign_audience.csv",
+    cleaned_filename: str = "creator_campaign_audience.cleaned.csv",
     *,
     rare_min_count: int = 0,
 ) -> Tuple[pd.DataFrame, Dict[str, int], Path]:
@@ -217,14 +203,12 @@ def load_and_clean_data(
     if not raw_path.exists():
         raise FileNotFoundError(f"Dataset not found at: {raw_path}")
 
-    # Read with no dtype coercion (be forgiving first)
     df_raw = pd.read_csv(raw_path)
 
-    # Optional one-time column renames (schema adapter)
-    df_raw = _apply_schema_adapter(df_raw)
-
     missing = [c for c in EXPECTED_COLS if c not in df_raw.columns]
+
     extra = [c for c in df_raw.columns if c not in EXPECTED_COLS]
+
     if missing:
         raise ValueError(f"CSV is missing required columns: {missing}")
     if extra:
