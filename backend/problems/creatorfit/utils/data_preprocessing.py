@@ -16,7 +16,6 @@ EXPECTED_COLS = {
     "qualified_leads": "int64",
     "enrollments": "int64",
     "refunds": "int64",
-    "geography": "string",
     "language": "string",
     "category_tag": "string",
 }
@@ -40,7 +39,6 @@ EDTECH_TOPICS = [
 ]
 
 VALID_LANGUAGES = ["English", "Hindi", "Telugu"]
-VALID_GEOGRAPHY = ["INDIA"]
 
 def project_root() -> Path:
     """Return repo root (two levels up from this file)."""
@@ -54,7 +52,6 @@ def _coerce_and_normalize(df: pd.DataFrame) -> pd.DataFrame:
     """
     EdTech-specific data cleaning and normalization:
     - Validate creator IDs follow EDU_XXXX format
-    - Ensure geography is INDIA only
     - Validate languages are English/Hindi/Telugu
     - Clean and validate EdTech topics
     - Coerce all metrics to proper integer types
@@ -66,7 +63,6 @@ def _coerce_and_normalize(df: pd.DataFrame) -> pd.DataFrame:
         if dt == "string" and c in df.columns:
             df[c] = df[c].astype("string").str.strip()
 
-    df["geography"] = df["geography"].str.upper().str.strip()
     df["language"] = df["language"].str.title().str.strip()
     df["topic"] = df["topic"].str.strip()
     df["category_tag"] = df["category_tag"].str.strip()
@@ -89,7 +85,7 @@ def _impute_missing(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
 
     df["recent_video_transcript"] = df["recent_video_transcript"].fillna("")
-    for c in ["topic", "geography", "language", "category_tag"]:
+    for c in ["topic", "language", "category_tag"]:
         df[c] = df[c].fillna("Unknown")
 
     # Numeric: median is safer for heavy-tailed distributions
@@ -105,7 +101,7 @@ def _apply_business_guards(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, in
     - Enforce funnel constraints: views → clicks → leads → qualified → enrollments
     - Validate EdTech-specific ranges and metrics
     - Flag data quality issues for educational platform
-    - Ensure geographic and language consistency
+    - Ensure language consistency
     """
     df = df.copy()
     fix_counts: Dict[str, int] = {}
@@ -135,11 +131,6 @@ def _apply_business_guards(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, in
     if "clicks" in df.columns and "views_90d" in df.columns:
         max_clicks = (df["views_90d"] * 0.1).astype(int)
         df["clicks"] = np.minimum(df["clicks"], max_clicks)
-    
-    invalid_geo = ~df["geography"].isin(VALID_GEOGRAPHY)
-    if invalid_geo.any():
-        fix_counts["invalid_geography"] = int(invalid_geo.sum())
-        df.loc[invalid_geo, "geography"] = "INDIA"
     
     invalid_lang = ~df["language"].isin(VALID_LANGUAGES)
     if invalid_lang.any():
@@ -188,7 +179,6 @@ def load_and_clean_data(
     
     EdTech-specific cleaning includes:
     - Validate creator IDs follow EDU_XXXX format
-    - Ensure geography is INDIA only (focused market)
     - Validate languages are English/Hindi/Telugu
     - Check topics are educational (Python, Data Science, etc.)
     - Enforce funnel constraints (views → clicks → leads → enrollments)

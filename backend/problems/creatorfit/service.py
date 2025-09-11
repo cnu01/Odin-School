@@ -181,11 +181,6 @@ class CreatorFitService:
             
             df['creator_tier'] = df['views_90d'].apply(classify_creator_tier)
             
-            # Debug logging for tier calculation
-            print(f"DEBUG: Tier calculation for first 5 creators:")
-            for i, row in df.head().iterrows():
-                print(f"  Creator {row['creator_id']}: {row['views_90d']} views → {row['creator_tier']} tier")
-            
             from .utils.features import compute_fit_scores
             
             program_text = ODIN_SCHOOL_PROGRAMS.get(program_type, ODIN_SCHOOL_PROGRAMS["data_science"])
@@ -195,9 +190,7 @@ class CreatorFitService:
             print(f"DEBUG: Fit scores: {fit_scores}")
             
             df['fit_score'] = fit_scores
-            
-            print(f"DEBUG: Fit score calculation completed. Found {len(fit_scores[fit_scores > 0])} relevant creators out of {len(df)} total.")
-            
+                        
             # Use actual qualified_leads from CSV, enhanced with fit score
             df['predicted_qualified_leads'] = (
                 df['qualified_leads'] * df['fit_score']
@@ -244,7 +237,6 @@ class CreatorFitService:
                         'qualified_leads': int(row.get('qualified_leads', 0)),
                         'enrollments': int(row.get('enrollments', 0)),
                         'refunds': int(row.get('refunds', 0)),
-                        'geography': str(row.get('geography', '')),
                         'language': str(row['language']),
                         'category_tag': str(row.get('category_tag', ''))
                     }

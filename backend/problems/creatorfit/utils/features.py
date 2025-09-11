@@ -1,21 +1,8 @@
 from __future__ import annotations
 import re
 from typing import Tuple, Dict, List, Optional, Iterable
-
 import numpy as np
 import pandas as pd
-
-try:
-    from sentence_transformers import SentenceTransformer
-    SENTENCE_TRANSFORMERS_AVAILABLE = True
-except ImportError as e:
-    print(f"[INFO] SentenceTransformers not available: {e}")
-    SentenceTransformer = None
-    SENTENCE_TRANSFORMERS_AVAILABLE = False
-
-DEFAULT_EMBEDDING_MODEL = "sentence-transformers/all-mpnet-base-v2"
-
-_MODEL_CACHE: Dict[str, any] = {}
 
 EDTECH_TOPICS = [
     "Python", "Data Science", "Machine Learning", "JavaScript", "React",
@@ -36,11 +23,11 @@ ODIN_SCHOOL_PROGRAMS = {
     React components, Node.js backend, database integration, full-stack projects,
     frontend backend development career guidance
     """,
-    "python_programming": """
-    Complete Python programming bootcamp covering basics syntax variables functions,
-    object-oriented programming classes inheritance, data structures lists dictionaries,
-    algorithms problem solving, web frameworks Django Flask, automation scripting,
-    testing debugging, project development, Python developer career advice
+    "ai_ml": """
+    Artificial Intelligence and Machine Learning tutorial covering supervised unsupervised learning,
+    deep learning neural networks CNN RNN transformers, natural language processing,
+    computer vision applications, reinforcement learning basics, model deployment MLOps,
+    real-world AI projects, career guidance for AI ML engineers and researchers
     """,
     "career_guidance": """
     Technical career guidance covering software engineering interview preparation,
@@ -49,6 +36,18 @@ ODIN_SCHOOL_PROGRAMS = {
     salary negotiation, career progression in tech industry
     """
 }
+
+DEFAULT_EMBEDDING_MODEL = "sentence-transformers/all-mpnet-base-v2"
+
+try:
+    from sentence_transformers import SentenceTransformer
+    SENTENCE_TRANSFORMERS_AVAILABLE = True
+except ImportError as e:
+    print(f"[INFO] SentenceTransformers not available: {e}")
+    SentenceTransformer = None
+    SENTENCE_TRANSFORMERS_AVAILABLE = False
+
+_MODEL_CACHE: Dict[str, any] = {}
 
 def truncate_text(text: str, max_tokens: int = 128) -> str:
     """
@@ -106,7 +105,6 @@ def add_audience_and_exposure(df: pd.DataFrame) -> pd.DataFrame:
     Add EdTech-specific audience and exposure features:
       - creator_tier: Established/Growing/Emerging based on views
       - language_diversity: Multi-language creators (English+Hindi+Telugu)
-      - india_focused: All creators are INDIA-focused (always 1)
       - log_views_90d: stabilized exposure (log1p of views_90d)
     """
     df = df.copy()
@@ -120,8 +118,6 @@ def add_audience_and_exposure(df: pd.DataFrame) -> pd.DataFrame:
             return "Emerging"
     
     df["creator_tier"] = df["views_90d"].apply(classify_creator_tier)
-    
-    df["india_focused"] = 1
     
     language_scores = {"English": 1.0, "Hindi": 0.8, "Telugu": 0.7}
     df["language_score"] = df["language"].map(language_scores).fillna(0.5)
@@ -148,8 +144,32 @@ def _encode_texts(
         show_progress_bar=False,
     )
 
+def is_program_relevant(content: str, program_type: str, program_text: str) -> bool:
+    """Check if content contains program-related keywords"""
+    if pd.isna(content) or not content:
+        return False
+    
+    content_lower = str(content).lower()
+    
+    # Convert program_type (e.g., "web_development" -> "web development")
+    program_name = program_type.replace('_', ' ')
+    if program_name in content_lower:
+        return True
+    
+    # Extract meaningful words from program_text (exclude common stop words)
+    stop_words = {'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those'}
+    
+    # Extract words that are 3+ characters and not stop words
+    program_words = re.findall(r'\b[a-zA-Z]{3,}\b', program_text.lower())
+    meaningful_words = [word for word in program_words if word not in stop_words]
+    
+    # Check if at least 2 meaningful words appear in content
+    matches = sum(1 for word in meaningful_words if word in content_lower)
+    return matches >= 2
+
 def compute_fit_scores(
     df: pd.DataFrame,
+    program_type: str,
     program_text: str,
     emb_model_name = DEFAULT_EMBEDDING_MODEL,
     model = None,
@@ -160,22 +180,28 @@ def compute_fit_scores(
     """
     if not isinstance(program_text, str) or not program_text.strip():
         raise ValueError("program_text must be a non-empty string.")
+    
+    relevant_mask = (
+        df["recent_video_transcript"].apply(lambda x: is_program_relevant(x, program_type, program_text)) |
+        df["topic"].apply(lambda x: is_program_relevant(x, program_type, program_text))
+    )
 
-    texts = _normalize_text_series(df["recent_video_transcript"])
+    if not relevant_mask.any():
+        return pd.Series(0.0, index=df.index, name="fit_score")
+    
+    df_filtered = df[relevant_mask]
 
+    transcript = _normalize_text_series(df_filtered["recent_video_transcript"])
     program_text_truncated = truncate_text(program_text, max_tokens=128)
-    texts_truncated = texts.apply(lambda x: truncate_text(x, max_tokens=128))
+    transcript_truncated = transcript.apply(lambda x: truncate_text(x, max_tokens=128))
 
     emb = model or _get_emb_model(emb_model_name)
+
     if emb is None:
         raise ValueError("Embedding model is not available.")
 
-    # Encode program text and creator transcripts
-    # prog_vec = _encode_texts([program_text], emb, batch_size=1, normalize=True)  # (1, d)
-    # creator_mat = _encode_texts(texts, emb, batch_size=batch_size, normalize=True)  # (N, d)
-
     prog_vec = _encode_texts([program_text_truncated], emb, batch_size=1, normalize=True)
-    creator_mat = _encode_texts(texts_truncated, emb, batch_size=batch_size, normalize=True)
+    creator_mat = _encode_texts(transcript_truncated, emb, batch_size=batch_size, normalize=True)
 
     cos = (creator_mat @ prog_vec.T).ravel()
 
@@ -186,7 +212,11 @@ def compute_fit_scores(
 
     cos = np.clip(cos, 0.0, 1.0)
 
-    return pd.Series(cos, index=df.index, name="fit_score")
+    result = pd.Series(0.0, index=df.index, name="fit_score")
+
+    result[relevant_mask] = cos
+
+    return result
 
 
 def build_features(
@@ -215,6 +245,7 @@ def build_features(
 
     df["fit_score"] = compute_fit_scores(
         df=df,
+        program_type=program_type,
         program_text=program_text,
         emb_model_name=emb_model_name,
         model=model,
@@ -243,7 +274,6 @@ def build_features(
         "posting_cadence_days",  
         "views_90d",             
         "log_views_90d",         
-        "india_focused",         
         "language_score",        
         "is_educational",         
         "transcript_length",      
