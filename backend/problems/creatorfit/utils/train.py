@@ -8,34 +8,27 @@ from lightgbm import LGBMRegressor, early_stopping, log_evaluation, reset_parame
 # from lightgbm import LGBMRegressor, early_stopping, log_evaluation
 from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error
 
-# Local modules
 from .data_preprocessing import load_and_clean_data
 from .features import build_features
 from .modeling import build_preprocessor, group_train_val_split
 
-# -----------------------------
-# EdTech CreatorFit Training Config
-# -----------------------------
 PROGRAM_TYPE = "data_science"  # Options: data_science, web_development, python_programming, career_guidance
 RAW_FILENAME = "creator_campaign_audience.csv"  # EdTech-focused dataset
 CLEANED_FILENAME = "creator_campaign_audience.cleaned.csv"
 
 def repo_root() -> Path:
-    # problems/creatorfit/train.py -> up 2 -> repo root
     return Path(__file__).resolve().parents[2]
 
 def dataset_path(name: str) -> Path:
     return repo_root() / "dataset" / name
 
 def main():
-    # 1) Load & clean (idempotent; will re-save cleaned CSV each run)
     df_clean, fix_report, cleaned_path = load_and_clean_data(
         raw_filename=RAW_FILENAME,
         cleaned_filename=CLEANED_FILENAME,
         # rare_min_count=10,  # optionally enable to fold rare categories
     )
 
-    # Optional: reload from disk to simulate downstream usage
     df_clean = pd.read_csv(cleaned_path)
 
     # 2) Build EdTech-specific features for modeling (pre-booking features only)
