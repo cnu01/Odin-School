@@ -78,7 +78,7 @@ const InfluencerHub = () => {
   const [programs] = useState([
     { value: 'data_science', label: 'Data Science' },
     { value: 'web_development', label: 'Web Development' },
-    { value: 'digital_marketing', label: 'Digital Marketing' },
+    { value: 'career_guidance', label: 'Career Guidance' },
     { value: 'ai_ml', label: 'AI/ML' }
   ]);
 

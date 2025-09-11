@@ -155,14 +155,14 @@ ipython_config.py
 # !ml/models/.gitkeep
 
 # Data files and datasets
-*.csv
+# *.csv
 *.tsv
 # *.json
 *.parquet
 *.feather
 *.xlsx
 *.xls
-dataset/
+# dataset/
 data/
 datasets/
 raw_data/

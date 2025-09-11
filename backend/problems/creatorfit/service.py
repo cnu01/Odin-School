@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Dict, Any
 
 from .models import PredictionResponse, AnalysisRequest, ErrorResponse
+from .constants import ODIN_SCHOOL_PROGRAMS
 
 class CreatorFitService:
     """Simple service for CreatorFit CSV analysis and lead forecasting"""
@@ -185,12 +186,21 @@ class CreatorFitService:
             for i, row in df.head().iterrows():
                 print(f"  Creator {row['creator_id']}: {row['views_90d']} views → {row['creator_tier']} tier")
             
-            # Simple feature engineering
-            df['fit_score'] = np.random.uniform(0.3, 0.9, len(df))  # Realistic fit scores
+            from .utils.features import compute_fit_scores
+            
+            program_text = ODIN_SCHOOL_PROGRAMS.get(program_type, ODIN_SCHOOL_PROGRAMS["data_science"])
+            
+            fit_scores = compute_fit_scores(df, program_type, program_text)
+
+            print(f"DEBUG: Fit scores: {fit_scores}")
+            
+            df['fit_score'] = fit_scores
+            
+            print(f"DEBUG: Fit score calculation completed. Found {len(fit_scores[fit_scores > 0])} relevant creators out of {len(df)} total.")
             
             # Use actual qualified_leads from CSV, enhanced with fit score
             df['predicted_qualified_leads'] = (
-                df['qualified_leads'] * df['fit_score'] * np.random.uniform(0.9, 1.1, len(df))
+                df['qualified_leads'] * df['fit_score']
             ).astype(int)
             
             # Sort by predicted leads
