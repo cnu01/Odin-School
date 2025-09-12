@@ -234,11 +234,21 @@ def load_and_clean_data(
 
     df = _remove_invalid_rows(df)
 
+    # Check for null values before imputation
     null_report = df.isna().sum().sort_values(ascending=False)
+    if null_report.sum() > 0:
+        print(f"[INFO] Found null values before imputation:")
+        for col, count in null_report[null_report > 0].items():
+            print(f"  - {col}: {count} null values")
 
+    # Check for duplicates
     dup_creators = int(df.duplicated(subset=["creator_id"]).sum())
     if dup_creators:
-        print(f"[INFO] Duplicate creator_id rows: {dup_creators} (OK if multiple rows per creator)")
+        print(f"[INFO] Found {dup_creators} duplicate creator_id rows - removing duplicates")
+        df = df.drop_duplicates(subset=["creator_id"], keep='first')
+        print(f"[INFO] Dataset size after removing duplicates: {len(df)} rows")
+    else:
+        print("[INFO] No duplicate creator_id rows found")
 
     df = _impute_missing(df)
 
@@ -248,18 +258,25 @@ def load_and_clean_data(
 
     df = _apply_minmax_scaling(df)
 
-    df = df.drop(columns=['geography', 'creator_id'], errors='ignore')
+    df = df.drop(columns=['geography', 'creator_id', 'enrollments', 'refunds'], errors='ignore')
     
     cleaned_path = dataset_path(cleaned_filename)
     df.to_csv(cleaned_path, index=False)
  
-    if null_report.sum() > 0:
-        print("[INFO] Data quality issues found and fixed:")
+    # Final data quality report
+    final_null_count = df.isna().sum().sum()
+    if final_null_count > 0:
+        print(f"[WARNING] {final_null_count} null values still present after imputation!")
+    else:
+        print("[SUCCESS] No null values remaining after imputation")
+    
+    if fix_report:
+        print("[INFO] Business logic fixes applied:")
         for issue, count in fix_report.items():
             if count > 0:
                 print(f"  - {issue}: {count} cases")
     else:
-        print("[EDTECH] - No data quality issues found - dataset is clean!")
+        print("[SUCCESS] No business logic fixes needed")
     
     top_topics = df['topic'].value_counts().head(5)
     print(f"[EDTECH] Top 5 topics: {top_topics.to_dict()}")
