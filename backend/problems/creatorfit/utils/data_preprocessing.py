@@ -94,6 +94,35 @@ def _remove_invalid_rows(df: pd.DataFrame) -> pd.DataFrame:
     
     return df_cleaned
 
+def _apply_label_encoding(df: pd.DataFrame) -> pd.DataFrame:
+    from sklearn.preprocessing import LabelEncoder
+    
+    df = df.copy()
+    
+    categorical_columns = ['topic', 'language', 'category_tag']
+    
+    existing_cat_cols = [col for col in categorical_columns if col in df.columns]
+    
+    if not existing_cat_cols:
+        print("[ENCODING] No categorical columns found for label encoding")
+        return df
+    
+    print(f"[ENCODING] Applying label encoding to: {existing_cat_cols}")
+    
+    label_encoders = {}
+    for col in existing_cat_cols:
+        if df[col].notna().sum() > 0:  # Only if column has non-null values
+            le = LabelEncoder()
+            df[col] = le.fit_transform(df[col].astype(str))
+            label_encoders[col] = le
+            
+            print(f"[ENCODING] '{col}': {len(le.classes_)} unique categories encoded")
+            print(f"[ENCODING] '{col}' categories: {le.classes_[:5]}...")  # Show first 5 categories
+    
+    print(f"[ENCODING] Label encoding completed for {len(existing_cat_cols)} columns")
+    
+    return df
+
 def _apply_minmax_scaling(df: pd.DataFrame) -> pd.DataFrame:
     from sklearn.preprocessing import MinMaxScaler
     
@@ -255,6 +284,8 @@ def load_and_clean_data(
     df, fix_report = _apply_business_guards(df)
 
     df = _fold_rare_categories(df, cols=("topic", "category_tag"), min_count=rare_min_count)
+
+    df = _apply_label_encoding(df)
 
     df = _apply_minmax_scaling(df)
 
