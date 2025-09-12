@@ -14,7 +14,6 @@ EXPECTED_COLS = {
     "clicks": "int64",
     "leads": "int64",
     "qualified_leads": "int64",
-    "enrollments": "int64",
     "refunds": "int64",
     "language": "string",
     "category_tag": "string",
@@ -26,8 +25,6 @@ NUMERIC_COLS = [
     "clicks",
     "leads",
     "qualified_leads",
-    "enrollments",
-    "refunds"
 ]
 
 EDTECH_TOPICS = [
@@ -41,21 +38,12 @@ EDTECH_TOPICS = [
 VALID_LANGUAGES = ["English", "Hindi", "Telugu"]
 
 def project_root() -> Path:
-    """Return repo root (two levels up from this file)."""
     return Path(__file__).resolve().parents[2]
 
 def dataset_path(filename: str) -> Path:
-    """Join dataset/filename under repo root."""
     return project_root() / "dataset" / filename
 
 def _coerce_and_normalize(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    EdTech-specific data cleaning and normalization:
-    - Validate creator IDs follow EDU_XXXX format
-    - Validate languages are English/Hindi/Telugu
-    - Clean and validate EdTech topics
-    - Coerce all metrics to proper integer types
-    """
     df = df.copy()
 
     # Trim/normalize string columns
@@ -89,7 +77,7 @@ def _remove_invalid_rows(df: pd.DataFrame) -> pd.DataFrame:
         'posting_cadence_days': lambda x: (x > 0) & (x.notna()),
         'recent_video_transcript': lambda x: (x.str.len() > 0) & (x.notna())
     }
-    
+
     # Apply all critical checks
     valid_mask = pd.Series(True, index=df.index)
     for col, check_func in critical_checks.items():
@@ -106,6 +94,34 @@ def _remove_invalid_rows(df: pd.DataFrame) -> pd.DataFrame:
     
     return df_cleaned
 
+def _apply_minmax_scaling(df: pd.DataFrame) -> pd.DataFrame:
+    from sklearn.preprocessing import MinMaxScaler
+    
+    df = df.copy()
+    
+    cols_to_scale = [
+        'posting_cadence_days', 
+        'views_90d', 
+        'clicks', 
+        'leads', 
+        'qualified_leads', 
+    ]
+    
+    existing_cols = [col for col in cols_to_scale if col in df.columns]
+    
+    if existing_cols:
+        print(f"[SCALING] Applying MinMax scaling to: {existing_cols}")
+        
+        scaler = MinMaxScaler()
+        
+        df[existing_cols] = scaler.fit_transform(df[existing_cols])
+        
+        print(f"[SCALING] MinMax scaling completed for {len(existing_cols)} columns")
+    else:
+        print("[SCALING] No columns found for scaling")
+    
+    return df
+
 def _impute_missing(df: pd.DataFrame) -> pd.DataFrame:
     """
     - Text/categorical: fill with empty string / 'Unknown'
@@ -117,21 +133,18 @@ def _impute_missing(df: pd.DataFrame) -> pd.DataFrame:
     for c in ["topic", "language", "category_tag"]:
         df[c] = df[c].fillna("Unknown")
 
-    # Numeric: median is safer for heavy-tailed distributions
-    for c in NUMERIC_COLS:
+    creator_metrics = [
+        "leads",
+        "qualified_leads",
+    ]
+    
+    for c in creator_metrics:
         if df[c].isna().any():
             df[c] = df[c].fillna(df[c].median())
 
     return df
 
 def _apply_business_guards(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, int]]:
-    """
-    Apply EdTech-specific business logic and validation:
-    - Enforce funnel constraints: views → clicks → leads → qualified → enrollments
-    - Validate EdTech-specific ranges and metrics
-    - Flag data quality issues for educational platform
-    - Ensure language consistency
-    """
     df = df.copy()
     fix_counts: Dict[str, int] = {}
 
@@ -143,13 +156,9 @@ def _apply_business_guards(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, in
             df.loc[mask, a] = df.loc[mask, b]
         fix_counts[key] = n
 
-    # 1. FUNNEL CONSTRAINTS (Critical for EdTech business logic)
     clip_le("leads", "clicks", "leads>clicks")
     clip_le("qualified_leads", "leads", "qualified_leads>leads")
-    clip_le("enrollments", "qualified_leads", "enrollments>qualified_leads")
-    clip_le("refunds", "enrollments", "refunds>enrollments")
 
-    # Posting cadence: 1-14 days (educational content requires consistency)
     if "posting_cadence_days" in df.columns:
         df["posting_cadence_days"] = df["posting_cadence_days"].astype(int)
         df["posting_cadence_days"] = df["posting_cadence_days"].clip(lower=1, upper=14)
@@ -162,16 +171,18 @@ def _apply_business_guards(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, in
         df["clicks"] = np.minimum(df["clicks"], max_clicks)
     
     invalid_lang = ~df["language"].isin(VALID_LANGUAGES)
+    
     if invalid_lang.any():
         fix_counts["invalid_language"] = int(invalid_lang.sum())
-        df.loc[invalid_lang, "language"] = "English"
+        df.loc[invalid_lang, "language"] = "Unknown"
     
     has_edtech_topic = df["topic"].str.contains("|".join(EDTECH_TOPICS), case=False, na=False)
+    
     non_edtech_count = int((~has_edtech_topic).sum())
     if non_edtech_count > 0:
         fix_counts["non_edtech_topics"] = non_edtech_count
     
-    for c in ["views_90d", "clicks", "leads", "qualified_leads", "enrollments", "refunds"]:
+    for c in ["views_90d", "clicks", "leads", "qualified_leads"]:
         if c in df.columns:
             df[c] = df[c].clip(lower=0)
 
@@ -204,6 +215,7 @@ def load_and_clean_data(
     rare_min_count: int = 0,
 ) -> Tuple[pd.DataFrame, Dict[str, int], Path]:
     raw_path = dataset_path(raw_filename)
+
     if not raw_path.exists():
         raise FileNotFoundError(f"Dataset not found at: {raw_path}")
 
@@ -223,13 +235,18 @@ def load_and_clean_data(
     df = _remove_invalid_rows(df)
 
     null_report = df.isna().sum().sort_values(ascending=False)
+
     dup_creators = int(df.duplicated(subset=["creator_id"]).sum())
     if dup_creators:
         print(f"[INFO] Duplicate creator_id rows: {dup_creators} (OK if multiple rows per creator)")
 
     df = _impute_missing(df)
+
     df, fix_report = _apply_business_guards(df)
+
     df = _fold_rare_categories(df, cols=("topic", "category_tag"), min_count=rare_min_count)
+
+    df = _apply_minmax_scaling(df)
 
     df = df.drop(columns=['geography', 'creator_id'], errors='ignore')
     

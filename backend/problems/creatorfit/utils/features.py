@@ -285,8 +285,8 @@ def build_features(
     categorical = ["topic", "category_tag", "creator_tier", "language"]
     target = "qualified_leads"
 
-    leakage_cols = {"clicks", "leads", "qualified_leads", "enrollments", "refunds", 
-                   "click_rate", "lead_rate", "qualification_rate", "enrollment_rate"}
+    leakage_cols = {"clicks", "leads", "qualified_leads", 
+                   "click_rate", "lead_rate", "qualification_rate"}
     feature_cols = set(numeric + categorical)
     if feature_cols & leakage_cols:
         raise ValueError(f"Data leakage detected! Features overlap with outcomes: {feature_cols & leakage_cols}")
