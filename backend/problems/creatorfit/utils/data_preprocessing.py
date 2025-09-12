@@ -77,6 +77,35 @@ def _coerce_and_normalize(df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
+def _remove_invalid_rows(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+    
+    initial_rows = len(df)
+    
+    # Critical columns that must have valid values
+    critical_checks = {
+        'views_90d': lambda x: (x > 0) & (x.notna()),
+        'clicks': lambda x: (x >= 0) & (x.notna()),
+        'posting_cadence_days': lambda x: (x > 0) & (x.notna()),
+        'recent_video_transcript': lambda x: (x.str.len() > 0) & (x.notna())
+    }
+    
+    # Apply all critical checks
+    valid_mask = pd.Series(True, index=df.index)
+    for col, check_func in critical_checks.items():
+        if col in df.columns:
+            valid_mask = valid_mask & check_func(df[col])
+    
+    # Remove invalid rows
+    df_cleaned = df[valid_mask].copy()
+    
+    removed_rows = initial_rows - len(df_cleaned)
+    if removed_rows > 0:
+        print(f"[CLEANING] Removed {removed_rows} rows with invalid data in critical columns")
+        print(f"[CLEANING] Dataset size: {initial_rows} → {len(df_cleaned)} rows")
+    
+    return df_cleaned
+
 def _impute_missing(df: pd.DataFrame) -> pd.DataFrame:
     """
     - Text/categorical: fill with empty string / 'Unknown'
@@ -174,21 +203,6 @@ def load_and_clean_data(
     *,
     rare_min_count: int = 0,
 ) -> Tuple[pd.DataFrame, Dict[str, int], Path]:
-    """
-    Load and clean EdTech creator campaign data with business-specific validation.
-    
-    EdTech-specific cleaning includes:
-    - Validate creator IDs follow EDU_XXXX format
-    - Validate languages are English/Hindi/Telugu
-    - Check topics are educational (Python, Data Science, etc.)
-    - Enforce funnel constraints (views → clicks → leads → enrollments)
-    - Validate realistic ranges for reputed EdTech platform
-
-    Returns:
-      clean_df:     cleaned DataFrame with EdTech validations
-      fix_report:   dict of data quality issues found and fixed
-      cleaned_path: Path to the saved cleaned CSV
-    """
     raw_path = dataset_path(raw_filename)
     if not raw_path.exists():
         raise FileNotFoundError(f"Dataset not found at: {raw_path}")
@@ -206,6 +220,8 @@ def load_and_clean_data(
 
     df = _coerce_and_normalize(df_raw)
 
+    df = _remove_invalid_rows(df)
+
     null_report = df.isna().sum().sort_values(ascending=False)
     dup_creators = int(df.duplicated(subset=["creator_id"]).sum())
     if dup_creators:
@@ -215,6 +231,8 @@ def load_and_clean_data(
     df, fix_report = _apply_business_guards(df)
     df = _fold_rare_categories(df, cols=("topic", "category_tag"), min_count=rare_min_count)
 
+    df = df.drop(columns=['geography', 'creator_id'], errors='ignore')
+    
     cleaned_path = dataset_path(cleaned_filename)
     df.to_csv(cleaned_path, index=False)
  

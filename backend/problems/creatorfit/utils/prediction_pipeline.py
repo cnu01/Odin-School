@@ -173,40 +173,6 @@ class CreatorFitPredictionPipeline:
         confidence_score = max(0.0, min(1.0, confidence_score))
         
         return confidence_score
-
-    # def predict_with_confidence(self, X: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
-    #     """Make predictions with confidence intervals."""
-        
-    #     # Primary prediction with LightGBM
-    #     primary_pred = self.models['lgb'].predict(X)
-        
-    #     # If ensemble models are available, use them
-    #     if len(self.models) > 1:
-    #         predictions = []
-    #         for name, model in self.models.items():
-    #             if name != 'lgb':
-    #                 try:
-    #                     # Quick fit for ensemble models (on current data)
-    #                     if not hasattr(model, 'feature_importances_'):
-    #                         # For new models, we'll use the primary prediction as baseline
-    #                         pred = primary_pred + np.random.normal(0, 0.1 * primary_pred.std(), len(primary_pred))
-    #                     else:
-    #                         pred = model.predict(X)
-    #                     predictions.append(pred)
-    #                 except:
-    #                     continue
-            
-    #         if predictions:
-    #             # Ensemble prediction (weighted average)
-    #             all_preds = np.column_stack([primary_pred] + predictions)
-    #             ensemble_pred = np.mean(all_preds, axis=1)
-    #             confidence = 1.0 - (np.std(all_preds, axis=1) / (np.mean(all_preds, axis=1) + 1e-8))
-    #             confidence = np.clip(confidence, 0.0, 1.0)
-    #             return ensemble_pred, confidence
-        
-    #     # Single model prediction with synthetic confidence
-    #     confidence = np.ones(len(primary_pred)) * 0.85  # High confidence for trained model
-    #     return primary_pred, confidence
     
     def predict_with_confidence(self, X: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
         """Make predictions with confidence intervals."""
