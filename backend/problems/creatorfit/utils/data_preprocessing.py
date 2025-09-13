@@ -95,6 +95,50 @@ def _remove_invalid_rows(df: pd.DataFrame) -> pd.DataFrame:
     
     return df_cleaned
 
+def _extract_text_features(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Extract text-based features BEFORE label encoding.
+    These are critical for qualified leads prediction.
+    """
+    df = df.copy()
+    
+    print("[TEXT_FEATURES] Extracting text-based features for qualified leads prediction...")
+    
+    educational_keywords = [
+        "tutorial", "learn", "course", "programming", "coding", 
+        "development", "algorithm", "data", "analysis", "project",
+        "training", "education", "teach", "explain", "guide"
+    ]
+    
+    def calculate_educational_score(text):
+        if pd.isna(text) or not text:
+            return 0.0
+        text_lower = str(text).lower()
+        matches = sum(1 for keyword in educational_keywords if keyword in text_lower)
+        return min(matches / len(educational_keywords), 1.0)  # Cap at 1.0
+    
+    df["educational_transcript_score"] = df["recent_video_transcript"].apply(calculate_educational_score)
+    
+    df["transcript_length"] = df["recent_video_transcript"].str.len().fillna(0)
+    
+    df["topic_count"] = (df["topic"].str.count(";") + 1).fillna(1)
+    
+    def calculate_edtech_depth(topic_text):
+        if pd.isna(topic_text) or not topic_text:
+            return 0
+        topic_lower = str(topic_text).lower()
+        return sum(1 for topic in EDTECH_TOPICS if topic.lower() in topic_lower)
+    
+    df["edtech_topic_depth"] = df["topic"].apply(calculate_edtech_depth)
+    
+    print(f"[TEXT_FEATURES] Educational transcript score - avg: {df['educational_transcript_score'].mean():.3f}")
+    print(f"[TEXT_FEATURES] Transcript length - avg: {df['transcript_length'].mean():.0f} chars")
+    print(f"[TEXT_FEATURES] Topic count - avg: {df['topic_count'].mean():.1f} topics")
+    print(f"[TEXT_FEATURES] EdTech depth - avg: {df['edtech_topic_depth'].mean():.1f} matches")
+    print("[TEXT_FEATURES] Text feature extraction completed successfully")
+    
+    return df
+
 def _apply_label_encoding(df: pd.DataFrame) -> pd.DataFrame:
     from sklearn.preprocessing import LabelEncoder
     
@@ -134,7 +178,11 @@ def _apply_minmax_scaling(df: pd.DataFrame) -> pd.DataFrame:
         'views_90d', 
         'clicks', 
         'leads', 
-        'qualified_leads', 
+        'qualified_leads',
+        'educational_transcript_score',
+        'transcript_length',
+        'topic_count',
+        'edtech_topic_depth'
     ]
     
     existing_cols = [col for col in cols_to_scale if col in df.columns]
@@ -287,9 +335,10 @@ def load_and_clean_data(
     df = _impute_missing(df)
     df, fix_report = _apply_business_guards(df)
     df = _fold_rare_categories(df, cols=("topic", "category_tag"), min_count=rare_min_count)
+    df = _extract_text_features(df)
     df = _apply_label_encoding(df)
     df = _apply_minmax_scaling(df)
-    df = df.drop(columns=['geography', 'creator_id', 'enrollments', 'refunds'], errors='ignore')
+    df = df.drop(columns=['geography', 'enrollments', 'refunds'], errors='ignore')
     
     cleaned_path = dataset_path(cleaned_filename)
     df.to_csv(cleaned_path, index=False)

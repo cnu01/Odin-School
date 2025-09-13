@@ -6,10 +6,11 @@ import pandas as pd
 
 EDTECH_TOPICS = [
     "Python", "Data Science", "Machine Learning", "JavaScript", "React",
-    "Node.js", "SQL", "Frontend Development", "Backend Development", 
+    "Node.js", "SQL", "Frontend Development", "Backend Development",
     "Web Development", "Mobile Development", "DevOps", "Cloud Computing",
     "Artificial Intelligence", "Deep Learning", "Analytics", "Database",
-    "Career Guidance", "Interview Preparation", "System Design"
+    "Career Guidance", "Interview Preparation", "System Design", "Django",
+    "Programming Fundamentals", "C++", "Statistics", "Data Structures",
 ]
 
 ODIN_SCHOOL_PROGRAMS = {
@@ -102,29 +103,10 @@ def _normalize_text_series(s: pd.Series) -> pd.Series:
 
 def add_audience_and_exposure(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Add EdTech-specific audience and exposure features:
-      - creator_tier: Established/Growing/Emerging based on views
-      - language_diversity: Multi-language creators (English+Hindi+Telugu)
-      - log_views_90d: stabilized exposure (log1p of views_90d)
+    STREAMLINED: Only add features essential for qualified_leads prediction.
+    Removed redundant processing since views_90d is already MinMax scaled.
     """
     df = df.copy()
-
-    def classify_creator_tier(views):
-        if views >= 100000:
-            return "Established"
-        elif views >= 25000:
-            return "Growing"
-        else:
-            return "Emerging"
-    
-    df["creator_tier"] = df["views_90d"].apply(classify_creator_tier)
-    
-    language_scores = {"English": 1.0, "Hindi": 0.8, "Telugu": 0.7}
-    df["language_score"] = df["language"].map(language_scores).fillna(0.5)
-    
-    # Stabilized view metrics for ML (log-transform reduces skewness)
-    df["log_views_90d"] = np.log1p(df["views_90d"].clip(lower=0))
-
     return df
 
 def _encode_texts(
@@ -151,19 +133,16 @@ def is_program_relevant(content: str, program_type: str, program_text: str) -> b
     
     content_lower = str(content).lower()
     
-    # Convert program_type (e.g., "web_development" -> "web development")
     program_name = program_type.replace('_', ' ')
     if program_name in content_lower:
         return True
     
-    # Extract meaningful words from program_text (exclude common stop words)
     stop_words = {'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those'}
     
     # Extract words that are 3+ characters and not stop words
     program_words = re.findall(r'\b[a-zA-Z]{3,}\b', program_text.lower())
     meaningful_words = [word for word in program_words if word not in stop_words]
     
-    # Check if at least 2 meaningful words appear in content
     matches = sum(1 for word in meaningful_words if word in content_lower)
     return matches >= 2
 
@@ -251,38 +230,19 @@ def build_features(
         model=model,
     )
     
-    # Educational content validation (using our specific topics)
-    edtech_pattern = "|".join(EDTECH_TOPICS)
-    df["is_educational"] = df["topic"].str.contains(
-        edtech_pattern, case=False, na=False
-    ).astype(int)
-    
-    # Content quality and depth indicators
-    df["transcript_length"] = df["recent_video_transcript"].str.len()
-    df["topic_count"] = df["topic"].str.count(";") + 1  # Multi-topic expertise
-    df["category_count"] = df["category_tag"].str.count(";") + 1
-    
-    df["posting_frequency_score"] = 1.0 / (df["posting_cadence_days"] + 0.1)
-    
-    df["edtech_topic_depth"] = df["topic"].apply(
-        lambda x: sum(1 for topic in EDTECH_TOPICS if topic.lower() in x.lower())
-    )
-
-    # Define EdTech feature contract (pre-booking signals only)
     numeric = [
-        "fit_score",          
-        "posting_cadence_days",  
-        "views_90d",             
-        "log_views_90d",         
-        "language_score",        
-        "is_educational",         
-        "transcript_length",      
-        "topic_count",            
-        "category_count",         
-        "posting_frequency_score",
-        "edtech_topic_depth"      # Topic expertise depth
+        "fit_score",                      # Semantic similarity with program
+        "posting_cadence_days",           # How often they post (scaled 0-1)
+        "views_90d",                      # Audience reach (scaled 0-1)
+        "educational_transcript_score",   # Educational intent (0-1)
+        "transcript_length",              # Content depth (scaled 0-1)
+        "topic_count",                    # Expertise breadth (scaled 0-1)
+        "edtech_topic_depth",             # Program relevance (scaled 0-1)
+        "topic",                          # ✅ NUMERIC (label encoded: 0,1,2...)
+        "category_tag",                   # ✅ NUMERIC (label encoded: 0,1,2...)
+        "language"                        # ✅ NUMERIC (label encoded: 0,1,2)
     ]
-    categorical = ["topic", "category_tag", "creator_tier", "language"]
+    categorical = []  # ✅ CORRECTED: No categorical features after preprocessing
     target = "qualified_leads"
 
     leakage_cols = {"clicks", "leads", "qualified_leads", 
