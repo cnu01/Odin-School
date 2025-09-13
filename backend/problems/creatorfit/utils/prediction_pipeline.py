@@ -19,7 +19,7 @@ sys.path.append(str(Path(__file__).parent.parent.parent))
 
 try:
     from backend.problems.creatorfit.utils.data_preprocessing import (
-        _apply_schema_adapter, _coerce_and_normalize, _impute_missing, 
+        _coerce_and_normalize, _impute_missing, 
         _apply_business_guards, _fold_rare_categories
     )
     from features import build_features, ODIN_SCHOOL_PROGRAMS
@@ -215,7 +215,6 @@ class CreatorFitPredictionPipeline:
             logging.info(f"Data quality score: {quality_report['quality_score']:.3f}")
             
             # 2. Apply full preprocessing pipeline
-            df_raw = _apply_schema_adapter(df_raw)
             df = _coerce_and_normalize(df_raw)
             df = _impute_missing(df)
             df, fix_report = _apply_business_guards(df)

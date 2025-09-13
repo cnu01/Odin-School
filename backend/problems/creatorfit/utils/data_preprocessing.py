@@ -32,7 +32,8 @@ EDTECH_TOPICS = [
     "Node.js", "SQL", "Frontend Development", "Backend Development",
     "Web Development", "Mobile Development", "DevOps", "Cloud Computing",
     "Artificial Intelligence", "Deep Learning", "Analytics", "Database",
-    "Career Guidance", "Interview Preparation", "System Design"
+    "Career Guidance", "Interview Preparation", "System Design", "Django",
+    "Programming Fundamentals", "C++", "Statistics", "Data Structures",
 ]
 
 VALID_LANGUAGES = ["English", "Hindi", "Telugu"]
@@ -193,7 +194,8 @@ def _apply_business_guards(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, in
         df["posting_cadence_days"] = df["posting_cadence_days"].clip(lower=1, upper=14)
     
     if "views_90d" in df.columns:
-        df["views_90d"] = df["views_90d"].clip(lower=1000, upper=2000000)
+        df['views_90d'] = df['views_90d'].clip(lower=100)
+        df["views_90d"] = df["views_90d"].clip(lower=5000, upper=2000000)
     
     if "clicks" in df.columns and "views_90d" in df.columns:
         max_clicks = (df["views_90d"] * 0.1).astype(int)
@@ -210,6 +212,9 @@ def _apply_business_guards(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, in
     non_edtech_count = int((~has_edtech_topic).sum())
     if non_edtech_count > 0:
         fix_counts["non_edtech_topics"] = non_edtech_count
+        
+        df.loc[~has_edtech_topic, "topic"] = "Other"
+        print(f"[BUSINESS] Replaced {non_edtech_count} non-EdTech topics with 'Other'")
     
     for c in ["views_90d", "clicks", "leads", "qualified_leads"]:
         if c in df.columns:
@@ -263,15 +268,15 @@ def load_and_clean_data(
 
     df = _remove_invalid_rows(df)
 
-    # Check for null values before imputation
     null_report = df.isna().sum().sort_values(ascending=False)
+
     if null_report.sum() > 0:
         print(f"[INFO] Found null values before imputation:")
         for col, count in null_report[null_report > 0].items():
             print(f"  - {col}: {count} null values")
 
-    # Check for duplicates
     dup_creators = int(df.duplicated(subset=["creator_id"]).sum())
+
     if dup_creators:
         print(f"[INFO] Found {dup_creators} duplicate creator_id rows - removing duplicates")
         df = df.drop_duplicates(subset=["creator_id"], keep='first')
@@ -280,15 +285,10 @@ def load_and_clean_data(
         print("[INFO] No duplicate creator_id rows found")
 
     df = _impute_missing(df)
-
     df, fix_report = _apply_business_guards(df)
-
     df = _fold_rare_categories(df, cols=("topic", "category_tag"), min_count=rare_min_count)
-
     df = _apply_label_encoding(df)
-
     df = _apply_minmax_scaling(df)
-
     df = df.drop(columns=['geography', 'creator_id', 'enrollments', 'refunds'], errors='ignore')
     
     cleaned_path = dataset_path(cleaned_filename)
