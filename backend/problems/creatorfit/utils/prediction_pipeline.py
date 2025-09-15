@@ -16,7 +16,6 @@ sys.path.append(str(Path(__file__).parent.parent.parent.parent))
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
 try:
-    # ✅ Use consistent relative imports since we're in the utils/ directory
     from data_preprocessing import load_and_clean_data, EDTECH_TOPICS
     from features import build_features, ODIN_SCHOOL_PROGRAMS
     FULL_PIPELINE_AVAILABLE = True
@@ -56,7 +55,6 @@ class CreatorFitPredictionPipeline:
             'fixes_applied': []
         }
         
-        # Check for missing critical fields
         critical_fields = ['creator_id', 'recent_video_transcript', 'views_90d', 'topic']
         missing_critical = df[critical_fields].isnull().any()
         if missing_critical.any():
@@ -249,15 +247,13 @@ class CreatorFitPredictionPipeline:
                     'creator_id': str(df_clean.iloc[i]['creator_id']),
                     'predicted_qualified_leads': max(0, int(predictions[i])),
                     'fit_score': float(round(X.iloc[i]['fit_score'], 3)),
-                    # 'confidence_score': float(round(creator_confidence, 3)),
                     'confidence_score': float(round(blended_confidence, 3)),
                     'topic': str(df_clean.iloc[i]['topic']),
                     'language': str(df_clean.iloc[i]['language']),
                     'views_90d': int(df_clean.iloc[i]['views_90d']),
                     'creator_tier': str(X.iloc[i].get('creator_tier', 'Unknown')),
                     'posting_cadence_days': int(df_clean.iloc[i].get('posting_cadence_days', 14)),
-                    # 'recommendation': 'BOOK' if predictions[i] > 100 and creator_confidence > 0.8 else 'REVIEW' if predictions[i] > 50 else 'SKIP'
-                    'recommendation': "TEMP" # Placeholder
+                    'recommendation': "" # Placeholder
                 }
                 results.append(result)
             
@@ -281,17 +277,13 @@ class CreatorFitPredictionPipeline:
             output = {
                 'success': True,
                 'program_type': program_type,
+                'total_creators_analyzed': len(results),
+                'model_type': 'LinearRegression',
                 'results': results,
-                'data_quality': quality_report,
-                'model_info': {
-                    'model_type': 'LinearRegression',
-                    'accuracy_metrics': self.metadata.get('performance', {}),
-                    'features_used': len(feature_cols),
-                    'total_creators_analyzed': len(results)
-                },
-                'recommendations': {
-                    'top_performers': [r for r in results[:5] if r['recommendation'] == 'BOOK'],
-                    'risk_mitigation': f"Monitor {len([r for r in results if r['confidence_score'] < 0.8])} creators with low confidence scores"
+                'summary': {
+                    'avg_fit_score': round(sum([r['fit_score'] for r in results]) / len(results), 3) if results else 0,
+                    'avg_predicted_leads': round(sum([r['predicted_qualified_leads'] for r in results]) / len(results), 2) if results else 0,
+                    'top_performer': results[0] if results else None  # Highest predicted leads
                 }
             }
             
