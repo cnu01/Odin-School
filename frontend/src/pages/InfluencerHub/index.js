@@ -462,7 +462,6 @@ const InfluencerHub = () => {
                     <TableCell>Confidence</TableCell>
                     <TableCell>Topic</TableCell>
                     <TableCell>Views (90d)</TableCell>
-                    <TableCell>Tier</TableCell>
                     {analysisType === 'forecast' && (
                       <TableCell>Recommendation</TableCell>
                     )}
@@ -511,10 +510,7 @@ const InfluencerHub = () => {
                             {creator.formattedViews}
                           </Typography>
                         </TableCell>
-                        <TableCell>
-                          <Chip size="small" label={creator.creator_tier} />
-                        </TableCell>
-                                                 {analysisType === 'forecast' && (
+                        {analysisType === 'forecast' && (
                           <TableCell>
                            <Tooltip title={`${creator.recommendation} - ${analysisType === 'analyze' ? 'Priority-based sorting' : 'Lead-based sorting'}`}>
                              <Chip
@@ -534,7 +530,7 @@ const InfluencerHub = () => {
                           </TableCell>
                         )}
                         <TableCell padding="none">
-                        <Box display="flex" justifyContent="flex-end" my={2} >
+                        <Box display="flex" justifyContent="flex-start" my={2} >
                         <Button
                           variant="outlined"
                           onClick={() => handleViewInput(creator)}
@@ -671,9 +667,6 @@ const InfluencerHub = () => {
                 </Typography>
               </li>
               <li>
-                <Typography variant="h10">
-                  {analysisType === 'forecast' ? '3. Tier:' : '2. Tier:'}
-                </Typography> 
                 <Typography variant="body2" color="textSecondary" component="span" sx={{ ml: 1 }}>
                   Based on views_90d: ≥100k=Established, ≥25k=Growing, &lt;25k=Emerging
                 </Typography>

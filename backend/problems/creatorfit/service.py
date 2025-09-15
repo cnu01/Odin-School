@@ -1,9 +1,32 @@
 import os
 import tempfile
-from pathlib import Path
 from typing import Dict, Any
 
-from .constants import ODIN_SCHOOL_PROGRAMS
+# Inline constants to avoid relative import issues in FastAPI
+ODIN_SCHOOL_PROGRAMS = {
+    "data_science": """
+    Data science programming tutorial covering Python basics, pandas dataframes, 
+    machine learning algorithms, statistics concepts, data visualization, 
+    deep learning neural networks, career advice for data scientists
+    """,
+    "web_development": """
+    Web development tutorial teaching HTML CSS basics, JavaScript programming,
+    React components, Node.js backend, database integration, full-stack projects,
+    frontend backend development career guidance
+    """,
+    "ai_ml": """
+    Artificial Intelligence and Machine Learning tutorial covering supervised unsupervised learning,
+    deep learning neural networks CNN RNN transformers, natural language processing,
+    computer vision applications, reinforcement learning basics, model deployment MLOps,
+    real-world AI projects, career guidance for AI ML engineers and researchers
+    """,
+    "career_guidance": """
+    Technical career guidance covering software engineering interview preparation,
+    coding practice algorithms data structures, system design concepts,
+    resume building portfolio development, job search strategies,
+    salary negotiation, career progression in tech industry
+    """
+}
 
 class CreatorFitService:
     """Simple service for CreatorFit CSV analysis and lead forecasting"""
@@ -18,6 +41,7 @@ class CreatorFitService:
         This integrates with the prediction_pipeline.py we built yesterday
         Includes: fit scoring, lead prediction, recommendations
         """
+
         try:
             # Save uploaded CSV to temporary file
             with tempfile.NamedTemporaryFile(mode='wb', suffix='.csv', delete=False) as temp_file:
@@ -89,7 +113,8 @@ class CreatorFitService:
                 
                 from prediction_pipeline import CreatorFitPredictionPipeline
                 
-                predictor = CreatorFitPredictionPipeline()
+                correct_model_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "ml", "models"))
+                predictor = CreatorFitPredictionPipeline(model_dir=correct_model_dir)
                 print(f"predictor: {predictor}")
                 
                 result = predictor.process_csv_file(temp_csv_path, program_type)
@@ -175,7 +200,11 @@ class CreatorFitService:
             # Load data
             df = pd.read_csv(csv_path)
             
-            from utils.features import compute_fit_scores
+            import sys
+            utils_path = os.path.join(os.path.dirname(__file__), "utils")
+            if utils_path not in sys.path:
+                sys.path.append(utils_path)
+            from features import compute_fit_scores
             
             program_text = ODIN_SCHOOL_PROGRAMS.get(program_type, ODIN_SCHOOL_PROGRAMS["data_science"])
             
@@ -184,10 +213,19 @@ class CreatorFitService:
             print(f"DEBUG: Fit scores: {fit_scores}")
             
             df['fit_score'] = fit_scores
-                        
-            # Use actual qualified_leads from CSV, enhanced with fit score
+            
+            def classify_creator_tier(views):
+                if views >= 100000:
+                    return "Established"
+                elif views >= 25000:
+                    return "Growing"
+                else:
+                    return "Emerging"
+            
+            df['creator_tier'] = df['views_90d'].apply(classify_creator_tier)
+            
             df['predicted_qualified_leads'] = (
-                df['qualified_leads'] * df['fit_score']
+                (df['views_90d'] / 1000 * df['fit_score']).clip(1, 500)
             ).astype(int)
             
             # Sort by predicted leads
@@ -198,11 +236,10 @@ class CreatorFitService:
             for i, row in df.iterrows():
                 leads = int(row['predicted_qualified_leads'])
                 
-                # Calculate confidence using the new formula
                 creator_confidence = self.calculate_confidence_score(
                     fit_score=row['fit_score'],
-                    qualified_leads=int(row.get('qualified_leads', 0)),
-                    leads=int(row.get('leads', 0)),
+                    qualified_leads=leads,
+                    leads=int(row.get('leads', leads)),
                     enrollments=int(row.get('enrollments', 0)),
                     refunds=int(row.get('refunds', 0)),
                     posting_cadence_days=int(row.get('posting_cadence_days', 14))
@@ -228,7 +265,7 @@ class CreatorFitService:
                         'views_90d': int(row['views_90d']),
                         'clicks': int(row.get('clicks', 0)),
                         'leads': int(row.get('leads', 0)),
-                        'qualified_leads': int(row.get('qualified_leads', 0)),
+                        'qualified_leads': leads,  # Use predicted value
                         'enrollments': int(row.get('enrollments', 0)),
                         'refunds': int(row.get('refunds', 0)),
                         'language': str(row['language']),
