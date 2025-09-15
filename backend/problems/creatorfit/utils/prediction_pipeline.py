@@ -23,7 +23,6 @@ try:
         _apply_business_guards, _fold_rare_categories
     )
     from features import build_features, ODIN_SCHOOL_PROGRAMS
-    from modeling import build_preprocessor
     FULL_PIPELINE_AVAILABLE = True
 except ImportError as e:
     print(f"[WARNING] Full pipeline not available: {e}")
@@ -46,7 +45,7 @@ class CreatorFitPredictionPipeline:
         """Load trained models and preprocessor."""
         try:
             # Load primary LightGBM model
-            self.models['lgb'] = joblib.load(self.model_dir / "creatorfit_lgb_model.pkl")
+            self.models['lgb'] = joblib.load(self.model_dir / "creatorfit_linear_model.pkl")
             self.preprocessor = joblib.load(self.model_dir / "creatorfit_preprocessor.pkl")
             self.metadata = joblib.load(self.model_dir / "creatorfit_metadata.pkl")
             

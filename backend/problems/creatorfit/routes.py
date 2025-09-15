@@ -171,7 +171,7 @@ async def health_check():
             )
             models_dir = os.environ.get("MODEL_DIR", default_ml_dir)
             model_files = [
-                "creatorfit_lgb_model.pkl",
+                "creatorfit_linear_model.pkl",
                 "creatorfit_preprocessor.pkl", 
                 "creatorfit_metadata.pkl"
             ]

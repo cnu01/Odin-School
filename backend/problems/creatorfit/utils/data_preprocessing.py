@@ -62,7 +62,7 @@ def _coerce_and_normalize(df: pd.DataFrame) -> pd.DataFrame:
         if c in df.columns:
             df[c] = pd.to_numeric(df[c], errors="coerce")
             if c != "posting_cadence_days":
-                df[c] = df[c].fillna(0).astype(int)
+                df[c] = df[c].fillna(0)
 
     return df
 
@@ -182,7 +182,10 @@ def _apply_minmax_scaling(df: pd.DataFrame) -> pd.DataFrame:
         'educational_transcript_score',
         'transcript_length',
         'topic_count',
-        'edtech_topic_depth'
+        'edtech_topic_depth',
+        'topic',        
+        'language',       
+        'category_tag'
     ]
     
     existing_cols = [col for col in cols_to_scale if col in df.columns]
@@ -246,7 +249,7 @@ def _apply_business_guards(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, in
         df["views_90d"] = df["views_90d"].clip(lower=5000, upper=2000000)
     
     if "clicks" in df.columns and "views_90d" in df.columns:
-        max_clicks = (df["views_90d"] * 0.1).astype(int)
+        max_clicks = df["views_90d"] * 0.1
         df["clicks"] = np.minimum(df["clicks"], max_clicks)
     
     invalid_lang = ~df["language"].isin(VALID_LANGUAGES)

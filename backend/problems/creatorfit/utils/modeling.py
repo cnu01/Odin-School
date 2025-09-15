@@ -1,33 +1,9 @@
 from __future__ import annotations
-from typing import Dict, List, Tuple
+from typing import Tuple
 import numpy as np
 import pandas as pd
 
 from sklearn.model_selection import GroupShuffleSplit
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.compose import ColumnTransformer
-
-
-def build_preprocessor(
-    categorical: List[str],
-    numeric: List[str],
-) -> ColumnTransformer:
-    """
-    Returns a ColumnTransformer that:
-      - One-hot encodes categorical features (handle_unknown='ignore')
-      - Passes numeric features through unchanged
-    """
-    ohe = OneHotEncoder(handle_unknown="ignore", sparse_output=True)
-    preprocessor = ColumnTransformer(
-        transformers=[
-            ("cat", ohe, categorical),
-            ("num", "passthrough", numeric),
-        ],
-        remainder="drop",
-        sparse_threshold=1.0,  # keep sparse output for efficiency
-    )
-    return preprocessor
-
 
 def group_train_val_split(
     X: pd.DataFrame,

@@ -100,15 +100,6 @@ def _normalize_text_series(s: pd.Series) -> pd.Series:
     
     return s.apply(clean_text)
 
-
-def add_audience_and_exposure(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    STREAMLINED: Only add features essential for qualified_leads prediction.
-    Removed redundant processing since views_90d is already MinMax scaled.
-    """
-    df = df.copy()
-    return df
-
 def _encode_texts(
     texts: Iterable[str],
     model: SentenceTransformer,
@@ -216,7 +207,7 @@ def build_features(
 
     Returns pre-booking features only (no data leakage).
     """
-    df = add_audience_and_exposure(df_clean)
+    df = df_clean.copy()
 
     if program_type not in ODIN_SCHOOL_PROGRAMS:
         program_type = "data_science"  # Default fallback
@@ -230,32 +221,32 @@ def build_features(
         model=model,
     )
     
+    df = df.drop(columns=['recent_video_transcript', 'clicks', 'leads'], errors='ignore')
+    
     numeric = [
-        "fit_score",                      # Semantic similarity with program
-        "posting_cadence_days",           # How often they post (scaled 0-1)
-        "views_90d",                      # Audience reach (scaled 0-1)
-        "educational_transcript_score",   # Educational intent (0-1)
-        "transcript_length",              # Content depth (scaled 0-1)
-        "topic_count",                    # Expertise breadth (scaled 0-1)
-        "edtech_topic_depth",             # Program relevance (scaled 0-1)
-        "topic",                          # ✅ NUMERIC (label encoded: 0,1,2...)
-        "category_tag",                   # ✅ NUMERIC (label encoded: 0,1,2...)
-        "language"                        # ✅ NUMERIC (label encoded: 0,1,2)
+        "fit_score",                      
+        "posting_cadence_days",           
+        "views_90d",                      
+        "educational_transcript_score",   
+        "transcript_length",             
+        "topic_count",                   
+        "edtech_topic_depth",             
+        "topic",                          
+        "category_tag",                   
+        "language"                        
     ]
-    categorical = []  # ✅ CORRECTED: No categorical features after preprocessing
+    categorical = []
     target = "qualified_leads"
 
     leakage_cols = {"clicks", "leads", "qualified_leads", 
                    "click_rate", "lead_rate", "qualification_rate"}
     feature_cols = set(numeric + categorical)
     if feature_cols & leakage_cols:
-        raise ValueError(f"Data leakage detected! Features overlap with outcomes: {feature_cols & leakage_cols}")
+        raise ValueError(f"DATA LEAKAGE detected! Features overlap with outcomes: {feature_cols & leakage_cols}")
 
-    # Build final feature matrix
     X = df[numeric + categorical].copy()
     y = df[target].astype(float).copy()
 
-    # Quality checks
     if X.isna().any().any():
         nan_cols = X.columns[X.isna().any()].tolist()
         raise ValueError(f"Missing values in features: {nan_cols}")
