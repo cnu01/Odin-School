@@ -14,10 +14,10 @@ RAW_FILENAME = "creator_campaign_audience.csv"
 CLEANED_FILENAME = "creator_campaign_audience.cleaned.csv"
 
 def repo_root() -> Path:
-    return Path(__file__).resolve().parents[2]
+    return Path(__file__).resolve().parents[3]  # ✅ Go up 3 levels to reach main backend/
 
 def dataset_path(name: str) -> Path:
-    return repo_root() / "dataset" / name
+    return repo_root() / "problems" / "dataset" / name
 
 def main():
     df_clean, fix_report, cleaned_path = load_and_clean_data(
@@ -84,7 +84,7 @@ def main():
 
     import joblib
     
-    default_ml_dir = Path(__file__).resolve().parent.parent / "ml"
+    default_ml_dir = Path(__file__).resolve().parent.parent.parent.parent / "ml" / "models"
     model_dir = Path(os.environ.get("MODEL_DIR", default_ml_dir))
 
     model_dir.mkdir(exist_ok=True)

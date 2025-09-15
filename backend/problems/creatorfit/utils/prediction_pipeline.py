@@ -3,12 +3,10 @@ import sys
 import json
 import warnings
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional, Any
+from typing import Dict, Tuple, Any
 import pandas as pd
 import numpy as np
 import joblib
-from sklearn.ensemble import VotingRegressor
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import logging
 
 warnings.filterwarnings('ignore')
@@ -18,10 +16,8 @@ sys.path.append(str(Path(__file__).parent.parent.parent.parent))
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
 try:
-    from backend.problems.creatorfit.utils.data_preprocessing import (
-        _coerce_and_normalize, _impute_missing, 
-        _apply_business_guards, _fold_rare_categories
-    )
+    # ✅ Use consistent relative imports since we're in the utils/ directory
+    from data_preprocessing import load_and_clean_data, EDTECH_TOPICS
     from features import build_features, ODIN_SCHOOL_PROGRAMS
     FULL_PIPELINE_AVAILABLE = True
 except ImportError as e:
@@ -29,11 +25,10 @@ except ImportError as e:
     FULL_PIPELINE_AVAILABLE = False
 
 class CreatorFitPredictionPipeline:
-    """Production-ready prediction pipeline with ensemble models and business intelligence."""
     
-    def __init__(self, model_dir: str = "../../ml"):
+    def __init__(self, model_dir: str = None):
         default_ml_dir = os.path.abspath(
-            os.path.join(os.path.dirname(__file__), "..", "..", "ml")
+            os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "ml", "models")
         )
         self.model_dir = Path(model_dir or os.environ.get("MODEL_DIR", default_ml_dir))
         self.models = {}
@@ -42,32 +37,18 @@ class CreatorFitPredictionPipeline:
         self.load_models()
     
     def load_models(self):
-        """Load trained models and preprocessor."""
         try:
-            # Load primary LightGBM model
-            self.models['lgb'] = joblib.load(self.model_dir / "creatorfit_linear_model.pkl")
-            self.preprocessor = joblib.load(self.model_dir / "creatorfit_preprocessor.pkl")
+            self.models['linear_model'] = joblib.load(self.model_dir / "creatorfit_linear_model.pkl")
+            self.preprocessor = None  
             self.metadata = joblib.load(self.model_dir / "creatorfit_metadata.pkl")
             
-            # Try to load alternative models for ensemble (if available)
-            try:
-                from sklearn.ensemble import RandomForestRegressor
-                from sklearn.linear_model import Ridge
-                
-                # Create ensemble models (train on-the-fly if needed)
-                self.models['rf'] = RandomForestRegressor(n_estimators=100, random_state=42)
-                self.models['ridge'] = Ridge(alpha=1.0, random_state=42)
-                
-                logging.info("Production ensemble models loaded successfully")
-            except Exception as e:
-                logging.warning(f"Ensemble models not available: {e}")
+            logging.info("LinearRegression model loaded successfully")
                 
         except Exception as e:
             logging.error(f"Error loading models: {e}")
             raise
     
     def validate_data_quality(self, df: pd.DataFrame) -> Dict[str, Any]:
-        """Advanced data quality validation and scoring."""
         quality_report = {
             'total_creators': len(df),
             'issues_found': [],
@@ -91,7 +72,7 @@ class CreatorFitPredictionPipeline:
             quality_report['issues_found'].append(f"{empty_transcripts.sum()} creators with very short transcripts")
             quality_report['quality_score'] *= 0.85
         
-        from data_preprocessing import EDTECH_TOPICS
+        # ✅ EDTECH_TOPICS already imported at top
         irrelevant_topics = ~df['topic'].str.contains('|'.join(EDTECH_TOPICS), case=False, na=False)
         if irrelevant_topics.any():
             quality_report['issues_found'].append(f"{irrelevant_topics.sum()} creators with non-EdTech topics")
@@ -100,7 +81,6 @@ class CreatorFitPredictionPipeline:
         return quality_report
     
     def build_advanced_features(self, df: pd.DataFrame, program_type: str) -> pd.DataFrame:
-        """Production-ready feature engineering for maximum predictive power."""
         
         # 1. Advanced content analysis (ensure column exists)
         if 'recent_video_transcript' in df.columns:
@@ -176,13 +156,13 @@ class CreatorFitPredictionPipeline:
     def predict_with_confidence(self, X: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
         """Make predictions with confidence intervals."""
         
-        primary_pred = self.models['lgb'].predict(X)
+        primary_pred = self.models['linear_model'].predict(X)
         
         # If ensemble models are available, use them for a robust confidence estimate
         if len(self.models) > 1:
             all_preds = [primary_pred]
             for name, model in self.models.items():
-                if name != 'lgb':
+                if name != 'linear_model':
                     all_preds.append(model.predict(X))
             
             all_preds = np.column_stack(all_preds)
@@ -203,7 +183,6 @@ class CreatorFitPredictionPipeline:
         return primary_pred, model_confidence
     
     def process_csv_file(self, csv_path: str, program_type: str = "data_science") -> Dict[str, Any]:
-        """Production CSV processing with maximum accuracy pipeline."""
         
         try:
             logging.info(f"Starting production prediction pipeline for {csv_path}")
@@ -213,11 +192,26 @@ class CreatorFitPredictionPipeline:
             quality_report = self.validate_data_quality(df_raw)
             logging.info(f"Data quality score: {quality_report['quality_score']:.3f}")
             
-            # 2. Apply full preprocessing pipeline
-            df = _coerce_and_normalize(df_raw)
-            df = _impute_missing(df)
-            df, fix_report = _apply_business_guards(df)
-            df_clean = _fold_rare_categories(df, cols=("topic", "category_tag"), min_count=0)
+            # 2. Apply full preprocessing pipeline (same as training)
+            # ✅ load_and_clean_data already imported at top
+            
+            # Save raw data to temp file for processing
+            import tempfile
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as temp_file:
+                df_raw.to_csv(temp_file.name, index=False)
+                temp_path = temp_file.name
+            
+            try:
+                # Use same preprocessing as training
+                df_clean, fix_report, _ = load_and_clean_data(
+                    raw_filename=temp_path,
+                    cleaned_filename=temp_path.replace('.csv', '.cleaned.csv')
+                )
+            finally:
+                # Clean up temp file
+                import os
+                if os.path.exists(temp_path):
+                    os.unlink(temp_path)
             
             # 3. Build standard features first
             X, _, meta = build_features(df_clean, program_type=program_type)
@@ -234,9 +228,8 @@ class CreatorFitPredictionPipeline:
             
             feature_cols = meta['numeric'] + meta['categorical']
             X_pred = X[feature_cols]
-            X_processed = self.preprocessor.transform(X_pred)
             
-            predictions, confidence = self.predict_with_confidence(X_processed)
+            predictions, confidence = self.predict_with_confidence(X_pred)
             
             results = []
             for i in range(len(df_clean)):
@@ -261,7 +254,7 @@ class CreatorFitPredictionPipeline:
                     'topic': str(df_clean.iloc[i]['topic']),
                     'language': str(df_clean.iloc[i]['language']),
                     'views_90d': int(df_clean.iloc[i]['views_90d']),
-                    'creator_tier': str(X.iloc[i]['creator_tier']),
+                    'creator_tier': str(X.iloc[i].get('creator_tier', 'Unknown')),
                     'posting_cadence_days': int(df_clean.iloc[i].get('posting_cadence_days', 14)),
                     # 'recommendation': 'BOOK' if predictions[i] > 100 and creator_confidence > 0.8 else 'REVIEW' if predictions[i] > 50 else 'SKIP'
                     'recommendation': "TEMP" # Placeholder
@@ -291,7 +284,7 @@ class CreatorFitPredictionPipeline:
                 'results': results,
                 'data_quality': quality_report,
                 'model_info': {
-                    'model_type': 'Production LightGBM Ensemble',
+                    'model_type': 'LinearRegression',
                     'accuracy_metrics': self.metadata.get('performance', {}),
                     'features_used': len(feature_cols),
                     'total_creators_analyzed': len(results)
@@ -320,7 +313,6 @@ class CreatorFitPredictionPipeline:
             }
 
 def main():
-    """Main execution function."""
     if len(sys.argv) < 2:
         print("Usage: python prediction_pipeline.py <csv_file> [program_type]")
         sys.exit(1)

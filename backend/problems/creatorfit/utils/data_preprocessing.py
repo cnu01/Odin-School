@@ -39,10 +39,10 @@ EDTECH_TOPICS = [
 VALID_LANGUAGES = ["English", "Hindi", "Telugu"]
 
 def project_root() -> Path:
-    return Path(__file__).resolve().parents[2]
+    return Path(__file__).resolve().parents[3]
 
 def dataset_path(filename: str) -> Path:
-    return project_root() / "dataset" / filename
+    return project_root() / "problems" / "dataset" / filename
 
 def _coerce_and_normalize(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
