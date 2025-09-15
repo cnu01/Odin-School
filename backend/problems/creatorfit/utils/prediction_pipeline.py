@@ -27,7 +27,7 @@ class CreatorFitPredictionPipeline:
     
     def __init__(self, model_dir: str = None):
         default_ml_dir = os.path.abspath(
-            os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "ml", "models")
+            os.path.join(os.path.dirname(__file__), "..", "..", "..", "ml", "models")
         )
         self.model_dir = Path(model_dir or os.environ.get("MODEL_DIR", default_ml_dir))
         self.models = {}

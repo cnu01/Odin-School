@@ -3,7 +3,6 @@ import tempfile
 from pathlib import Path
 from typing import Dict, Any
 
-from .models import PredictionResponse, AnalysisRequest, ErrorResponse
 from .constants import ODIN_SCHOOL_PROGRAMS
 
 class CreatorFitService:
@@ -25,7 +24,6 @@ class CreatorFitService:
                 temp_file.write(csv_content)
                 temp_csv_path = temp_file.name
             
-            # Use lightweight prediction pipeline
             try:
                 result = self._lightweight_analysis(temp_csv_path, program_type)
                 
@@ -76,32 +74,40 @@ class CreatorFitService:
         """
         try:
             # Save uploaded CSV to temporary file
+            print(f"forecast_leads_csv: {program_type}, {csv_content}")
             with tempfile.NamedTemporaryFile(mode='wb', suffix='.csv', delete=False) as temp_file:
                 temp_file.write(csv_content)
                 temp_csv_path = temp_file.name
             
-            # Use lightweight prediction pipeline
             try:
-                result = self._lightweight_analysis(temp_csv_path, program_type)
+                import sys
+                from pathlib import Path
                 
-                # Enhance result with forecasting-specific information
+                utils_path = Path(__file__).parent / "utils"
+                if str(utils_path) not in sys.path:
+                    sys.path.append(str(utils_path))
+                
+                from prediction_pipeline import CreatorFitPredictionPipeline
+                
+                predictor = CreatorFitPredictionPipeline()
+                print(f"predictor: {predictor}")
+                
+                result = predictor.process_csv_file(temp_csv_path, program_type)
+                
                 if result.get('success'):
                     result['endpoint_type'] = 'forecast'
                     result['focus'] = 'qualified_leads_prediction'
+                    result['model_used'] = 'LinearRegression'
                 
                 return result
                 
             except ImportError as e:
-                # Fallback to basic processing if ML pipeline not available
-                print(f"DEBUG: Import error: {e}")
                 return {
                     'success': False,
                     'error': f'ML pipeline not available: {str(e)}',
                     'details': 'Please ensure the prediction pipeline is properly set up'
                 }
             except Exception as e:
-                # Catch any other errors during pipeline execution
-                print(f"DEBUG: Pipeline execution error: {e}")
                 return {
                     'success': False,
                     'error': f'Pipeline execution failed: {str(e)}',
@@ -165,23 +171,11 @@ class CreatorFitService:
         """Fast analysis using simple algorithms without heavy ML dependencies"""
         try:
             import pandas as pd
-            import numpy as np
             
             # Load data
             df = pd.read_csv(csv_path)
             
-            # Create creator_tier from views_90d (consistent with ML pipeline)
-            def classify_creator_tier(views):
-                if views >= 100000:
-                    return "Established"
-                elif views >= 25000:
-                    return "Growing"
-                else:
-                    return "Emerging"
-            
-            df['creator_tier'] = df['views_90d'].apply(classify_creator_tier)
-            
-            from .utils.features import compute_fit_scores
+            from utils.features import compute_fit_scores
             
             program_text = ODIN_SCHOOL_PROGRAMS.get(program_type, ODIN_SCHOOL_PROGRAMS["data_science"])
             
