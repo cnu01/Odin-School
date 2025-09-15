@@ -82,17 +82,6 @@ def main():
 
     print(f"[METRICS] MAE={mae:.2f}  RMSE={rmse:.2f}  MAPE={mape:.3f}  R2={r2:.3f}")
 
-    # Feature importances (Linear Regression coefficients)
-    feature_names = X_train.columns
-    coefficients = np.abs(model.coef_)
-    
-    order = np.argsort(coefficients)[::-1]
-    top_k = min(20, len(feature_names))
-
-    print("\n[TOP FEATURES] (by absolute coefficient value)")
-    for i in order[:top_k]:
-        print(f"{feature_names[i]:35s}  {coefficients[i]:.4f} (coef: {model.coef_[i]:+.4f})")
-    
     import joblib
     
     default_ml_dir = Path(__file__).resolve().parent.parent / "ml"
