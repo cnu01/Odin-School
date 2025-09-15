@@ -1,51 +1,51 @@
-creator_id,topic,recent_video_transcript,posting_cadence_days,views_90d,clicks,enrollments,refunds,geography,language,category_tag
-EDU_1451,Software Engineering;Database Management,Full-stack development bootcamp: MERN stack with authentication and deployment strategies,4,94822,2732,96,7,INDIA,Hindi,career-guidance;project-based
-EDU_1452,Java;Machine Learning,"Software engineering best practices: clean code, testing, and agile development methodologies",2,105925,4867,445,42,INDIA,Telugu,career-guidance
-EDU_1453,System Design;PostgreSQL,System design interview masterclass: scalability patterns and distributed systems architecture,3,44150,1383,135,9,INDIA,Telugu,comprehensive;quick-start
-EDU_1454,JavaScript;Artificial Intelligence,Frontend development with React and Redux: building scalable web applications with modern practices,2,30922,1435,224,19,INDIA,Hindi,interview-prep
-EDU_1455,JavaScript;Java,"JavaScript complete guide: ES6+, async programming, DOM manipulation, and modern frameworks",5,5274,281,21,0,INDIA,English,theory;practical
-EDU_1456,Machine Learning,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,2,51152,3652,508,28,INDIA,English,career-guidance
-EDU_1457,Flask;Software Engineering,Complete Python programming masterclass: from basics to advanced projects including web scraping and automation,3,66609,2677,179,5,INDIA,English,quick-start;comprehensive
-EDU_1458,Career Guidance;Artificial Intelligence,Coding interview bootcamp: problem-solving techniques and whiteboard coding strategies,5,31416,1617,231,21,INDIA,English,interview-prep
-EDU_1459,Analytics;Django,"Data Science career roadmap 2024: statistics, pandas, machine learning, and real industry projects",4,114051,3464,163,7,INDIA,Hindi,career-guidance;tutorial
-EDU_1460,JavaScript;Django,"JavaScript complete guide: ES6+, async programming, DOM manipulation, and modern frameworks",4,5717,222,18,0,INDIA,Hindi,theory;interview-prep
-EDU_1461,Data Science;Statistics,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,2,150000,9320,1325,42,INDIA,English,comprehensive;interview-prep
-EDU_1462,Coding Practice;C++,"Career transition to tech: portfolio building, networking, and landing your first developer job",4,97423,2966,145,7,INDIA,English,quick-start
-EDU_1463,Artificial Intelligence,Deep learning with PyTorch and TensorFlow: computer vision and NLP projects from scratch,2,20712,596,31,3,INDIA,Hindi,career-guidance
-EDU_1464,Java,Data structures and algorithms: coding interview preparation with 200+ practice problems,4,50000,1231,28,2,INDIA,Hindi,comprehensive
-EDU_1465,Data Structures,"Career transition to tech: portfolio building, networking, and landing your first developer job",5,90765,3285,97,9,INDIA,Telugu,practical;quick-start
-EDU_1466,JavaScript,Frontend development with React and Redux: building scalable web applications with modern practices,2,55543,3369,464,46,INDIA,English,step-by-step;project-based
-EDU_1467,Data Science;Backend Development,"Data analysis with Python: exploratory data analysis, visualization with matplotlib and seaborn",2,25266,1486,195,16,INDIA,English,quick-start
-EDU_1468,Mobile Development,Frontend development with React and Redux: building scalable web applications with modern practices,2,150000,6569,289,19,INDIA,English,beginner-friendly
-EDU_1469,Coding Practice;Mobile Development,"Software engineering best practices: clean code, testing, and agile development methodologies",2,65586,2401,127,6,INDIA,Telugu,theory;hands-on
-EDU_1470,Python,"Data analysis with Python: exploratory data analysis, visualization with matplotlib and seaborn",3,11803,719,115,3,INDIA,English,step-by-step
-EDU_1471,Flask;Statistics,Full-stack development bootcamp: MERN stack with authentication and deployment strategies,4,15029,367,12,1,INDIA,Telugu,comprehensive
-EDU_1472,Deep Learning,Deep learning with PyTorch and TensorFlow: computer vision and NLP projects from scratch,4,5724,163,7,0,INDIA,English,project-based
-EDU_1473,DevOps,"DevOps engineering essentials: Docker containers, Kubernetes orchestration, and CI/CD automation",1,9107,319,21,1,INDIA,English,quick-start
-EDU_1474,JavaScript;Algorithms,"JavaScript complete guide: ES6+, async programming, DOM manipulation, and modern frameworks",14,5288,75,3,0,INDIA,English,advanced
-EDU_1475,Data Science,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,4,56878,3309,306,28,INDIA,English,step-by-step
-EDU_1476,Coding Practice,Web development portfolio: 10 projects to showcase your skills and impress employers,4,26151,1028,55,1,INDIA,English,quick-start
-EDU_1477,React,React Native mobile development: cross-platform apps with navigation and state management,4,38211,1732,142,6,INDIA,Hindi,interview-prep
-EDU_1478,Data Science;Programming Fundamentals,"Data Science career roadmap 2024: statistics, pandas, machine learning, and real industry projects",5,35997,1337,114,12,INDIA,Hindi,tutorial
-EDU_1479,Career Guidance,"Career transition to tech: portfolio building, networking, and landing your first developer job",5,61853,2995,370,16,INDIA,English,career-guidance;hands-on
-EDU_1480,Frontend Development,"JavaScript complete guide: ES6+, async programming, DOM manipulation, and modern frameworks",1,22579,905,61,6,INDIA,Hindi,practical
-EDU_1481,Statistics;Database Management,"Career transition to tech: portfolio building, networking, and landing your first developer job",4,56349,2194,190,21,INDIA,English,quick-start
-EDU_1482,Backend Development,"Backend development masterclass: Node.js, Express, MongoDB, and RESTful API design patterns",4,50000,2036,62,6,INDIA,Hindi,practical
-EDU_1483,System Design;Data Structures,"Database design fundamentals: normalization, indexing, and performance optimization strategies",4,19671,492,29,2,INDIA,Hindi,project-based
-EDU_1484,Django;Statistics,"Career transition to tech: portfolio building, networking, and landing your first developer job",4,4150,174,3,0,INDIA,Telugu,advanced
-EDU_1485,Frontend Development,Frontend development with React and Redux: building scalable web applications with modern practices,3,51262,1550,87,1,INDIA,Hindi,hands-on;step-by-step
-EDU_1486,Interview Preparation,Coding interview bootcamp: problem-solving techniques and whiteboard coding strategies,4,96050,4138,246,11,INDIA,Telugu,step-by-step
-EDU_1487,JavaScript;Statistics,Frontend development with React and Redux: building scalable web applications with modern practices,1,176010,9209,1293,117,INDIA,Telugu,advanced
-EDU_1488,Data Structures;Django,Web development portfolio: 10 projects to showcase your skills and impress employers,4,18202,673,28,2,INDIA,English,comprehensive
-EDU_1489,Deep Learning,"Data Science career roadmap 2024: statistics, pandas, machine learning, and real industry projects",3,56507,3349,182,11,INDIA,English,hands-on
-EDU_1490,Analytics;Flask,"SQL for data analysis: advanced queries, window functions, and database optimization techniques",6,23750,490,17,0,INDIA,Hindi,advanced
-EDU_1491,Mobile Development;System Design,Frontend development with React and Redux: building scalable web applications with modern practices,6,25000,731,31,2,INDIA,Hindi,tutorial;practical
-EDU_1492,Python,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,3,15063,782,112,11,INDIA,English,theory;project-based
-EDU_1493,Cloud Computing,"DevOps engineering essentials: Docker containers, Kubernetes orchestration, and CI/CD automation",1,76133,2588,157,17,INDIA,Telugu,comprehensive
-EDU_1494,Algorithms,Coding interview bootcamp: problem-solving techniques and whiteboard coding strategies,6,52673,2030,93,5,INDIA,English,career-guidance
-EDU_1495,Data Structures,"Software engineering best practices: clean code, testing, and agile development methodologies",2,31136,1099,38,2,INDIA,Telugu,project-based
-EDU_1496,SQL,"Database design fundamentals: normalization, indexing, and performance optimization strategies",5,6343,270,23,1,INDIA,English,comprehensive;career-guidance
-EDU_1497,Programming Fundamentals;Frontend Development,"Software engineering best practices: clean code, testing, and agile development methodologies",5,31818,1018,35,3,INDIA,Telugu,interview-prep;step-by-step
-EDU_1498,Deep Learning;MongoDB,Deep learning with PyTorch and TensorFlow: computer vision and NLP projects from scratch,3,29063,838,50,4,INDIA,Telugu,beginner-friendly;practical
-EDU_1499,Mobile Development,React Native mobile development: cross-platform apps with navigation and state management,3,79962,2422,102,6,INDIA,Hindi,beginner-friendly
-EDU_1500,Python,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,3,3466,171,19,1,INDIA,English,theory
+creator_id,topic,recent_video_transcript,posting_cadence_days,views_90d,clicks,leads,qualified_leads,enrollments,refunds,geography,language,category_tag
+EDU_1451,Software Engineering;Database Management,Full-stack development bootcamp: MERN stack with authentication and deployment strategies,4,94822,2732,257,172,96,7,INDIA,Hindi,career-guidance;project-based
+EDU_1452,Java;Machine Learning,"Software engineering best practices: clean code, testing, and agile development methodologies",2,105925,4867,870,778,445,42,INDIA,Telugu,career-guidance
+EDU_1453,System Design;PostgreSQL,System design interview masterclass: scalability patterns and distributed systems architecture,3,44150,1383,240,216,135,9,INDIA,Telugu,comprehensive;quick-start
+EDU_1454,JavaScript;Artificial Intelligence,Frontend development with React and Redux: building scalable web applications with modern practices,2,30922,1435,351,315,224,19,INDIA,Hindi,interview-prep
+EDU_1455,JavaScript;Java,"JavaScript complete guide: ES6+, async programming, DOM manipulation, and modern frameworks",5,5274,281,39,29,21,0,INDIA,English,theory;practical
+EDU_1456,Machine Learning,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,2,51152,3652,754,678,508,28,INDIA,English,career-guidance
+EDU_1457,Flask;Software Engineering,Complete Python programming masterclass: from basics to advanced projects including web scraping and automation,3,66609,2677,349,293,179,5,INDIA,English,quick-start;comprehensive
+EDU_1458,Career Guidance;Artificial Intelligence,Coding interview bootcamp: problem-solving techniques and whiteboard coding strategies,5,31416,1617,384,345,231,21,INDIA,English,interview-prep
+EDU_1459,Analytics;Django,"Data Science career roadmap 2024: statistics, pandas, machine learning, and real industry projects",4,114051,3464,453,335,163,7,INDIA,Hindi,career-guidance;tutorial
+EDU_1460,JavaScript;Django,"JavaScript complete guide: ES6+, async programming, DOM manipulation, and modern frameworks",4,5717,222,35,27,18,0,INDIA,Hindi,theory;interview-prep
+EDU_1461,Data Science;Statistics,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,2,150000,9320,1964,1767,1325,42,INDIA,English,comprehensive;interview-prep
+EDU_1462,Coding Practice;C++,"Career transition to tech: portfolio building, networking, and landing your first developer job",4,97423,2966,381,220,145,7,INDIA,English,quick-start
+EDU_1463,Artificial Intelligence,Deep learning with PyTorch and TensorFlow: computer vision and NLP projects from scratch,2,20712,596,76,53,31,3,INDIA,Hindi,career-guidance
+EDU_1464,Java,Data structures and algorithms: coding interview preparation with 200+ practice problems,4,50000,1231,95,66,28,2,INDIA,Hindi,comprehensive
+EDU_1465,Data Structures,"Career transition to tech: portfolio building, networking, and landing your first developer job",5,90765,3285,391,223,97,9,INDIA,Telugu,practical;quick-start
+EDU_1466,JavaScript,Frontend development with React and Redux: building scalable web applications with modern practices,2,55543,3369,688,619,464,46,INDIA,English,step-by-step;project-based
+EDU_1467,Data Science;Backend Development,"Data analysis with Python: exploratory data analysis, visualization with matplotlib and seaborn",2,25266,1486,290,261,195,16,INDIA,English,quick-start
+EDU_1468,Mobile Development,Frontend development with React and Redux: building scalable web applications with modern practices,2,150000,6569,821,539,289,19,INDIA,English,beginner-friendly
+EDU_1469,Coding Practice;Mobile Development,"Software engineering best practices: clean code, testing, and agile development methodologies",2,65586,2401,322,237,127,6,INDIA,Telugu,theory;hands-on
+EDU_1470,Python,"Data analysis with Python: exploratory data analysis, visualization with matplotlib and seaborn",3,11803,719,172,154,115,3,INDIA,English,step-by-step
+EDU_1471,Flask;Statistics,Full-stack development bootcamp: MERN stack with authentication and deployment strategies,4,15029,367,46,28,12,1,INDIA,Telugu,comprehensive
+EDU_1472,Deep Learning,Deep learning with PyTorch and TensorFlow: computer vision and NLP projects from scratch,4,5724,163,27,19,7,0,INDIA,English,project-based
+EDU_1473,DevOps,"DevOps engineering essentials: Docker containers, Kubernetes orchestration, and CI/CD automation",1,9107,319,44,38,21,1,INDIA,English,quick-start
+EDU_1474,JavaScript;Algorithms,"JavaScript complete guide: ES6+, async programming, DOM manipulation, and modern frameworks",14,5288,75,10,6,3,0,INDIA,English,advanced
+EDU_1475,Data Science,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,4,56878,3309,700,474,306,28,INDIA,English,step-by-step
+EDU_1476,Coding Practice,Web development portfolio: 10 projects to showcase your skills and impress employers,4,26151,1028,137,101,55,1,INDIA,English,quick-start
+EDU_1477,React,React Native mobile development: cross-platform apps with navigation and state management,4,38211,1732,267,218,142,6,INDIA,Hindi,interview-prep
+EDU_1478,Data Science;Programming Fundamentals,"Data Science career roadmap 2024: statistics, pandas, machine learning, and real industry projects",5,35997,1337,200,170,114,12,INDIA,Hindi,tutorial
+EDU_1479,Career Guidance,"Career transition to tech: portfolio building, networking, and landing your first developer job",5,61853,2995,618,531,370,16,INDIA,English,career-guidance;hands-on
+EDU_1480,Frontend Development,"JavaScript complete guide: ES6+, async programming, DOM manipulation, and modern frameworks",1,22579,905,137,98,61,6,INDIA,Hindi,practical
+EDU_1481,Statistics;Database Management,"Career transition to tech: portfolio building, networking, and landing your first developer job",4,56349,2194,432,361,190,21,INDIA,English,quick-start
+EDU_1482,Backend Development,"Backend development masterclass: Node.js, Express, MongoDB, and RESTful API design patterns",4,50000,2036,190,121,62,6,INDIA,Hindi,practical
+EDU_1483,System Design;Data Structures,"Database design fundamentals: normalization, indexing, and performance optimization strategies",4,19671,492,74,55,29,2,INDIA,Hindi,project-based
+EDU_1484,Django;Statistics,"Career transition to tech: portfolio building, networking, and landing your first developer job",4,4150,174,12,7,3,0,INDIA,Telugu,advanced
+EDU_1485,Frontend Development,Frontend development with React and Redux: building scalable web applications with modern practices,3,51262,1550,234,162,87,1,INDIA,Hindi,hands-on;step-by-step
+EDU_1486,Interview Preparation,Coding interview bootcamp: problem-solving techniques and whiteboard coding strategies,4,96050,4138,546,423,246,11,INDIA,Telugu,step-by-step
+EDU_1487,JavaScript;Statistics,Frontend development with React and Redux: building scalable web applications with modern practices,1,176010,9209,1917,1725,1293,117,INDIA,Telugu,advanced
+EDU_1488,Data Structures;Django,Web development portfolio: 10 projects to showcase your skills and impress employers,4,18202,673,74,57,28,2,INDIA,English,comprehensive
+EDU_1489,Deep Learning,"Data Science career roadmap 2024: statistics, pandas, machine learning, and real industry projects",3,56507,3349,407,317,182,11,INDIA,English,hands-on
+EDU_1490,Analytics;Flask,"SQL for data analysis: advanced queries, window functions, and database optimization techniques",6,23750,490,54,34,17,0,INDIA,Hindi,advanced
+EDU_1491,Mobile Development;System Design,Frontend development with React and Redux: building scalable web applications with modern practices,6,25000,731,86,56,31,2,INDIA,Hindi,tutorial;practical
+EDU_1492,Python,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,3,15063,782,167,150,112,11,INDIA,English,theory;project-based
+EDU_1493,Cloud Computing,"DevOps engineering essentials: Docker containers, Kubernetes orchestration, and CI/CD automation",1,76133,2588,358,226,157,17,INDIA,Telugu,comprehensive
+EDU_1494,Algorithms,Coding interview bootcamp: problem-solving techniques and whiteboard coding strategies,6,52673,2030,272,184,93,5,INDIA,English,career-guidance
+EDU_1495,Data Structures,"Software engineering best practices: clean code, testing, and agile development methodologies",2,31136,1099,108,81,38,2,INDIA,Telugu,project-based
+EDU_1496,SQL,"Database design fundamentals: normalization, indexing, and performance optimization strategies",5,6343,270,44,39,23,1,INDIA,English,comprehensive;career-guidance
+EDU_1497,Programming Fundamentals;Frontend Development,"Software engineering best practices: clean code, testing, and agile development methodologies",5,31818,1018,137,82,35,3,INDIA,Telugu,interview-prep;step-by-step
+EDU_1498,Deep Learning;MongoDB,Deep learning with PyTorch and TensorFlow: computer vision and NLP projects from scratch,3,29063,838,122,80,50,4,INDIA,Telugu,beginner-friendly;practical
+EDU_1499,Mobile Development,React Native mobile development: cross-platform apps with navigation and state management,3,79962,2422,392,218,102,6,INDIA,Hindi,beginner-friendly
+EDU_1500,Python,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,3,3466,171,29,26,19,1,INDIA,English,theory

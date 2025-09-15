@@ -1,151 +1,151 @@
-creator_id,topic,recent_video_transcript,posting_cadence_days,views_90d,clicks,enrollments,refunds,geography,language,category_tag
-EDU_1301,Django,"Career transition to tech: portfolio building, networking, and landing your first developer job",3,86781,3343,220,13,INDIA,Hindi,interview-prep
-EDU_1302,Software Engineering,Full-stack development bootcamp: MERN stack with authentication and deployment strategies,1,8000,280,11,1,INDIA,Hindi,interview-prep
-EDU_1303,DevOps,"DevOps engineering essentials: Docker containers, Kubernetes orchestration, and CI/CD automation",1,68923,2644,176,17,INDIA,English,interview-prep;comprehensive
-EDU_1304,Programming Fundamentals;C++,"Career transition to tech: portfolio building, networking, and landing your first developer job",2,18918,604,38,2,INDIA,English,interview-prep
-EDU_1305,Machine Learning;Interview Preparation,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,1,24838,1306,162,6,INDIA,Hindi,practical
-EDU_1306,Cloud Computing,"DevOps engineering essentials: Docker containers, Kubernetes orchestration, and CI/CD automation",4,300073,9638,303,7,INDIA,Hindi,theory
-EDU_1307,Interview Preparation;JavaScript,System design interview masterclass: scalability patterns and distributed systems architecture,5,4978,230,24,1,INDIA,English,quick-start
-EDU_1308,Coding Practice;C++,"Career transition to tech: portfolio building, networking, and landing your first developer job",1,14525,700,67,2,INDIA,English,interview-prep
-EDU_1309,Python;Java,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,3,9275,473,45,4,INDIA,Hindi,hands-on
-EDU_1310,MongoDB;PostgreSQL,"Career transition to tech: portfolio building, networking, and landing your first developer job",3,19117,948,81,7,INDIA,Hindi,beginner-friendly
-EDU_1311,Data Science;C++,"Data analysis with Python: exploratory data analysis, visualization with matplotlib and seaborn",7,35526,1064,66,5,INDIA,Hindi,quick-start;step-by-step
-EDU_1312,Statistics;Django,"Software engineering best practices: clean code, testing, and agile development methodologies",5,138503,5538,223,17,INDIA,English,quick-start;step-by-step
-EDU_1313,DevOps,"DevOps engineering essentials: Docker containers, Kubernetes orchestration, and CI/CD automation",3,70757,2318,172,14,INDIA,English,practical
-EDU_1314,Artificial Intelligence,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,4,53781,1903,58,3,INDIA,Hindi,comprehensive
-EDU_1315,C++,"Software engineering best practices: clean code, testing, and agile development methodologies",3,72220,3184,158,11,INDIA,English,quick-start
-EDU_1316,SQL,"Database design fundamentals: normalization, indexing, and performance optimization strategies",4,14492,515,26,2,INDIA,Hindi,beginner-friendly
-EDU_1317,Flask;SQL,Complete Python programming masterclass: from basics to advanced projects including web scraping and automation,7,41383,733,56,4,INDIA,Telugu,theory;interview-prep
-EDU_1318,System Design;Software Engineering,"DevOps engineering essentials: Docker containers, Kubernetes orchestration, and CI/CD automation",4,9300,434,21,1,INDIA,English,career-guidance;theory
-EDU_1319,Database Management,"Career transition to tech: portfolio building, networking, and landing your first developer job",4,154239,3931,257,18,INDIA,English,comprehensive;tutorial
-EDU_1320,Frontend Development;Backend Development,Frontend development with React and Redux: building scalable web applications with modern practices,3,139725,3258,103,10,INDIA,Telugu,interview-prep;step-by-step
-EDU_1321,Web Development,Web development portfolio: 10 projects to showcase your skills and impress employers,2,23738,753,51,1,INDIA,Hindi,project-based
-EDU_1322,System Design,System design interview masterclass: scalability patterns and distributed systems architecture,4,9322,285,17,0,INDIA,English,advanced
-EDU_1323,Coding Practice,Web development portfolio: 10 projects to showcase your skills and impress employers,6,8747,326,10,0,INDIA,Telugu,quick-start
-EDU_1324,Machine Learning;Career Guidance,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,2,15662,1010,145,9,INDIA,English,theory
-EDU_1325,Programming Fundamentals,"Career transition to tech: portfolio building, networking, and landing your first developer job",2,21192,778,33,2,INDIA,English,beginner-friendly;advanced
-EDU_1326,System Design,"DevOps engineering essentials: Docker containers, Kubernetes orchestration, and CI/CD automation",5,48206,1327,109,2,INDIA,English,comprehensive
-EDU_1327,Backend Development,System design interview masterclass: scalability patterns and distributed systems architecture,5,8926,282,8,0,INDIA,English,comprehensive
-EDU_1328,Data Science;System Design,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,4,15954,555,48,4,INDIA,Telugu,practical;step-by-step
-EDU_1329,Cloud Computing,System design interview masterclass: scalability patterns and distributed systems architecture,2,1938,80,3,0,INDIA,English,quick-start;project-based
-EDU_1330,Web Development,Web development portfolio: 10 projects to showcase your skills and impress employers,2,16797,449,18,1,INDIA,Telugu,theory
-EDU_1331,Database Management;MongoDB,Web development portfolio: 10 projects to showcase your skills and impress employers,3,6421,195,11,0,INDIA,English,quick-start;tutorial
-EDU_1332,DevOps,System design interview masterclass: scalability patterns and distributed systems architecture,2,69447,2952,118,11,INDIA,Hindi,hands-on
-EDU_1333,React,React Native mobile development: cross-platform apps with navigation and state management,1,8507,598,100,9,INDIA,English,hands-on;theory
-EDU_1334,Database Management,"Software engineering best practices: clean code, testing, and agile development methodologies",4,14028,498,42,1,INDIA,English,project-based;interview-prep
-EDU_1335,Data Structures,Web development portfolio: 10 projects to showcase your skills and impress employers,2,122699,3235,201,8,INDIA,Telugu,interview-prep;project-based
-EDU_1336,Statistics,"Career transition to tech: portfolio building, networking, and landing your first developer job",4,8769,283,15,0,INDIA,English,comprehensive;tutorial
-EDU_1337,Database Management,Web development portfolio: 10 projects to showcase your skills and impress employers,3,32877,1326,95,10,INDIA,English,step-by-step
-EDU_1338,Flask,"Backend development masterclass: Node.js, Express, MongoDB, and RESTful API design patterns",3,42301,1225,54,4,INDIA,Telugu,theory;project-based
-EDU_1339,Algorithms,Coding interview bootcamp: problem-solving techniques and whiteboard coding strategies,2,149985,5427,323,17,INDIA,English,practical;interview-prep
-EDU_1340,Data Structures,Web development portfolio: 10 projects to showcase your skills and impress employers,3,55059,2265,142,7,INDIA,English,tutorial
-EDU_1341,MongoDB;Software Engineering,Web development portfolio: 10 projects to showcase your skills and impress employers,2,10785,498,28,1,INDIA,English,beginner-friendly
-EDU_1342,Mobile Development,Frontend development with React and Redux: building scalable web applications with modern practices,1,9919,449,32,1,INDIA,English,advanced;interview-prep
-EDU_1343,JavaScript;Flask,"JavaScript complete guide: ES6+, async programming, DOM manipulation, and modern frameworks",2,15331,808,114,2,INDIA,English,interview-prep
-EDU_1344,Java;Career Guidance,"Software engineering best practices: clean code, testing, and agile development methodologies",2,6956,381,57,5,INDIA,English,beginner-friendly
-EDU_1345,Career Guidance;Flask,"Career transition to tech: portfolio building, networking, and landing your first developer job",4,4229,154,11,0,INDIA,Telugu,project-based;comprehensive
-EDU_1346,Frontend Development,"JavaScript complete guide: ES6+, async programming, DOM manipulation, and modern frameworks",2,42227,1773,71,1,INDIA,Hindi,comprehensive;theory
-EDU_1347,Statistics,Web development portfolio: 10 projects to showcase your skills and impress employers,1,38957,1338,117,5,INDIA,English,advanced
-EDU_1348,React;Coding Practice,React Native mobile development: cross-platform apps with navigation and state management,1,5534,336,53,6,INDIA,English,advanced;project-based
-EDU_1349,System Design,System design interview masterclass: scalability patterns and distributed systems architecture,3,15168,564,34,1,INDIA,English,theory;step-by-step
-EDU_1350,Django,"Career transition to tech: portfolio building, networking, and landing your first developer job",3,8074,445,21,1,INDIA,English,quick-start
-EDU_1351,Web Development;Data Science,Full-stack development bootcamp: MERN stack with authentication and deployment strategies,3,271659,10214,621,55,INDIA,Telugu,step-by-step;tutorial
-EDU_1352,Frontend Development,"JavaScript complete guide: ES6+, async programming, DOM manipulation, and modern frameworks",3,93160,3155,116,3,INDIA,Telugu,hands-on;quick-start
-EDU_1353,Frontend Development,Frontend development with React and Redux: building scalable web applications with modern practices,5,34367,864,28,1,INDIA,Hindi,career-guidance
-EDU_1354,React,React Native mobile development: cross-platform apps with navigation and state management,5,138984,5314,337,17,INDIA,Hindi,career-guidance
-EDU_1355,Analytics;Data Science,"SQL for data analysis: advanced queries, window functions, and database optimization techniques",3,39252,2323,249,11,INDIA,English,interview-prep
-EDU_1356,Flask;Career Guidance,Complete Python programming masterclass: from basics to advanced projects including web scraping and automation,4,22443,936,96,9,INDIA,English,career-guidance
-EDU_1357,Frontend Development,Frontend development with React and Redux: building scalable web applications with modern practices,3,24522,1019,49,3,INDIA,English,advanced
-EDU_1358,React,Full-stack development bootcamp: MERN stack with authentication and deployment strategies,3,17830,978,68,5,INDIA,Telugu,hands-on
-EDU_1359,C++,"Career transition to tech: portfolio building, networking, and landing your first developer job",1,6482,168,12,0,INDIA,Telugu,advanced
-EDU_1360,Artificial Intelligence;Frontend Development,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,3,185268,5404,480,41,INDIA,English,quick-start
-EDU_1361,PostgreSQL,Web development portfolio: 10 projects to showcase your skills and impress employers,2,11288,787,123,7,INDIA,English,hands-on
-EDU_1362,C++;Programming Fundamentals,Web development portfolio: 10 projects to showcase your skills and impress employers,1,23440,485,20,0,INDIA,Telugu,advanced
-EDU_1363,SQL,"SQL for data analysis: advanced queries, window functions, and database optimization techniques",5,11826,411,25,2,INDIA,Telugu,beginner-friendly
-EDU_1364,Data Structures,"Software engineering best practices: clean code, testing, and agile development methodologies",4,22988,886,44,3,INDIA,English,tutorial
-EDU_1365,Data Science;PostgreSQL,"Data Science career roadmap 2024: statistics, pandas, machine learning, and real industry projects",4,35087,2107,250,21,INDIA,English,beginner-friendly
-EDU_1366,PostgreSQL,Web development portfolio: 10 projects to showcase your skills and impress employers,2,9875,579,94,6,INDIA,English,comprehensive;hands-on
-EDU_1367,Statistics;C++,"Software engineering best practices: clean code, testing, and agile development methodologies",2,5463,223,11,0,INDIA,Telugu,career-guidance;beginner-friendly
-EDU_1368,Frontend Development,"JavaScript complete guide: ES6+, async programming, DOM manipulation, and modern frameworks",6,55967,1412,34,2,INDIA,Telugu,advanced
-EDU_1369,Cloud Computing;Coding Practice,System design interview masterclass: scalability patterns and distributed systems architecture,10,24771,435,4,0,INDIA,Telugu,career-guidance;beginner-friendly
-EDU_1370,Interview Preparation,System design interview masterclass: scalability patterns and distributed systems architecture,3,50000,2255,221,22,INDIA,Hindi,hands-on;beginner-friendly
-EDU_1371,Data Science;Statistics,"Data analysis with Python: exploratory data analysis, visualization with matplotlib and seaborn",4,8363,371,30,1,INDIA,Hindi,quick-start
-EDU_1372,Algorithms,Data structures and algorithms: coding interview preparation with 200+ practice problems,3,81765,1848,86,10,INDIA,Telugu,quick-start
-EDU_1373,Java,System design interview masterclass: scalability patterns and distributed systems architecture,3,11768,322,28,2,INDIA,English,quick-start;project-based
-EDU_1374,Analytics,"SQL for data analysis: advanced queries, window functions, and database optimization techniques",5,59027,2074,69,5,INDIA,Telugu,hands-on
-EDU_1375,MongoDB;Analytics,Web development portfolio: 10 projects to showcase your skills and impress employers,2,48306,1987,75,3,INDIA,English,tutorial
-EDU_1376,Deep Learning;System Design,Deep learning with PyTorch and TensorFlow: computer vision and NLP projects from scratch,5,62112,2874,163,3,INDIA,English,hands-on
-EDU_1377,DevOps,"AWS cloud computing: EC2, S3, Lambda, and serverless architecture implementation guide",4,30129,1149,45,5,INDIA,English,theory;project-based
-EDU_1378,Flask,Full-stack development bootcamp: MERN stack with authentication and deployment strategies,5,115736,4303,117,11,INDIA,Telugu,tutorial
-EDU_1379,Career Guidance,"Career transition to tech: portfolio building, networking, and landing your first developer job",3,38189,1769,202,17,INDIA,Hindi,advanced
-EDU_1380,Django,Web development portfolio: 10 projects to showcase your skills and impress employers,1,47687,2343,289,28,INDIA,English,practical
-EDU_1381,Database Management,"Software engineering best practices: clean code, testing, and agile development methodologies",2,216005,10507,742,79,INDIA,English,quick-start;interview-prep
-EDU_1382,Data Science,"Data Science career roadmap 2024: statistics, pandas, machine learning, and real industry projects",5,150000,7469,820,91,INDIA,English,interview-prep
-EDU_1383,System Design,"Database design fundamentals: normalization, indexing, and performance optimization strategies",2,10448,418,16,0,INDIA,Hindi,tutorial
-EDU_1384,Java;Algorithms,"Software engineering best practices: clean code, testing, and agile development methodologies",2,14382,565,29,2,INDIA,English,hands-on
-EDU_1385,Algorithms,Data structures and algorithms: coding interview preparation with 200+ practice problems,7,33164,617,5,0,INDIA,Telugu,quick-start
-EDU_1386,Flask,Complete Python programming masterclass: from basics to advanced projects including web scraping and automation,3,2170,110,4,0,INDIA,English,beginner-friendly
-EDU_1387,PostgreSQL;Web Development,Web development portfolio: 10 projects to showcase your skills and impress employers,3,16467,816,78,5,INDIA,Hindi,beginner-friendly;practical
-EDU_1388,Django,Web development portfolio: 10 projects to showcase your skills and impress employers,3,29086,872,34,2,INDIA,Telugu,quick-start;tutorial
-EDU_1389,Software Engineering,"Software engineering best practices: clean code, testing, and agile development methodologies",4,37385,1638,64,3,INDIA,English,tutorial
-EDU_1390,DevOps;Algorithms,System design interview masterclass: scalability patterns and distributed systems architecture,4,69862,2373,157,17,INDIA,English,hands-on
-EDU_1391,Node.js,"JavaScript complete guide: ES6+, async programming, DOM manipulation, and modern frameworks",3,50000,1453,93,3,INDIA,English,interview-prep
-EDU_1392,Django,"Career transition to tech: portfolio building, networking, and landing your first developer job",4,7481,222,10,0,INDIA,English,tutorial
-EDU_1393,React,Frontend development with React and Redux: building scalable web applications with modern practices,4,97006,4982,505,50,INDIA,English,theory
-EDU_1394,Analytics,"Data Science career roadmap 2024: statistics, pandas, machine learning, and real industry projects",2,81299,2118,62,3,INDIA,Hindi,quick-start;career-guidance
-EDU_1395,Statistics,"Software engineering best practices: clean code, testing, and agile development methodologies",3,150000,4289,215,10,INDIA,Hindi,advanced;comprehensive
-EDU_1396,Python,Complete Python programming masterclass: from basics to advanced projects including web scraping and automation,6,100493,4883,355,24,INDIA,English,advanced;theory
-EDU_1397,MongoDB,"Career transition to tech: portfolio building, networking, and landing your first developer job",4,57119,1898,90,7,INDIA,English,comprehensive
-EDU_1398,Career Guidance;Web Development,Coding interview bootcamp: problem-solving techniques and whiteboard coding strategies,5,78571,3976,303,12,INDIA,English,theory;hands-on
-EDU_1399,Node.js,"JavaScript complete guide: ES6+, async programming, DOM manipulation, and modern frameworks",3,11358,453,35,4,INDIA,English,tutorial
-EDU_1400,Coding Practice;Java,"Software engineering best practices: clean code, testing, and agile development methodologies",10,16728,363,4,0,INDIA,Telugu,advanced;tutorial
-EDU_1401,Statistics,"Career transition to tech: portfolio building, networking, and landing your first developer job",1,12241,531,21,2,INDIA,English,project-based
-EDU_1402,Database Management;Programming Fundamentals,"Career transition to tech: portfolio building, networking, and landing your first developer job",4,69339,2514,155,8,INDIA,Telugu,interview-prep;career-guidance
-EDU_1403,Machine Learning,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,1,8570,501,46,5,INDIA,Telugu,comprehensive
-EDU_1404,Artificial Intelligence,"Data Science career roadmap 2024: statistics, pandas, machine learning, and real industry projects",5,30417,1204,46,3,INDIA,English,comprehensive
-EDU_1405,Machine Learning,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,4,50000,2854,218,11,INDIA,English,interview-prep;advanced
-EDU_1406,React,Frontend development with React and Redux: building scalable web applications with modern practices,1,12408,641,63,2,INDIA,Hindi,quick-start
-EDU_1407,PostgreSQL,"Career transition to tech: portfolio building, networking, and landing your first developer job",1,92913,4664,420,17,INDIA,Telugu,project-based
-EDU_1408,Data Structures;Flask,Web development portfolio: 10 projects to showcase your skills and impress employers,2,64823,2458,100,9,INDIA,Hindi,beginner-friendly
-EDU_1409,Career Guidance,Coding interview bootcamp: problem-solving techniques and whiteboard coding strategies,2,34187,1906,113,3,INDIA,Hindi,comprehensive
-EDU_1410,Django,"Software engineering best practices: clean code, testing, and agile development methodologies",4,33696,890,57,2,INDIA,Hindi,beginner-friendly
-EDU_1411,Data Structures,Web development portfolio: 10 projects to showcase your skills and impress employers,4,95790,2985,119,11,INDIA,Telugu,comprehensive;interview-prep
-EDU_1412,Machine Learning,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,10,67344,1317,26,3,INDIA,Telugu,practical
-EDU_1413,JavaScript,Frontend development with React and Redux: building scalable web applications with modern practices,3,244542,16575,1853,178,INDIA,English,theory;tutorial
-EDU_1414,C++,Web development portfolio: 10 projects to showcase your skills and impress employers,3,17846,658,18,0,INDIA,Hindi,comprehensive
-EDU_1415,React,Full-stack development bootcamp: MERN stack with authentication and deployment strategies,5,14300,610,75,1,INDIA,English,comprehensive
-EDU_1416,DevOps,"DevOps engineering essentials: Docker containers, Kubernetes orchestration, and CI/CD automation",4,50000,1942,144,3,INDIA,English,theory
-EDU_1417,Deep Learning,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,4,39497,1089,58,5,INDIA,Telugu,interview-prep;advanced
-EDU_1418,PostgreSQL;Django,"Career transition to tech: portfolio building, networking, and landing your first developer job",3,58809,1995,195,9,INDIA,Telugu,quick-start
-EDU_1419,Interview Preparation;Algorithms,System design interview masterclass: scalability patterns and distributed systems architecture,3,11135,742,103,3,INDIA,English,step-by-step;project-based
-EDU_1420,Programming Fundamentals,"Career transition to tech: portfolio building, networking, and landing your first developer job",5,19253,425,14,1,INDIA,Hindi,beginner-friendly
-EDU_1421,Java;Data Science,System design interview masterclass: scalability patterns and distributed systems architecture,3,61516,3111,375,11,INDIA,Hindi,practical
-EDU_1422,Cloud Computing;Database Management,"AWS cloud computing: EC2, S3, Lambda, and serverless architecture implementation guide",7,157383,3771,115,10,INDIA,Hindi,practical
-EDU_1423,Statistics,Web development portfolio: 10 projects to showcase your skills and impress employers,1,66909,2129,91,8,INDIA,Telugu,career-guidance
-EDU_1424,Coding Practice;Python,Web development portfolio: 10 projects to showcase your skills and impress employers,4,6523,227,11,0,INDIA,Hindi,quick-start;career-guidance
-EDU_1425,Web Development,Full-stack development bootcamp: MERN stack with authentication and deployment strategies,1,22284,963,51,2,INDIA,English,hands-on
-EDU_1426,Coding Practice;Java,"Software engineering best practices: clean code, testing, and agile development methodologies",10,6938,84,1,0,INDIA,English,career-guidance
-EDU_1427,Programming Fundamentals,Web development portfolio: 10 projects to showcase your skills and impress employers,14,19879,346,6,0,INDIA,English,interview-prep;theory
-EDU_1428,Programming Fundamentals,Web development portfolio: 10 projects to showcase your skills and impress employers,2,13843,523,25,1,INDIA,English,beginner-friendly
-EDU_1429,System Design;Django,"Database design fundamentals: normalization, indexing, and performance optimization strategies",3,9717,400,27,1,INDIA,English,comprehensive;tutorial
-EDU_1430,DevOps;Python,System design interview masterclass: scalability patterns and distributed systems architecture,1,33964,2182,331,28,INDIA,English,beginner-friendly
-EDU_1431,Coding Practice,Web development portfolio: 10 projects to showcase your skills and impress employers,5,3802,134,4,0,INDIA,Hindi,career-guidance;project-based
-EDU_1432,Data Structures;Node.js,Web development portfolio: 10 projects to showcase your skills and impress employers,4,94545,3072,91,2,INDIA,Telugu,project-based
-EDU_1433,Mobile Development,React Native mobile development: cross-platform apps with navigation and state management,3,325663,12376,441,20,INDIA,Hindi,comprehensive
-EDU_1434,C++,Web development portfolio: 10 projects to showcase your skills and impress employers,1,10573,342,15,0,INDIA,Hindi,beginner-friendly;project-based
-EDU_1435,PostgreSQL,Web development portfolio: 10 projects to showcase your skills and impress employers,3,305288,14954,1311,66,INDIA,Telugu,theory
-EDU_1436,Database Management,"Software engineering best practices: clean code, testing, and agile development methodologies",4,23958,846,80,9,INDIA,English,career-guidance
-EDU_1437,Programming Fundamentals,Web development portfolio: 10 projects to showcase your skills and impress employers,3,12243,439,39,1,INDIA,English,step-by-step
-EDU_1438,Flask,"Backend development masterclass: Node.js, Express, MongoDB, and RESTful API design patterns",5,20651,569,18,0,INDIA,Telugu,project-based
-EDU_1439,Programming Fundamentals;PostgreSQL,Web development portfolio: 10 projects to showcase your skills and impress employers,6,76969,3522,254,29,INDIA,English,theory
-EDU_1440,DevOps;Programming Fundamentals,System design interview masterclass: scalability patterns and distributed systems architecture,3,25099,792,59,3,INDIA,English,beginner-friendly
-EDU_1441,Cloud Computing;Data Science,"DevOps engineering essentials: Docker containers, Kubernetes orchestration, and CI/CD automation",5,33276,1588,108,11,INDIA,Hindi,beginner-friendly
-EDU_1442,Flask,Complete Python programming masterclass: from basics to advanced projects including web scraping and automation,3,94893,2993,124,9,INDIA,Hindi,quick-start;step-by-step
-EDU_1443,PostgreSQL;Analytics,"Career transition to tech: portfolio building, networking, and landing your first developer job",3,25000,1492,171,18,INDIA,English,beginner-friendly;tutorial
-EDU_1444,Java,Data structures and algorithms: coding interview preparation with 200+ practice problems,5,46652,935,17,1,INDIA,Hindi,tutorial
-EDU_1445,Data Structures;Software Engineering,"Software engineering best practices: clean code, testing, and agile development methodologies",4,50000,2387,126,9,INDIA,English,interview-prep
-EDU_1446,Artificial Intelligence,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,4,142045,4894,203,14,INDIA,English,project-based
-EDU_1447,JavaScript,Frontend development with React and Redux: building scalable web applications with modern practices,10,98335,2197,73,8,INDIA,Hindi,step-by-step
-EDU_1448,Software Engineering,"Software engineering best practices: clean code, testing, and agile development methodologies",5,33267,521,11,0,INDIA,Telugu,step-by-step;advanced
-EDU_1449,Statistics,"Career transition to tech: portfolio building, networking, and landing your first developer job",2,180645,6686,330,22,INDIA,Telugu,hands-on;advanced
-EDU_1450,Software Engineering;Java,System design interview masterclass: scalability patterns and distributed systems architecture,1,15699,600,36,0,INDIA,Telugu,interview-prep
+creator_id,topic,recent_video_transcript,posting_cadence_days,views_90d,clicks,leads,qualified_leads,enrollments,refunds,geography,language,category_tag
+EDU_1301,Django,"Career transition to tech: portfolio building, networking, and landing your first developer job",3,86781,3343,501,379,220,13,INDIA,Hindi,interview-prep
+EDU_1302,Software Engineering,Full-stack development bootcamp: MERN stack with authentication and deployment strategies,1,8000,280,37,25,11,1,INDIA,Hindi,interview-prep
+EDU_1303,DevOps,"DevOps engineering essentials: Docker containers, Kubernetes orchestration, and CI/CD automation",1,68923,2644,416,305,176,17,INDIA,English,interview-prep;comprehensive
+EDU_1304,Programming Fundamentals;C++,"Career transition to tech: portfolio building, networking, and landing your first developer job",2,18918,604,88,59,38,2,INDIA,English,interview-prep
+EDU_1305,Machine Learning;Interview Preparation,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,1,24838,1306,256,216,162,6,INDIA,Hindi,practical
+EDU_1306,Cloud Computing,"DevOps engineering essentials: Docker containers, Kubernetes orchestration, and CI/CD automation",4,300073,9638,1003,611,303,7,INDIA,Hindi,theory
+EDU_1307,Interview Preparation;JavaScript,System design interview masterclass: scalability patterns and distributed systems architecture,5,4978,230,40,34,24,1,INDIA,English,quick-start
+EDU_1308,Coding Practice;C++,"Career transition to tech: portfolio building, networking, and landing your first developer job",1,14525,700,106,95,67,2,INDIA,English,interview-prep
+EDU_1309,Python;Java,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,3,9275,473,72,60,45,4,INDIA,Hindi,hands-on
+EDU_1310,MongoDB;PostgreSQL,"Career transition to tech: portfolio building, networking, and landing your first developer job",3,19117,948,166,126,81,7,INDIA,Hindi,beginner-friendly
+EDU_1311,Data Science;C++,"Data analysis with Python: exploratory data analysis, visualization with matplotlib and seaborn",7,35526,1064,157,126,66,5,INDIA,Hindi,quick-start;step-by-step
+EDU_1312,Statistics;Django,"Software engineering best practices: clean code, testing, and agile development methodologies",5,138503,5538,480,349,223,17,INDIA,English,quick-start;step-by-step
+EDU_1313,DevOps,"DevOps engineering essentials: Docker containers, Kubernetes orchestration, and CI/CD automation",3,70757,2318,443,288,172,14,INDIA,English,practical
+EDU_1314,Artificial Intelligence,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,4,53781,1903,145,100,58,3,INDIA,Hindi,comprehensive
+EDU_1315,C++,"Software engineering best practices: clean code, testing, and agile development methodologies",3,72220,3184,409,308,158,11,INDIA,English,quick-start
+EDU_1316,SQL,"Database design fundamentals: normalization, indexing, and performance optimization strategies",4,14492,515,66,49,26,2,INDIA,Hindi,beginner-friendly
+EDU_1317,Flask;SQL,Complete Python programming masterclass: from basics to advanced projects including web scraping and automation,7,41383,733,106,86,56,4,INDIA,Telugu,theory;interview-prep
+EDU_1318,System Design;Software Engineering,"DevOps engineering essentials: Docker containers, Kubernetes orchestration, and CI/CD automation",4,9300,434,62,47,21,1,INDIA,English,career-guidance;theory
+EDU_1319,Database Management,"Career transition to tech: portfolio building, networking, and landing your first developer job",4,154239,3931,682,463,257,18,INDIA,English,comprehensive;tutorial
+EDU_1320,Frontend Development;Backend Development,Frontend development with React and Redux: building scalable web applications with modern practices,3,139725,3258,380,261,103,10,INDIA,Telugu,interview-prep;step-by-step
+EDU_1321,Web Development,Web development portfolio: 10 projects to showcase your skills and impress employers,2,23738,753,108,85,51,1,INDIA,Hindi,project-based
+EDU_1322,System Design,System design interview masterclass: scalability patterns and distributed systems architecture,4,9322,285,45,31,17,0,INDIA,English,advanced
+EDU_1323,Coding Practice,Web development portfolio: 10 projects to showcase your skills and impress employers,6,8747,326,36,25,10,0,INDIA,Telugu,quick-start
+EDU_1324,Machine Learning;Career Guidance,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,2,15662,1010,244,219,145,9,INDIA,English,theory
+EDU_1325,Programming Fundamentals,"Career transition to tech: portfolio building, networking, and landing your first developer job",2,21192,778,73,48,33,2,INDIA,English,beginner-friendly;advanced
+EDU_1326,System Design,"DevOps engineering essentials: Docker containers, Kubernetes orchestration, and CI/CD automation",5,48206,1327,226,187,109,2,INDIA,English,comprehensive
+EDU_1327,Backend Development,System design interview masterclass: scalability patterns and distributed systems architecture,5,8926,282,31,18,8,0,INDIA,English,comprehensive
+EDU_1328,Data Science;System Design,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,4,15954,555,88,70,48,4,INDIA,Telugu,practical;step-by-step
+EDU_1329,Cloud Computing,System design interview masterclass: scalability patterns and distributed systems architecture,2,1938,80,8,5,3,0,INDIA,English,quick-start;project-based
+EDU_1330,Web Development,Web development portfolio: 10 projects to showcase your skills and impress employers,2,16797,449,56,37,18,1,INDIA,Telugu,theory
+EDU_1331,Database Management;MongoDB,Web development portfolio: 10 projects to showcase your skills and impress employers,3,6421,195,34,21,11,0,INDIA,English,quick-start;tutorial
+EDU_1332,DevOps,System design interview masterclass: scalability patterns and distributed systems architecture,2,69447,2952,246,201,118,11,INDIA,Hindi,hands-on
+EDU_1333,React,React Native mobile development: cross-platform apps with navigation and state management,1,8507,598,149,134,100,9,INDIA,English,hands-on;theory
+EDU_1334,Database Management,"Software engineering best practices: clean code, testing, and agile development methodologies",4,14028,498,64,57,42,1,INDIA,English,project-based;interview-prep
+EDU_1335,Data Structures,Web development portfolio: 10 projects to showcase your skills and impress employers,2,122699,3235,513,367,201,8,INDIA,Telugu,interview-prep;project-based
+EDU_1336,Statistics,"Career transition to tech: portfolio building, networking, and landing your first developer job",4,8769,283,44,27,15,0,INDIA,English,comprehensive;tutorial
+EDU_1337,Database Management,Web development portfolio: 10 projects to showcase your skills and impress employers,3,32877,1326,234,154,95,10,INDIA,English,step-by-step
+EDU_1338,Flask,"Backend development masterclass: Node.js, Express, MongoDB, and RESTful API design patterns",3,42301,1225,141,87,54,4,INDIA,Telugu,theory;project-based
+EDU_1339,Algorithms,Coding interview bootcamp: problem-solving techniques and whiteboard coding strategies,2,149985,5427,587,446,323,17,INDIA,English,practical;interview-prep
+EDU_1340,Data Structures,Web development portfolio: 10 projects to showcase your skills and impress employers,3,55059,2265,290,218,142,7,INDIA,English,tutorial
+EDU_1341,MongoDB;Software Engineering,Web development portfolio: 10 projects to showcase your skills and impress employers,2,10785,498,79,58,28,1,INDIA,English,beginner-friendly
+EDU_1342,Mobile Development,Frontend development with React and Redux: building scalable web applications with modern practices,1,9919,449,72,45,32,1,INDIA,English,advanced;interview-prep
+EDU_1343,JavaScript;Flask,"JavaScript complete guide: ES6+, async programming, DOM manipulation, and modern frameworks",2,15331,808,182,153,114,2,INDIA,English,interview-prep
+EDU_1344,Java;Career Guidance,"Software engineering best practices: clean code, testing, and agile development methodologies",2,6956,381,89,80,57,5,INDIA,English,beginner-friendly
+EDU_1345,Career Guidance;Flask,"Career transition to tech: portfolio building, networking, and landing your first developer job",4,4229,154,21,17,11,0,INDIA,Telugu,project-based;comprehensive
+EDU_1346,Frontend Development,"JavaScript complete guide: ES6+, async programming, DOM manipulation, and modern frameworks",2,42227,1773,243,183,71,1,INDIA,Hindi,comprehensive;theory
+EDU_1347,Statistics,Web development portfolio: 10 projects to showcase your skills and impress employers,1,38957,1338,275,187,117,5,INDIA,English,advanced
+EDU_1348,React;Coding Practice,React Native mobile development: cross-platform apps with navigation and state management,1,5534,336,84,71,53,6,INDIA,English,advanced;project-based
+EDU_1349,System Design,System design interview masterclass: scalability patterns and distributed systems architecture,3,15168,564,88,61,34,1,INDIA,English,theory;step-by-step
+EDU_1350,Django,"Career transition to tech: portfolio building, networking, and landing your first developer job",3,8074,445,57,38,21,1,INDIA,English,quick-start
+EDU_1351,Web Development;Data Science,Full-stack development bootcamp: MERN stack with authentication and deployment strategies,3,271659,10214,1349,1004,621,55,INDIA,Telugu,step-by-step;tutorial
+EDU_1352,Frontend Development,"JavaScript complete guide: ES6+, async programming, DOM manipulation, and modern frameworks",3,93160,3155,376,250,116,3,INDIA,Telugu,hands-on;quick-start
+EDU_1353,Frontend Development,Frontend development with React and Redux: building scalable web applications with modern practices,5,34367,864,82,49,28,1,INDIA,Hindi,career-guidance
+EDU_1354,React,React Native mobile development: cross-platform apps with navigation and state management,5,138984,5314,977,609,337,17,INDIA,Hindi,career-guidance
+EDU_1355,Analytics;Data Science,"SQL for data analysis: advanced queries, window functions, and database optimization techniques",3,39252,2323,409,368,249,11,INDIA,English,interview-prep
+EDU_1356,Flask;Career Guidance,Complete Python programming masterclass: from basics to advanced projects including web scraping and automation,4,22443,936,158,142,96,9,INDIA,English,career-guidance
+EDU_1357,Frontend Development,Frontend development with React and Redux: building scalable web applications with modern practices,3,24522,1019,100,74,49,3,INDIA,English,advanced
+EDU_1358,React,Full-stack development bootcamp: MERN stack with authentication and deployment strategies,3,17830,978,155,111,68,5,INDIA,Telugu,hands-on
+EDU_1359,C++,"Career transition to tech: portfolio building, networking, and landing your first developer job",1,6482,168,28,20,12,0,INDIA,Telugu,advanced
+EDU_1360,Artificial Intelligence;Frontend Development,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,3,185268,5404,1059,777,480,41,INDIA,English,quick-start
+EDU_1361,PostgreSQL,Web development portfolio: 10 projects to showcase your skills and impress employers,2,11288,787,191,171,123,7,INDIA,English,hands-on
+EDU_1362,C++;Programming Fundamentals,Web development portfolio: 10 projects to showcase your skills and impress employers,1,23440,485,60,39,20,0,INDIA,Telugu,advanced
+EDU_1363,SQL,"SQL for data analysis: advanced queries, window functions, and database optimization techniques",5,11826,411,58,42,25,2,INDIA,Telugu,beginner-friendly
+EDU_1364,Data Structures,"Software engineering best practices: clean code, testing, and agile development methodologies",4,22988,886,106,84,44,3,INDIA,English,tutorial
+EDU_1365,Data Science;PostgreSQL,"Data Science career roadmap 2024: statistics, pandas, machine learning, and real industry projects",4,35087,2107,407,338,250,21,INDIA,English,beginner-friendly
+EDU_1366,PostgreSQL,Web development portfolio: 10 projects to showcase your skills and impress employers,2,9875,579,141,126,94,6,INDIA,English,comprehensive;hands-on
+EDU_1367,Statistics;C++,"Software engineering best practices: clean code, testing, and agile development methodologies",2,5463,223,28,18,11,0,INDIA,Telugu,career-guidance;beginner-friendly
+EDU_1368,Frontend Development,"JavaScript complete guide: ES6+, async programming, DOM manipulation, and modern frameworks",6,55967,1412,155,71,34,2,INDIA,Telugu,advanced
+EDU_1369,Cloud Computing;Coding Practice,System design interview masterclass: scalability patterns and distributed systems architecture,10,24771,435,32,15,4,0,INDIA,Telugu,career-guidance;beginner-friendly
+EDU_1370,Interview Preparation,System design interview masterclass: scalability patterns and distributed systems architecture,3,50000,2255,435,318,221,22,INDIA,Hindi,hands-on;beginner-friendly
+EDU_1371,Data Science;Statistics,"Data analysis with Python: exploratory data analysis, visualization with matplotlib and seaborn",4,8363,371,54,47,30,1,INDIA,Hindi,quick-start
+EDU_1372,Algorithms,Data structures and algorithms: coding interview preparation with 200+ practice problems,3,81765,1848,288,157,86,10,INDIA,Telugu,quick-start
+EDU_1373,Java,System design interview masterclass: scalability patterns and distributed systems architecture,3,11768,322,62,42,28,2,INDIA,English,quick-start;project-based
+EDU_1374,Analytics,"SQL for data analysis: advanced queries, window functions, and database optimization techniques",5,59027,2074,161,123,69,5,INDIA,Telugu,hands-on
+EDU_1375,MongoDB;Analytics,Web development portfolio: 10 projects to showcase your skills and impress employers,2,48306,1987,182,127,75,3,INDIA,English,tutorial
+EDU_1376,Deep Learning;System Design,Deep learning with PyTorch and TensorFlow: computer vision and NLP projects from scratch,5,62112,2874,359,257,163,3,INDIA,English,hands-on
+EDU_1377,DevOps,"AWS cloud computing: EC2, S3, Lambda, and serverless architecture implementation guide",4,30129,1149,149,101,45,5,INDIA,English,theory;project-based
+EDU_1378,Flask,Full-stack development bootcamp: MERN stack with authentication and deployment strategies,5,115736,4303,534,329,117,11,INDIA,Telugu,tutorial
+EDU_1379,Career Guidance,"Career transition to tech: portfolio building, networking, and landing your first developer job",3,38189,1769,321,279,202,17,INDIA,Hindi,advanced
+EDU_1380,Django,Web development portfolio: 10 projects to showcase your skills and impress employers,1,47687,2343,498,420,289,28,INDIA,English,practical
+EDU_1381,Database Management,"Software engineering best practices: clean code, testing, and agile development methodologies",2,216005,10507,1445,1064,742,79,INDIA,English,quick-start;interview-prep
+EDU_1382,Data Science,"Data Science career roadmap 2024: statistics, pandas, machine learning, and real industry projects",5,150000,7469,1216,1094,820,91,INDIA,English,interview-prep
+EDU_1383,System Design,"Database design fundamentals: normalization, indexing, and performance optimization strategies",2,10448,418,51,30,16,0,INDIA,Hindi,tutorial
+EDU_1384,Java;Algorithms,"Software engineering best practices: clean code, testing, and agile development methodologies",2,14382,565,75,58,29,2,INDIA,English,hands-on
+EDU_1385,Algorithms,Data structures and algorithms: coding interview preparation with 200+ practice problems,7,33164,617,23,14,5,0,INDIA,Telugu,quick-start
+EDU_1386,Flask,Complete Python programming masterclass: from basics to advanced projects including web scraping and automation,3,2170,110,13,10,4,0,INDIA,English,beginner-friendly
+EDU_1387,PostgreSQL;Web Development,Web development portfolio: 10 projects to showcase your skills and impress employers,3,16467,816,141,126,78,5,INDIA,Hindi,beginner-friendly;practical
+EDU_1388,Django,Web development portfolio: 10 projects to showcase your skills and impress employers,3,29086,872,115,66,34,2,INDIA,Telugu,quick-start;tutorial
+EDU_1389,Software Engineering,"Software engineering best practices: clean code, testing, and agile development methodologies",4,37385,1638,168,106,64,3,INDIA,English,tutorial
+EDU_1390,DevOps;Algorithms,System design interview masterclass: scalability patterns and distributed systems architecture,4,69862,2373,384,306,157,17,INDIA,English,hands-on
+EDU_1391,Node.js,"JavaScript complete guide: ES6+, async programming, DOM manipulation, and modern frameworks",3,50000,1453,188,139,93,3,INDIA,English,interview-prep
+EDU_1392,Django,"Career transition to tech: portfolio building, networking, and landing your first developer job",4,7481,222,27,20,10,0,INDIA,English,tutorial
+EDU_1393,React,Frontend development with React and Redux: building scalable web applications with modern practices,4,97006,4982,850,674,505,50,INDIA,English,theory
+EDU_1394,Analytics,"Data Science career roadmap 2024: statistics, pandas, machine learning, and real industry projects",2,81299,2118,252,155,62,3,INDIA,Hindi,quick-start;career-guidance
+EDU_1395,Statistics,"Software engineering best practices: clean code, testing, and agile development methodologies",3,150000,4289,485,326,215,10,INDIA,Hindi,advanced;comprehensive
+EDU_1396,Python,Complete Python programming masterclass: from basics to advanced projects including web scraping and automation,6,100493,4883,664,499,355,24,INDIA,English,advanced;theory
+EDU_1397,MongoDB,"Career transition to tech: portfolio building, networking, and landing your first developer job",4,57119,1898,270,171,90,7,INDIA,English,comprehensive
+EDU_1398,Career Guidance;Web Development,Coding interview bootcamp: problem-solving techniques and whiteboard coding strategies,5,78571,3976,514,462,303,12,INDIA,English,theory;hands-on
+EDU_1399,Node.js,"JavaScript complete guide: ES6+, async programming, DOM manipulation, and modern frameworks",3,11358,453,70,53,35,4,INDIA,English,tutorial
+EDU_1400,Coding Practice;Java,"Software engineering best practices: clean code, testing, and agile development methodologies",10,16728,363,21,14,4,0,INDIA,Telugu,advanced;tutorial
+EDU_1401,Statistics,"Career transition to tech: portfolio building, networking, and landing your first developer job",1,12241,531,62,38,21,2,INDIA,English,project-based
+EDU_1402,Database Management;Programming Fundamentals,"Career transition to tech: portfolio building, networking, and landing your first developer job",4,69339,2514,336,219,155,8,INDIA,Telugu,interview-prep;career-guidance
+EDU_1403,Machine Learning,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,1,8570,501,74,62,46,5,INDIA,Telugu,comprehensive
+EDU_1404,Artificial Intelligence,"Data Science career roadmap 2024: statistics, pandas, machine learning, and real industry projects",5,30417,1204,130,97,46,3,INDIA,English,comprehensive
+EDU_1405,Machine Learning,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,4,50000,2854,391,291,218,11,INDIA,English,interview-prep;advanced
+EDU_1406,React,Frontend development with React and Redux: building scalable web applications with modern practices,1,12408,641,104,84,63,2,INDIA,Hindi,quick-start
+EDU_1407,PostgreSQL,"Career transition to tech: portfolio building, networking, and landing your first developer job",1,92913,4664,735,661,420,17,INDIA,Telugu,project-based
+EDU_1408,Data Structures;Flask,Web development portfolio: 10 projects to showcase your skills and impress employers,2,64823,2458,292,210,100,9,INDIA,Hindi,beginner-friendly
+EDU_1409,Career Guidance,Coding interview bootcamp: problem-solving techniques and whiteboard coding strategies,2,34187,1906,199,157,113,3,INDIA,Hindi,comprehensive
+EDU_1410,Django,"Software engineering best practices: clean code, testing, and agile development methodologies",4,33696,890,128,88,57,2,INDIA,Hindi,beginner-friendly
+EDU_1411,Data Structures,Web development portfolio: 10 projects to showcase your skills and impress employers,4,95790,2985,383,287,119,11,INDIA,Telugu,comprehensive;interview-prep
+EDU_1412,Machine Learning,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,10,67344,1317,148,77,26,3,INDIA,Telugu,practical
+EDU_1413,JavaScript,Frontend development with React and Redux: building scalable web applications with modern practices,3,244542,16575,2935,2641,1853,178,INDIA,English,theory;tutorial
+EDU_1414,C++,Web development portfolio: 10 projects to showcase your skills and impress employers,3,17846,658,46,36,18,0,INDIA,Hindi,comprehensive
+EDU_1415,React,Full-stack development bootcamp: MERN stack with authentication and deployment strategies,5,14300,610,129,101,75,1,INDIA,English,comprehensive
+EDU_1416,DevOps,"DevOps engineering essentials: Docker containers, Kubernetes orchestration, and CI/CD automation",4,50000,1942,316,233,144,3,INDIA,English,theory
+EDU_1417,Deep Learning,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,4,39497,1089,168,114,58,5,INDIA,Telugu,interview-prep;advanced
+EDU_1418,PostgreSQL;Django,"Career transition to tech: portfolio building, networking, and landing your first developer job",3,58809,1995,365,284,195,9,INDIA,Telugu,quick-start
+EDU_1419,Interview Preparation;Algorithms,System design interview masterclass: scalability patterns and distributed systems architecture,3,11135,742,162,138,103,3,INDIA,English,step-by-step;project-based
+EDU_1420,Programming Fundamentals,"Career transition to tech: portfolio building, networking, and landing your first developer job",5,19253,425,42,26,14,1,INDIA,Hindi,beginner-friendly
+EDU_1421,Java;Data Science,System design interview masterclass: scalability patterns and distributed systems architecture,3,61516,3111,678,594,375,11,INDIA,Hindi,practical
+EDU_1422,Cloud Computing;Database Management,"AWS cloud computing: EC2, S3, Lambda, and serverless architecture implementation guide",7,157383,3771,329,238,115,10,INDIA,Hindi,practical
+EDU_1423,Statistics,Web development portfolio: 10 projects to showcase your skills and impress employers,1,66909,2129,254,157,91,8,INDIA,Telugu,career-guidance
+EDU_1424,Coding Practice;Python,Web development portfolio: 10 projects to showcase your skills and impress employers,4,6523,227,33,22,11,0,INDIA,Hindi,quick-start;career-guidance
+EDU_1425,Web Development,Full-stack development bootcamp: MERN stack with authentication and deployment strategies,1,22284,963,133,91,51,2,INDIA,English,hands-on
+EDU_1426,Coding Practice;Java,"Software engineering best practices: clean code, testing, and agile development methodologies",10,6938,84,8,5,1,0,INDIA,English,career-guidance
+EDU_1427,Programming Fundamentals,Web development portfolio: 10 projects to showcase your skills and impress employers,14,19879,346,23,15,6,0,INDIA,English,interview-prep;theory
+EDU_1428,Programming Fundamentals,Web development portfolio: 10 projects to showcase your skills and impress employers,2,13843,523,64,45,25,1,INDIA,English,beginner-friendly
+EDU_1429,System Design;Django,"Database design fundamentals: normalization, indexing, and performance optimization strategies",3,9717,400,60,44,27,1,INDIA,English,comprehensive;tutorial
+EDU_1430,DevOps;Python,System design interview masterclass: scalability patterns and distributed systems architecture,1,33964,2182,492,442,331,28,INDIA,English,beginner-friendly
+EDU_1431,Coding Practice,Web development portfolio: 10 projects to showcase your skills and impress employers,5,3802,134,13,10,4,0,INDIA,Hindi,career-guidance;project-based
+EDU_1432,Data Structures;Node.js,Web development portfolio: 10 projects to showcase your skills and impress employers,4,94545,3072,329,170,91,2,INDIA,Telugu,project-based
+EDU_1433,Mobile Development,React Native mobile development: cross-platform apps with navigation and state management,3,325663,12376,1349,799,441,20,INDIA,Hindi,comprehensive
+EDU_1434,C++,Web development portfolio: 10 projects to showcase your skills and impress employers,1,10573,342,46,26,15,0,INDIA,Hindi,beginner-friendly;project-based
+EDU_1435,PostgreSQL,Web development portfolio: 10 projects to showcase your skills and impress employers,3,305288,14954,2367,1904,1311,66,INDIA,Telugu,theory
+EDU_1436,Database Management,"Software engineering best practices: clean code, testing, and agile development methodologies",4,23958,846,158,137,80,9,INDIA,English,career-guidance
+EDU_1437,Programming Fundamentals,Web development portfolio: 10 projects to showcase your skills and impress employers,3,12243,439,80,67,39,1,INDIA,English,step-by-step
+EDU_1438,Flask,"Backend development masterclass: Node.js, Express, MongoDB, and RESTful API design patterns",5,20651,569,59,39,18,0,INDIA,Telugu,project-based
+EDU_1439,Programming Fundamentals;PostgreSQL,Web development portfolio: 10 projects to showcase your skills and impress employers,6,76969,3522,551,368,254,29,INDIA,English,theory
+EDU_1440,DevOps;Programming Fundamentals,System design interview masterclass: scalability patterns and distributed systems architecture,3,25099,792,98,82,59,3,INDIA,English,beginner-friendly
+EDU_1441,Cloud Computing;Data Science,"DevOps engineering essentials: Docker containers, Kubernetes orchestration, and CI/CD automation",5,33276,1588,205,181,108,11,INDIA,Hindi,beginner-friendly
+EDU_1442,Flask,Complete Python programming masterclass: from basics to advanced projects including web scraping and automation,3,94893,2993,336,260,124,9,INDIA,Hindi,quick-start;step-by-step
+EDU_1443,PostgreSQL;Analytics,"Career transition to tech: portfolio building, networking, and landing your first developer job",3,25000,1492,255,229,171,18,INDIA,English,beginner-friendly;tutorial
+EDU_1444,Java,Data structures and algorithms: coding interview preparation with 200+ practice problems,5,46652,935,47,39,17,1,INDIA,Hindi,tutorial
+EDU_1445,Data Structures;Software Engineering,"Software engineering best practices: clean code, testing, and agile development methodologies",4,50000,2387,388,252,126,9,INDIA,English,interview-prep
+EDU_1446,Artificial Intelligence,Machine learning algorithms deep dive: linear regression to neural networks with Python implementation,4,142045,4894,568,423,203,14,INDIA,English,project-based
+EDU_1447,JavaScript,Frontend development with React and Redux: building scalable web applications with modern practices,10,98335,2197,200,152,73,8,INDIA,Hindi,step-by-step
+EDU_1448,Software Engineering,"Software engineering best practices: clean code, testing, and agile development methodologies",5,33267,521,54,36,11,0,INDIA,Telugu,step-by-step;advanced
+EDU_1449,Statistics,"Career transition to tech: portfolio building, networking, and landing your first developer job",2,180645,6686,769,613,330,22,INDIA,Telugu,hands-on;advanced
+EDU_1450,Software Engineering;Java,System design interview masterclass: scalability patterns and distributed systems architecture,1,15699,600,80,60,36,0,INDIA,Telugu,interview-prep
