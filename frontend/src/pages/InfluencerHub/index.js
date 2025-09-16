@@ -642,48 +642,6 @@ const InfluencerHub = () => {
               </Typography>
             </Box>
           )}
-
-          <Box sx={{ mt: 3, p: 2, backgroundColor: 'grey.50', borderRadius: 1 }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, color: 'primary.main' }}>
-              📊 Output Values:
-            </Typography>
-            <Box component="ul" sx={{ pl: 3, my: 0, '& > li': { mb: 1.5 } }}>
-              {analysisType === 'forecast' && (
-                <li>
-                  <Typography variant="h10">
-                    1. Predicted Leads:
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary" component="span" sx={{ ml: 1 }}>
-                    qualified_leads × fit_score × random_factor(0.9-1.1)
-                  </Typography>
-                </li>
-              )}
-              <li>
-                <Typography variant="h10">
-                  {analysisType === 'forecast' ? '2. Confidence:' : '1. Confidence:'}
-                </Typography> 
-                <Typography variant="body2" color="textSecondary" component="span" sx={{ ml: 1 }}>
-                  Calculates relation between user engagement (clicks), posting stability and semantic fit
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="body2" color="textSecondary" component="span" sx={{ ml: 1 }}>
-                  Based on views_90d: ≥100k=Established, ≥25k=Growing, &lt;25k=Emerging
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="h10">
-                  {analysisType === 'forecast' ? '4. Recommendation:' : '3. Recommendation:'}
-                </Typography> 
-                <Typography variant="body2" color="textSecondary" component="span" sx={{ ml: 1 }}>
-                  {analysisType === 'forecast' 
-                    ? 'BOOK if leads > 100 & confidence > 0.8, else REVIEW if leads > 50, else SKIP'
-                    : 'BOOK if confidence > 0.8, else REVIEW if confidence > 0.6, else SKIP'
-                  }
-                </Typography>
-              </li>
-            </Box>
-          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setInputModalOpen(false)} variant="contained">
