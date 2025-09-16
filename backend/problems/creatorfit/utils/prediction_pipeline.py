@@ -15,12 +15,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 sys.path.append(str(Path(__file__).parent.parent.parent.parent))
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
-# ============================================================================
-# NEW STREAMLINED FORECASTING PIPELINE - ONLY ESSENTIAL PROCESSING
-# ============================================================================
 
 class CreatorFitPredictionPipeline:
-    """Streamlined prediction pipeline - only essential processing for forecasting"""
     
     def __init__(self, model_dir: str = None):
         default_ml_dir = os.path.abspath(
@@ -31,7 +27,6 @@ class CreatorFitPredictionPipeline:
         self.load_model()
     
     def load_model(self):
-        """Load only the trained LinearRegression model"""
         try:
             self.model = joblib.load(self.model_dir / "creatorfit_linear_model.pkl")
             logging.info("LinearRegression model loaded successfully")
@@ -40,7 +35,6 @@ class CreatorFitPredictionPipeline:
             raise
     
     def simple_data_processing(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Minimal data processing - only what's absolutely needed for prediction"""
         
         # 1. Check if we actually have missing values (don't fill unnecessarily)
         missing_values = df.isnull().sum().sum()
@@ -59,21 +53,16 @@ class CreatorFitPredictionPipeline:
             else:
                 views_median = 10000
             
-            # Fill missing numeric values
             df['posting_cadence_days'] = pd.to_numeric(df['posting_cadence_days'], errors='coerce').fillna(posting_median)
             df['views_90d'] = pd.to_numeric(df['views_90d'], errors='coerce').fillna(views_median)
             
-            # Fill missing categorical values
             df['topic'] = df['topic'].fillna('Unknown')
             df['language'] = df['language'].fillna('Unknown')
             df['category_tag'] = df['category_tag'].fillna('Unknown')
         else:
-            print("✅ No missing values - skipping NA handling")
-            # Still ensure numeric types are correct
             df['posting_cadence_days'] = pd.to_numeric(df['posting_cadence_days'], errors='coerce')
             df['views_90d'] = pd.to_numeric(df['views_90d'], errors='coerce')
         
-        # 4. Simple label encoding for categorical features
         from sklearn.preprocessing import LabelEncoder
         
         for col in ['topic', 'language', 'category_tag']:
@@ -81,7 +70,6 @@ class CreatorFitPredictionPipeline:
                 le = LabelEncoder()
                 df[col] = le.fit_transform(df[col].astype(str))
         
-        # 5. Simple MinMax scaling for numeric features
         from sklearn.preprocessing import MinMaxScaler
         
         numeric_cols = ['posting_cadence_days', 'views_90d']
@@ -90,31 +78,54 @@ class CreatorFitPredictionPipeline:
                 scaler = MinMaxScaler()
                 df[col] = scaler.fit_transform(df[[col]])
         
-        # 6. Create required text features (minimal versions to match training)
         if 'recent_video_transcript' not in df.columns:
             df['recent_video_transcript'] = "Default content description"
         
-        # Simple text feature extraction (match training features)
-        df['educational_transcript_score'] = 0.0  # Default
+        educational_keywords = [
+            "tutorial", "learn", "course", "programming", "coding", 
+            "development", "algorithm", "data", "analysis", "project",
+            "training", "education", "teach", "explain", "guide"
+        ]
+        
+        def calculate_educational_score(text):
+            if pd.isna(text) or not text:
+                return 0.0
+            text_lower = str(text).lower()
+            matches = sum(1 for keyword in educational_keywords if keyword in text_lower)
+            return min(matches / len(educational_keywords), 1.0)  # Cap at 1.0
+        
+        df['educational_transcript_score'] = df['recent_video_transcript'].apply(calculate_educational_score)
+        
         df['transcript_length'] = df['recent_video_transcript'].str.len().fillna(20)
         df['topic_count'] = df['topic'].astype(str).str.count(';') + 1  # Count topics
-        df['edtech_topic_depth'] = 1.0  # Default depth
+        
+        edtech_topics = [
+            "Python", "Data Science", "Machine Learning", "JavaScript", "React",
+            "Node.js", "SQL", "Frontend Development", "Backend Development",
+            "Web Development", "Mobile Development", "DevOps", "Cloud Computing",
+            "Artificial Intelligence", "Deep Learning", "Analytics", "Database",
+            "Career Guidance", "Interview Preparation", "System Design", "Django",
+            "Programming Fundamentals", "C++", "Statistics", "Data Structures",
+        ]
+        
+        def calculate_edtech_depth(topic_text):
+            if pd.isna(topic_text) or not topic_text:
+                return 0
+            topic_lower = str(topic_text).lower()
+            return sum(1 for topic in edtech_topics if topic.lower() in topic_lower)
+        
+        df['edtech_topic_depth'] = df['topic'].apply(calculate_edtech_depth)
+        print(f"📊 EdTech depth - avg: {df['edtech_topic_depth'].mean():.1f}")
         
         # Scale these to match training range [0, 1]
         df['transcript_length'] = df['transcript_length'] / 100  # Normalize
         df['topic_count'] = df['topic_count'] / 10  # Normalize
         
-        # 6. Create basic fit_score (simple constant for now)
         df['fit_score'] = 0.5
         
         return df
     
     def process_csv_file(self, csv_path: str, program_type: str = "data_science") -> Dict[str, Any]:
-        """
-        NEW STREAMLINED FORECASTING - Only essential processing
-        Input: CSV file path
-        Output: Predictions with original data preserved for display
-        """
         try:
             logging.info(f"Starting streamlined forecasting for {csv_path}")
             
@@ -127,7 +138,6 @@ class CreatorFitPredictionPipeline:
             # 2. Simple data processing (only essentials)
             df_processed = self.simple_data_processing(df_raw.copy())
             
-            # 3. Prepare features for model (match training feature order)
             feature_columns = [
                 'fit_score',
                 'posting_cadence_days', 
@@ -193,14 +203,12 @@ class CreatorFitPredictionPipeline:
                 }
                 results.append(result)
             
-            # 6. Sort by predicted leads (highest first)
             results.sort(key=lambda x: x['predicted_qualified_leads'], reverse=True)
             
             # Update ranks after sorting
             for i, result in enumerate(results):
                 result['rank'] = i + 1
             
-            # 7. Create output
             output = {
                 'success': True,
                 'program_type': program_type,
