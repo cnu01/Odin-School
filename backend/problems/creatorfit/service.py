@@ -209,8 +209,6 @@ class CreatorFitService:
             program_text = ODIN_SCHOOL_PROGRAMS.get(program_type, ODIN_SCHOOL_PROGRAMS["data_science"])
             
             fit_scores = compute_fit_scores(df, program_type, program_text)
-
-            print(f"DEBUG: Fit scores: {fit_scores}")
             
             df['fit_score'] = fit_scores
             

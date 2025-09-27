@@ -178,7 +178,6 @@ def _apply_minmax_scaling(df: pd.DataFrame) -> pd.DataFrame:
         'views_90d', 
         'clicks', 
         'leads', 
-        'qualified_leads',
         'educational_transcript_score',
         'transcript_length',
         'topic_count',

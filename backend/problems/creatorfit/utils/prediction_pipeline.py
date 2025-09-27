@@ -51,11 +51,9 @@ class CreatorFitPredictionPipeline:
             df['language'] = df['language'].fillna('Unknown')
             df['category_tag'] = df['category_tag'].fillna('Unknown')
         else:
-            print("✅ No missing values - ensuring correct data types")
             df['posting_cadence_days'] = pd.to_numeric(df['posting_cadence_days'], errors='coerce')
             df['views_90d'] = pd.to_numeric(df['views_90d'], errors='coerce')
         
-        # 2. CRITICAL FIX: Add missing columns that training expects
         for col in ['clicks', 'leads', 'qualified_leads']:
             if col not in df.columns:
                 df[col] = 0  # Default values for missing training columns
@@ -119,7 +117,7 @@ class CreatorFitPredictionPipeline:
         from sklearn.preprocessing import MinMaxScaler
         
         cols_to_scale = [
-            'posting_cadence_days', 'views_90d', 'clicks', 'leads', 'qualified_leads',
+            'posting_cadence_days', 'views_90d', 'clicks', 'leads', 
             'educational_transcript_score', 'transcript_length', 'topic_count', 
             'edtech_topic_depth', 'topic', 'language', 'category_tag'
         ]
