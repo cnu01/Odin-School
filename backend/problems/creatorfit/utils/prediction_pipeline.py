@@ -181,12 +181,7 @@ class CreatorFitPredictionPipeline:
             for i in range(len(df_original)):
                 raw_pred = predictions[i]
                 
-                # Handle predictions (convert to realistic leads count)
-                if raw_pred < 0:
-                    predicted_leads = 1  # Minimum
-                else:
-                    # Scale small predictions to realistic range
-                    predicted_leads = max(1, int(raw_pred * df_original.iloc[i]['views_90d'] / 1000))
+                predicted_leads = max(1, int(round(raw_pred)))
                 
                 # Create creator tier based on views
                 views = df_original.iloc[i]['views_90d']
@@ -211,7 +206,7 @@ class CreatorFitPredictionPipeline:
                     'views_90d': int(df_original.iloc[i]['views_90d']),
                     'creator_tier': tier,
                     'posting_cadence_days': int(df_original.iloc[i].get('posting_cadence_days', 7)),
-                    'recommendation': 'BOOK' if predicted_leads >= 10 else 'REVIEW' if predicted_leads >= 5 else 'SKIP'
+                    'recommendation': 'BOOK' if predicted_leads >= 1000 else 'REVIEW' if predicted_leads >= 700 else 'SKIP'
                 }
                 results.append(result)
             
